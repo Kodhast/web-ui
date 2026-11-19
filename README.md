@@ -135,7 +135,7 @@ npm run jamfor -- ../android-ui/ui-components/src/test/screenshots   # Android b
 Galleriet: öppna `gallery/index.html` i en webbläsare (`?tema=ljust` eller `?tema=mork`).
 
 **En ny version:** höj `version` i `package.json` och lägg en rad i versionshistoriken i PR:en; efter sammanslagningen
-taggas sammanslagningscommiten på `main` med `v<version>`.
+taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`tagga.yml`, bara för hand).
 
 **Nya tal i android-ui:** kopiera `tokens.json` från android-ui:s `main`, kör `npm run tokens` och
 `npm run skarmdumpar`, och höj versionen.
