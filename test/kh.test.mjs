@@ -136,6 +136,40 @@ test('knapp: höjd, pillform, varianter, inaktiv, arbetar och nedtryckt med djup
   assert.equal(pressed.shadow, 'none', 'skuggan sjunker bort nedtryckt');
 });
 
+test('ikonknapp: 48 i tryckyta och form, ikon 24; tonad i secondary-container eller tonens färg; inaktiv grå; krymper till 0,92 med djup', async () => {
+  await mount(`<style>.ton-prov { --kh-tone-container: var(--kh-tertiary); --kh-tone-content: var(--kh-on-tertiary); }</style>
+    <div style="color: var(--kh-on-surface)">
+      <button class="kh-icon-btn kh-icon-btn--tonal" id="a" aria-label="Tillbaka"><svg><use href="#i-arrow-back"/></svg></button>
+      <button class="kh-icon-btn" id="b" aria-label="Arkivera"><svg><use href="#i-archive"/></svg></button>
+      <button class="kh-icon-btn kh-icon-btn--tonal" id="c" aria-label="Lägg till" disabled><svg><use href="#i-add"/></svg></button>
+      <button class="kh-icon-btn kh-icon-btn--tonal ton-prov" id="d" aria-label="Tonad"><svg><use href="#i-add"/></svg></button>
+      <button class="kh-icon-btn ton-prov" id="e" aria-label="Tonad ikon"><svg><use href="#i-add"/></svg></button>
+    </div>`, { depth: true });
+  const a = await box('#a');
+  assert.deepEqual([a.width, a.height], [48, 48]);
+  assert.equal((await box('#a svg')).width, tokens.iconSize.standard);
+  assert.equal(await style('#a', 'border-radius'), '9999px');
+  assert.equal(await style('#a', 'background-color'), await themeColor('--kh-secondary-container'));
+  assert.equal(await style('#a', 'color'), await themeColor('--kh-on-secondary-container'));
+  assert.equal(await style('#b', 'background-color'), 'rgba(0, 0, 0, 0)', 'den vanliga har ingen platta');
+  assert.equal(await style('#b', 'color'), await themeColor('--kh-on-surface'), 'och ikonen i omgivande färg');
+  assert.notEqual(await style('#c', 'background-color'), await themeColor('--kh-secondary-container'), 'inaktiv är grå');
+  assert.equal(await style('#c', 'box-shadow'), 'none', 'en inaktiv lyfts inte');
+  assert.equal(await style('#d', 'background-color'), await themeColor('--kh-tertiary'));
+  assert.equal(await style('#d', 'color'), await themeColor('--kh-on-tertiary'));
+  assert.equal(await style('#e', 'background-color'), 'rgba(0, 0, 0, 0)');
+  assert.equal(await style('#e', 'color'), await themeColor('--kh-on-tertiary'), 'tonen färgar bara ikonen på den vanliga');
+  assert.match(await style('#a', 'box-shadow'), /inset/, 'den tonade lyfts med ljuskant');
+  assert.equal(await style('#b', 'box-shadow'), 'none', 'den vanliga lyfts inte');
+  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+  await page.mouse.down();
+  await settle();
+  const pressed = await style('#a', 'transform');
+  await page.mouse.up();
+  const scale = Number(pressed.match(/^matrix\(([^,]+),/)[1]);
+  assert.ok(Math.abs(scale - (1 - (1 - tokens.depth.pressedScale) * 8 / 3)) < 1e-6, `nedtryckt ${pressed}`);
+});
+
 test('utan kh-depth är knappar och kort platta', async () => {
   await mount('<button class="kh-btn" id="a">Spara</button><div class="kh-card" id="b">x</div>');
   assert.equal(await style('#a', 'box-shadow'), 'none');

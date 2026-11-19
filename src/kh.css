@@ -98,13 +98,13 @@
 
 /* Tryckläget (Material 3:s state layer): ett lager i innehållets färg. */
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable) {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable, .kh-icon-btn) {
   position: relative;
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable)::after {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable, .kh-icon-btn)::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -116,11 +116,11 @@
   z-index: -1;
 }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item):not(:disabled):hover::after { opacity: 0.08; }
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-icon-btn):not(:disabled):hover::after { opacity: 0.08; }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item):not(:disabled):active::after { opacity: 0.1; }
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-icon-btn):not(:disabled):active::after { opacity: 0.1; }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable):focus-visible {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable, .kh-icon-btn):focus-visible {
   outline: 2px solid var(--kh-primary);
   outline-offset: 2px;
 }
@@ -713,6 +713,39 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   background: var(--kh-online, var(--kh-primary));
 }
 
+/* ---------- Ikonknapp (AppIconButton) ---------- */
+
+/* Den enda ikonknappen: 48 i tryckyta och form, en ikon på 24 och alltid aria-label. Plain (standard) är bara
+   ikonen i omgivande färg; --tonal en platta i secondary-container. En ton (appens tonklass) färgar plattan
+   och ikonen för den tonade, ikonen för den vanliga. */
+.kh-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 48px;
+  block-size: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: transparent;
+  color: var(--kh-tone-content, currentColor);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-icon-btn > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); fill: currentColor; }
+.kh-icon-btn--tonal {
+  background-color: var(--kh-tone-container, var(--kh-secondary-container));
+  color: var(--kh-tone-content, var(--kh-on-secondary-container));
+}
+.kh-icon-btn:is(:disabled, [aria-disabled='true']) {
+  color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent);
+  cursor: default;
+}
+.kh-icon-btn--tonal:is(:disabled, [aria-disabled='true']) { background-color: color-mix(in srgb, var(--kh-on-surface) 10%, transparent); }
+
 /* ---------- Skuggor utan djup (Material 3:s nivåer), i scrimfärgen ---------- */
 
 :root {
@@ -1083,6 +1116,16 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 }
 .kh-depth :is(.kh-chip, .kh-segmented > *):active { background-image: none; }
 
+/* Ikonknappen krymper mer än en bred knapp för att trycket ska synas (0,97 → 0,92); den tonade lyfts som ett valt chip. */
+.kh-depth .kh-icon-btn:not(:disabled, [aria-disabled='true']):active {
+  transform: scale(calc(1 - (1 - var(--kh-depth-pressed-scale)) * 8 / 3));
+}
+.kh-depth .kh-icon-btn--tonal:not(:disabled, [aria-disabled='true']) {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-selected);
+}
+.kh-depth .kh-icon-btn--tonal:not(:disabled, [aria-disabled='true']):active { background-image: none; box-shadow: none; }
+
 /* Kort: mjuk skugga och hårfin kant – inte ett tonat kort. En app med egen kontur (--kh-card-border)
    sätter --kh-depth-card-edge: transparent, som AppCardStyle.border går före kanten. */
 .kh-depth .kh-card:not(.kh-card--tone) {
@@ -1134,6 +1177,6 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 .kh-depth .kh-menu { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge), var(--kh-elevation-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, kh-header) { transition: none; }
+  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
   kh-dots[bouncing] > i { animation: none; }
 }
