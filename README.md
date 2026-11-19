@@ -22,6 +22,9 @@ Roborazzi-bilderna i `android-ui/ui-components/src/test/screenshots`.
 
 Inga beroenden och inget byggsteg: två CSS-filer.
 
+**Webbläsare:** Chrome på dator och Chrome på Android (familjens telefoner är Galaxy S21 Ultra och S10).
+Andra webbläsare provas inte.
+
 ## Använda
 
 **Utan byggsteg (Husjakt):** lägg en låst kopia av `src/tokens.css` och `src/kh.css` i appen
@@ -96,7 +99,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 Skillnader mot Android som är kända:
 
 - **Text:** Compose trimmar radavståndet över första och under sista raden; här görs det med `text-box`
-  (Chrome 133, Safari 18.2). Firefox ger lite mer luft.
+  (Chrome 133 och senare).
 - **Skuggor:** Compose-skuggorna är omräknade till `box-shadow` (oskärpa = radien × 1,15 + 1). Jämförda
   med ögat, inte pixel för pixel.
 - **En knapp som arbetar** har ännu inga prickar; de kommer med prickarna i W3.

@@ -72,7 +72,7 @@
 
 /*
  * Compose trimmar radavståndet ovanför första och under sista raden (LineHeightStyle Trim.Both); text-box gör
- * samma sak här, så att rader och kort får Androids höjd. Webbläsare utan text-box får lite mer luft.
+ * samma sak här, så att rader och kort får Androids höjd (Chrome 133 och senare).
  */
 :is(.kh-text-screen-title, .kh-text-big-number, .kh-text-headline, .kh-text-section-title, .kh-text-quantity,
     .kh-text-item-title, .kh-text-item-subtitle, .kh-text-body, .kh-text-caption,
