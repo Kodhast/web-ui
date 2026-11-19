@@ -266,3 +266,211 @@ test('textstilarna kommer ur appens variabler', async () => {
   assert.equal(await style('#b', 'font-size'), '16px');
   assert.match(await style('#b', 'font-family'), /Roboto Galleri/);
 });
+
+/* ---------- Beteendet (kh.js) ---------- */
+
+/** En färg som [r, g, b] 0–255, oavsett om webbläsaren skriver rgb() eller color(srgb …) (color-mix). */
+const rgb = (value) => {
+  const srgb = value.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)/);
+  if (srgb) return srgb.slice(1, 4).map((v) => Math.round(Number(v) * 255));
+  return value.match(/\d+(\.\d+)?/g).slice(0, 3).map((v) => Math.round(Number(v)));
+};
+
+// Två bildrutor: rullningshändelsen och kh-headers uppdatering har hunnit köras.
+const frames = () => page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+const scrollTo = async (selector, top) => {
+  await page.evaluate(({ selector, top }) => { document.querySelector(selector).scrollTop = top; }, { selector, top });
+  await frames();
+};
+const HEADER = `
+  <div id="r" style="block-size: 320px; overflow-y: auto">
+    <kh-header id="h">
+      <svg class="kh-header__icon" id="icon"></svg>
+      <span class="kh-header__name" id="name">Husjakt</span>
+      <div class="kh-header__trailing"><button class="kh-avatar" id="konto"><span class="kh-avatar__circle">MK</span></button></div>
+      <h1 class="kh-header__title" id="title"><kh-dots></kh-dots><span>Objekt</span></h1>
+      <p class="kh-header__subtitle" id="sub">12 hus</p>
+    </kh-header>
+    <div id="innehall" style="block-size: 900px"></div>
+  </div>`;
+
+test('prickar: två prickar; bouncing hoppar med 900 ms period och den andra 150 ms efter; stilla utan animeringar', async () => {
+  await mount('<kh-dots id="a"></kh-dots><kh-dots bouncing id="b"></kh-dots>');
+  assert.equal(await page.locator('#a > i').count(), 2);
+  assert.equal(await style('#a', 'width'), '48px');
+  const timing = () => page.evaluate(() => document.getElementById('b').getAnimations({ subtree: true }).map((a) => [a.effect.getTiming().duration, a.effect.getTiming().delay]));
+  assert.deepEqual(await timing(), [[900, 0], [900, 150]]);
+  assert.equal((await page.evaluate(() => document.getElementById('a').getAnimations({ subtree: true }).length)), 0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  try {
+    assert.deepEqual(await timing(), []);
+  } finally {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+  }
+});
+
+test('sidhuvud: 144 i vila, krymper med fingret till 64 utan att innehållet hoppar, upphöjt först när innehåll ligger under', async () => {
+  await mount(HEADER, { depth: true });
+  await frames();
+  assert.equal((await box('#h')).height, tokens.header.expanded);
+  const contentAt = async () => (await box('#innehall')).top - (await box('#r')).top;
+  assert.equal(await contentAt(), tokens.header.expanded);
+  assert.deepEqual(rgb(await style('#h', 'background-color')), rgb(await themeColor('--kh-background')));
+
+  await scrollTo('#r', 40);
+  assert.equal((await box('#h')).height, tokens.header.expanded - 40);
+  assert.equal(await contentAt(), tokens.header.expanded - 40, 'innehållet följer fingret');
+  assert.equal(await page.evaluate(() => document.getElementById('h').collapsedFraction), 0.5);
+  assert.equal(await style('#name', 'opacity'), '0', 'appnamnet har tonat bort på första 40 %');
+  assert.equal(await page.evaluate(() => document.getElementById('h').hasAttribute('data-raised')), false);
+
+  await scrollTo('#r', tokens.header.expanded - tokens.header.collapsed);
+  assert.equal((await box('#h')).height, tokens.header.collapsed);
+  assert.equal(await page.evaluate(() => document.getElementById('h').hasAttribute('data-raised')), false, 'ihopfällt men inget under än');
+  assert.equal(await style('#title', 'font-size'), '18px', 'rubriken i section-title');
+  assert.equal((await box('#icon')).width, tokens.header.collapsedAppIcon);
+  // Rubriken bredvid ikonen, mitt i den smala raden.
+  const title = await box('#title');
+  const header = await box('#h');
+  assert.equal(title.left - header.left, tokens.spacing.l + tokens.header.collapsedAppIcon + tokens.spacing.m);
+  assert.ok(Math.abs(title.top + title.height / 2 - (header.top + tokens.header.collapsed / 2)) <= 1);
+
+  await scrollTo('#r', 200);
+  await page.waitForTimeout(250);
+  assert.equal((await box('#h')).height, tokens.header.collapsed);
+  assert.equal(await page.evaluate(() => document.getElementById('h').hasAttribute('data-raised')), true);
+  assert.deepEqual(rgb(await style('#h', 'background-color')), rgb(await themeColor('--kh-card')));
+  assert.match(await style('#h', 'box-shadow'), /15px/);
+
+  await scrollTo('#r', 0);
+  await page.waitForTimeout(250);
+  assert.equal((await box('#h')).height, tokens.header.expanded, 'fälls ut högst upp');
+  assert.deepEqual(rgb(await style('#h', 'background-color')), rgb(await themeColor('--kh-background')));
+});
+
+test('sidhuvud utan djup: en hårfin linje i stället för skuggan', async () => {
+  await mount(HEADER);
+  await scrollTo('#r', 200);
+  await page.waitForTimeout(250);
+  assert.match(await style('#h', 'box-shadow'), /0px -1px 0px 0px inset/);
+});
+
+const TOOLBAR = `
+  <kh-toolbar id="t">
+    <div class="kh-toolbar__tabs">
+      <button class="kh-toolbar__tab" id="t0" aria-selected="true"><svg></svg><span class="kh-toolbar__label">Objekt</span></button>
+      <button class="kh-toolbar__tab" id="t1" aria-selected="false"><svg></svg><span class="kh-toolbar__label">Karta</span><span class="kh-toolbar__badge">3</span></button>
+    </div>
+    <button class="kh-toolbar__action" id="plus" popovertarget="m"><svg></svg></button>
+  </kh-toolbar>
+  <div class="kh-menu" id="m" popover><button class="kh-menu__item" id="val">Klistra in</button></div>`;
+
+test('flikrad: vald flik visar namnet i primärfärgen, ett tryck byter flik och meddelar kh-select', async () => {
+  await mount(TOOLBAR);
+  await page.waitForTimeout(350);
+  assert.equal(await style('#t0', 'background-color'), await themeColor('--kh-primary'));
+  assert.ok((await box('#t0 .kh-toolbar__label')).width > 0);
+  assert.equal((await box('#t1 .kh-toolbar__label')).width, 0);
+  assert.equal((await box('#t1')).height, 48);
+  assert.equal((await box('#t .kh-toolbar__tabs')).height, 64);
+  assert.equal(await style('#t1 .kh-toolbar__badge', 'display'), 'grid');
+  const selected = page.evaluate(() => new Promise((done) => document.getElementById('t').addEventListener('kh-select', (e) => done(e.detail.index), { once: true })));
+  await page.click('#t1');
+  assert.equal(await selected, 1);
+  await page.waitForTimeout(350);
+  assert.equal(await page.getAttribute('#t0', 'aria-selected'), 'false');
+  assert.equal(await page.getAttribute('#t1', 'aria-selected'), 'true');
+  assert.equal((await box('#t0 .kh-toolbar__label')).width, 0);
+  assert.equal(await style('#t1 .kh-toolbar__badge', 'display'), 'none', 'märket bara på ovald flik');
+});
+
+test('flikrad: huvudknappen öppnar menyn ovanför sig, och ett val stänger den', async () => {
+  // Plats ovanför, som när raden står längst ned på skärmen (annars fälls menyn under knappen).
+  await mount(`<div style="block-size: 400px"></div>${TOOLBAR}`);
+  const plus = await box('#plus');
+  assert.equal(plus.width, 56);
+  assert.equal(await style('#plus', 'background-color'), await themeColor('--kh-secondary'));
+  await page.click('#plus');
+  assert.equal(await page.evaluate(() => document.getElementById('m').matches(':popover-open')), true);
+  await page.waitForFunction(() => document.getElementById('plus').getAttribute('aria-expanded') === 'true');
+  const menu = await box('#m');
+  assert.ok(Math.abs(menu.bottom - plus.top) <= 1, `menyn står på knappen (${menu.bottom} mot ${plus.top})`);
+  assert.ok(Math.abs(menu.right - plus.right) <= 1, 'menyn linjerar med knappens ytterkant');
+  assert.equal(await style('#m', 'border-radius'), `${tokens.radius.menu}px`);
+  await page.click('#val');
+  assert.equal(await page.evaluate(() => document.getElementById('m').matches(':popover-open')), false);
+  await page.waitForFunction(() => document.getElementById('plus').getAttribute('aria-expanded') === 'false');
+});
+
+test('segmentval: ett val i taget, med tryck och pilar, och kh-select', async () => {
+  await mount(`<kh-segmented id="s" role="radiogroup">
+    <button role="radio" aria-checked="true" id="s0">Ljust</button><button role="radio" aria-checked="false" id="s1">Mörkt</button><button role="radio" aria-checked="false" id="s2">System</button>
+  </kh-segmented>`);
+  assert.equal(await page.evaluate(() => document.getElementById('s').classList.contains('kh-segmented')), true);
+  const events = page.evaluate(() => new Promise((done) => {
+    const seen = [];
+    document.getElementById('s').addEventListener('kh-select', (e) => { seen.push(e.detail.value); if (seen.length === 2) done(seen); });
+  }));
+  await page.click('#s1');
+  await page.keyboard.press('ArrowRight');
+  assert.deepEqual(await events, ['Mörkt', 'System']);
+  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#s > *')].map((b) => b.getAttribute('aria-checked'))), ['false', 'false', 'true']);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 's2');
+});
+
+test('dra ned: efter tröskeln meddelas kh-refresh och prickarna står kvar tills uppdateringen är klar; före tröskeln inget', async () => {
+  const touchPage = await browser.newPage({ viewport: { width: 440, height: 900 }, hasTouch: true });
+  try {
+    await touchPage.clock.install();
+    await touchPage.goto(`${gallery}?tema=ljust`);
+    await touchPage.evaluate(() => {
+      document.body.innerHTML = '<div id="r" style="block-size: 400px; overflow-y: auto"><kh-refresh id="k"><div style="block-size: 1200px"></div></kh-refresh></div>';
+      window.refreshes = 0;
+      // Galleriets eget prov svarar på kh-refresh; här svarar provet självt.
+      document.getElementById('r').addEventListener('kh-refresh', (e) => { e.stopPropagation(); window.refreshes++; });
+    });
+    const pull = (distance) => touchPage.evaluate((distance) => {
+      const target = document.getElementById('k');
+      const touch = (y) => new Touch({ identifier: 1, target, clientX: 200, clientY: y });
+      const fire = (type, y) => target.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true, touches: type === 'touchend' ? [] : [touch(y)], changedTouches: [touch(y)]
+      }));
+      fire('touchstart', 100);
+      for (let y = 100; y <= 100 + distance; y += 20) fire('touchmove', y);
+      fire('touchend', 100 + distance);
+    }, distance);
+    const state = () => touchPage.evaluate(() => document.getElementById('k').dataset.state ?? null);
+    const visible = () => touchPage.evaluate(() => getComputedStyle(document.querySelector('#k > .kh-refresh__indicator')).visibility);
+
+    // 100 px finger = 50 i dragning: under tröskeln 80.
+    await pull(100);
+    assert.equal(await touchPage.evaluate(() => window.refreshes), 0);
+    assert.equal(await state(), null);
+
+    await pull(200);
+    assert.equal(await touchPage.evaluate(() => window.refreshes), 1);
+    assert.equal(await state(), 'refreshing');
+    assert.equal(await visible(), 'visible');
+    await touchPage.evaluate(() => document.getElementById('k').setAttribute('refreshing', ''));
+    await touchPage.clock.fastForward(6000);
+    assert.equal(await state(), 'refreshing', 'står kvar så länge appen uppdaterar');
+    await touchPage.evaluate(() => document.getElementById('k').removeAttribute('refreshing'));
+    assert.equal(await state(), null);
+
+    // En dragning som appen aldrig svarar på släpps efter 5 s.
+    await pull(200);
+    await touchPage.clock.fastForward(5100);
+    assert.equal(await state(), null);
+
+    // En uppdatering appen startat själv visar inga prickar här.
+    await touchPage.evaluate(() => document.getElementById('k').setAttribute('refreshing', ''));
+    assert.equal(await state(), null);
+
+    // Rullad en bit ned: ingen dragning.
+    await touchPage.evaluate(() => { document.getElementById('k').removeAttribute('refreshing'); document.getElementById('r').scrollTop = 50; });
+    await pull(200);
+    assert.equal(await touchPage.evaluate(() => window.refreshes), 2);
+  } finally {
+    await touchPage.close();
+  }
+});

@@ -43,8 +43,11 @@ for (const file of readdirSync(join(root, 'screenshots')).filter((f) => f.endsWi
     const same = (y) => [0, 1, 2].every((c) => Math.abs(column[y * 4 + c] - column[4 + c]) < 3);
     let end = img.naturalHeight;
     for (let y = 1; y < img.naturalHeight; y++) if (!same(y)) { end = y; break; }
-    if (end < img.naturalHeight) {
-      img.parentElement.style.height = `${(end / img.naturalWidth) * 400 + 20}px`;
+    // Aldrig kortare än webbens bild: ett sidhuvud slutar i en annan färg än innehållet under.
+    const web = document.images[1];
+    const height = Math.max(end / img.naturalWidth, web.naturalHeight / web.naturalWidth) * 400;
+    if (height < (img.naturalHeight / img.naturalWidth) * 400) {
+      img.parentElement.style.height = `${height + 20}px`;
       img.parentElement.style.overflow = 'hidden';
     }
   });

@@ -21,7 +21,31 @@ try {
     const frames = await page.locator('[data-skarmdump]').all();
     for (const frame of frames) {
       const name = await frame.getAttribute('data-skarmdump');
-      await frame.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: 'disabled' });
+      await frame.scrollIntoViewIfNeeded();
+      // data-klick: öppna (t.ex. huvudknappens meny) före bilden.
+      const click = await frame.getAttribute('data-klick');
+      if (click) {
+        await frame.locator(click).click();
+        await page.mouse.move(0, 0);
+      }
+      // Två bildrutor, så att kh-header hunnit rätta sig efter rullningen.
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      // data-tid: prickar som hoppar står still så många ms in i perioden (som Roborazzi-provets klocka).
+      const time = await frame.getAttribute('data-tid');
+      if (time) {
+        await frame.evaluate((element, ms) => {
+          for (const animation of element.getAnimations({ subtree: true })) {
+            if (animation instanceof CSSAnimation) {
+              animation.pause();
+              animation.currentTime = ms;
+            } else {
+              animation.finish();
+            }
+          }
+        }, Number(time));
+      }
+      await frame.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: time ? 'allow' : 'disabled' });
+      await page.evaluate(() => document.querySelectorAll(':popover-open').forEach((p) => p.hidePopover()));
     }
     console.log(`${frames.length} skärmdumpar (${suffix}).`);
     await page.close();

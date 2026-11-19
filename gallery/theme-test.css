@@ -35,8 +35,12 @@
   --kh-on-primary: #ffffff;
   --kh-primary-container: #ffe6da;
   --kh-on-primary-container: #7a2e18;
+  --kh-secondary: #6b5a50;
+  --kh-on-secondary: #ffffff;
   --kh-secondary-container: #ffe6da;
   --kh-on-secondary-container: #7a2e18;
+  --kh-tertiary: #2c6584;
+  --kh-on-tertiary: #ffffff;
   --kh-background: #fff4ee;
   --kh-on-background: #241b16;
   --kh-on-surface: #241b16;
@@ -54,6 +58,9 @@
   --kh-scrim: #000000;
   --kh-card: #ffffff;
   --kh-row-tint: #fdf1ea;
+  --kh-toolbar: #241b16;
+  --kh-on-toolbar: #f3e6df;
+  --kh-surface-container-high: #ffffff;
 
   --kh-depth-highlight: rgb(255 255 255 / 0.3);
   --kh-depth-sheen: rgb(255 255 255 / 0.12);
@@ -74,8 +81,12 @@
   --kh-on-primary: #5e1703;
   --kh-primary-container: #6e2a15;
   --kh-on-primary-container: #ffdbcd;
+  --kh-secondary: #cdbbb1;
+  --kh-on-secondary: #33271f;
   --kh-secondary-container: #6e2a15;
   --kh-on-secondary-container: #ffdbcd;
+  --kh-tertiary: #9bcbe8;
+  --kh-on-tertiary: #0e3448;
   --kh-background: #1c1512;
   --kh-on-background: #f3e6df;
   --kh-on-surface: #f3e6df;
@@ -93,6 +104,9 @@
   --kh-scrim: #000000;
   --kh-card: #2a201b;
   --kh-row-tint: #33271f;
+  --kh-toolbar: #f3e6df;
+  --kh-on-toolbar: #33271f;
+  --kh-surface-container-high: #2a201b;
 
   --kh-depth-highlight: rgb(255 255 255 / 0.4);
   --kh-depth-sheen: rgb(255 255 255 / 0.14);

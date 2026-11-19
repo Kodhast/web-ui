@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../src/tokens.css">
 <link rel="stylesheet" href="../src/kh.css">
 <link rel="stylesheet" href="theme-test.css">
+<script src="../src/kh.js" defer></script>
 <script>
   // Ljust eller mörkt: ?tema=mork|ljust, annars systemets val.
   const tema = new URLSearchParams(location.search).get('tema');
@@ -32,6 +33,15 @@
   .ram .kh-sheet { margin: 0 -16px -16px; inline-size: calc(100% + 32px); max-inline-size: none; position: relative; }
   .ram .kh-dialog { inline-size: auto; min-inline-size: 0; margin: 0 24px; }
   .ram .kh-snackbar-host { position: static; padding: 0 12px; }
+  /* Ramar med ett eget rullande innehåll (sidhuvudet) och helskärmsramar (flikraden med meny). */
+  .ram--skarm { padding: 0; block-size: 320px; gap: 0; }
+  .ram--hog { block-size: 560px; justify-content: flex-end; }
+  .rullar { block-size: 100%; overflow-y: auto; scrollbar-width: none; }
+  .ark { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+  .fyll { block-size: 640px; }
+  .vanster { justify-content: flex-start; }
+  .prova { block-size: 560px; padding: 0; position: relative; }
+  .prova kh-toolbar { position: absolute; inset-inline: 0; inset-block-end: 16px; }
   .stepper { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 9999px; background: var(--kh-primary-container); align-self: flex-start; }
 </style>
 </head>
@@ -190,11 +200,11 @@
 <section class="galleri-del">
   <h2 class="kh-text-caption">Segmentval · AppSegmentedChoice_tema</h2>
   <div class="ram" data-skarmdump="AppSegmentedChoice_tema">
-    <div class="kh-segmented" role="radiogroup" aria-label="Tema">
+    <kh-segmented role="radiogroup" aria-label="Tema">
       <button type="button" role="radio" aria-checked="false">Ljust</button>
       <button type="button" role="radio" aria-checked="false">Mörkt</button>
       <button type="button" role="radio" aria-checked="true">System</button>
-    </div>
+    </kh-segmented>
   </div>
 </section>
 
@@ -332,6 +342,191 @@
   </div>
 </section>
 
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud i vila · AppHeader_vila</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_vila" data-rull="0">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud halvvägs · AppHeader_halvvags</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_halvvags" data-rull="40">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud ihopfällt · AppHeader_ihopfalld</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_ihopfalld" data-rull="81">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud ihopfällt utan djup · AppHeader_utan_djup</h2>
+  <div class="ram ram--skarm" data-skarmdump="AppHeader_utan_djup" data-rull="81">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud som synkar · AppHeader_synkar</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_synkar" data-rull="0" data-tid="225">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots bouncing></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Flikrad · AppFloatingToolbar_flikar</h2>
+  <div class="ram" data-skarmdump="AppFloatingToolbar_flikar">
+    <kh-toolbar class="vanster">
+      <div class="kh-toolbar__tabs">
+        <button class="kh-toolbar__tab" type="button" aria-selected="true" aria-label="Resor"><svg><use href="#i-box"/></svg><span class="kh-toolbar__label">Resor</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Idag"><svg><use href="#i-clock"/></svg><span class="kh-toolbar__label">Idag</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Lägg till"><svg><use href="#i-add"/></svg><span class="kh-toolbar__label">Lägg till</span></button>
+      </div>
+    </kh-toolbar>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Flikrad med huvudknapp · AppFloatingToolbar_huvudknapp</h2>
+  <div class="ram" data-skarmdump="AppFloatingToolbar_huvudknapp">
+    <kh-toolbar class="vanster">
+      <div class="kh-toolbar__tabs">
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Resor"><svg><use href="#i-box"/></svg><span class="kh-toolbar__label">Resor</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="true" aria-label="Idag"><svg><use href="#i-clock"/></svg><span class="kh-toolbar__label">Idag</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Lägg till"><svg><use href="#i-add"/></svg><span class="kh-toolbar__label">Lägg till</span></button>
+      </div>
+      <button class="kh-toolbar__action" type="button" aria-label="Logga"><svg><use href="#i-add"/></svg></button>
+    </kh-toolbar>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Huvudknappens meny · AppFloatingToolbar_huvudknapp_meny</h2>
+  <div class="ram ram--hog" data-skarmdump="AppFloatingToolbar_huvudknapp_meny" data-klick=".kh-toolbar__action">
+    <kh-toolbar>
+      <div class="kh-toolbar__tabs">
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Översikt"><svg><use href="#i-clock"/></svg><span class="kh-toolbar__label">Översikt</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="true" aria-label="Innehav"><svg><use href="#i-box"/></svg><span class="kh-toolbar__label">Innehav</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Beslut"><svg><use href="#i-check"/></svg><span class="kh-toolbar__label">Beslut</span></button>
+      </div>
+      <button class="kh-toolbar__action" type="button" aria-label="Lägg till" popovertarget="meny-fonder"><svg><use href="#i-add"/></svg></button>
+    </kh-toolbar>
+    <div class="kh-menu" id="meny-fonder" popover>
+      <button class="kh-menu__item" type="button">Registrera köp</button>
+      <button class="kh-menu__item" type="button">Registrera sälj</button>
+      <button class="kh-menu__item" type="button">Importera innehav</button>
+      <button class="kh-menu__item" type="button">Importera ordrar</button>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Laddning med prickar · AppLoading_prickar</h2>
+  <div class="ram" data-skarmdump="AppLoading_prickar" data-tid="225" style="block-size: 200px; padding: 32px">
+    <div class="kh-loading"><kh-dots bouncing></kh-dots></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Dra ned med prickar · AppPullToRefresh_prickar</h2>
+  <div class="ram" data-skarmdump="AppPullToRefresh_prickar" data-tid="225" style="inline-size: 160px; block-size: 120px; padding: 12px 0 0">
+    <kh-refresh data-state="refreshing" style="--kh-refresh-fraction: 1; block-size: 100%"></kh-refresh>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Knapp som arbetar, med prickar · AppButton_laddar_prickar</h2>
+  <div class="ram" data-skarmdump="AppButton_laddar_prickar" data-tid="225">
+    <div class="rad"><button class="kh-btn" type="button" aria-busy="true"><kh-dots bouncing></kh-dots>Sparar …</button></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Prova: rulla, dra ned (på telefonen) och byt flik</h2>
+  <div class="ram prova kh-depth">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Husjakt</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">MK</span></button></div>
+        <h1 class="kh-header__title"><kh-dots></kh-dots><span>Objekt</span></h1>
+        <p class="kh-header__subtitle">12 hus i korridoren</p>
+      </kh-header>
+      <kh-refresh>
+        <div class="ark">
+          <div class="kh-card"><div class="prov"><span class="kh-text-item-title">Gården vid ån</span><span class="kh-text-item-subtitle">Påhittad · 6 rum · 180 kvm</span></div></div>
+          <div class="kh-card"><div class="prov"><span class="kh-text-item-title">Villan på höjden</span><span class="kh-text-item-subtitle">Påhittad · 5 rum · 140 kvm</span></div></div>
+          <div class="kh-card"><div class="prov"><span class="kh-text-item-title">Torpet i skogen</span><span class="kh-text-item-subtitle">Påhittad · 4 rum · 95 kvm</span></div></div>
+          <div class="fyll"></div>
+        </div>
+      </kh-refresh>
+    </div>
+    <kh-toolbar>
+      <div class="kh-toolbar__tabs">
+        <button class="kh-toolbar__tab" type="button" aria-selected="true" aria-label="Objekt"><svg><use href="#i-box"/></svg><span class="kh-toolbar__label">Objekt</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Karta"><svg><use href="#i-clock"/></svg><span class="kh-toolbar__label">Karta</span><span class="kh-toolbar__badge">3</span></button>
+        <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Natten"><svg><use href="#i-check"/></svg><span class="kh-toolbar__label">Natten</span></button>
+      </div>
+      <button class="kh-toolbar__action" type="button" aria-label="Lägg till" popovertarget="meny-prova"><svg><use href="#i-add"/></svg></button>
+    </kh-toolbar>
+    <div class="kh-menu" id="meny-prova" popover>
+      <button class="kh-menu__item" type="button"><svg><use href="#i-add"/></svg>Klistra in en länk</button>
+      <button class="kh-menu__item" type="button"><svg><use href="#i-box"/></svg>Nytt hus för hand</button>
+      <button class="kh-menu__item kh-menu__item--destructive" type="button"><svg><use href="#i-remove"/></svg>Rensa sålda</button>
+    </div>
+  </div>
+</section>
+
 </main>
 <script>
   document.getElementById('byt-tema').addEventListener('click', () => {
@@ -342,13 +537,15 @@
   for (const chip of document.querySelectorAll('.kh-chip[aria-pressed]')) {
     chip.addEventListener('click', () => chip.setAttribute('aria-pressed', String(chip.getAttribute('aria-pressed') !== 'true')));
   }
-  for (const group of document.querySelectorAll('.kh-segmented')) {
-    group.addEventListener('click', (e) => {
-      const target = e.target.closest('[role=radio]');
-      if (!target) return;
-      for (const b of group.children) b.setAttribute('aria-checked', String(b === target));
-    });
+  // Ramar som visar ett rullat läge (sidhuvudet): data-rull är hur långt.
+  for (const frame of document.querySelectorAll('[data-rull]')) {
+    frame.querySelector('.rullar').scrollTop = Number(frame.dataset.rull);
   }
+  // Provet med dra-ned: uppdateringen tar en sekund.
+  document.addEventListener('kh-refresh', (e) => {
+    e.target.setAttribute('refreshing', '');
+    setTimeout(() => e.target.removeAttribute('refreshing'), 1000);
+  });
   for (const a of document.querySelectorAll('a[href="#"]')) a.addEventListener('click', (e) => e.preventDefault());
 </script>
 </body>
