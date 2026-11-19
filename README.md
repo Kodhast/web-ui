@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.0.0 (tagg `v1.0.0`) ·
+**Version:** 1.1.0 (tagg `v1.1.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -87,6 +87,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-chevron` | pilen i `ItemRow(navigates)` och `NoticeBanner` | – |
 | `kh-divider` | `AppDivider` | – |
 | `kh-btn` | `AppButton` | `--secondary`, `--outlined`, `--text`, `--destructive`, `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
+| `kh-icon-btn` | `AppIconButton` | `--tonal` (platta i `secondary-container`), en tonklass (den tonade: platta och ikon; den vanliga: ikonen), `disabled`; 48 i tryckyta och form, ikonen 24, alltid `aria-label` |
 | `kh-chips` + `kh-chip` med `__label`, `__value`, `__pending` | `AppFilterChip`, `ChipRow` | `aria-pressed`/`aria-checked` (bocken ritas av biblioteket), `--emphasized`, `--pending`, `disabled` |
 | `kh-segmented` | `AppSegmentedChoice` | barnen med `aria-checked`/`aria-pressed`/`aria-selected` |
 | `kh-pills` + `kh-pill` | `InfoPill` | en tonklass, klickbar som `button` (48 i tryckyta), `--square` |
@@ -144,6 +145,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.1.0 | Ikonknappen `kh-icon-btn` (`AppIconButton`): vanlig och `--tonal`, valfri ton, med djup lyft och tryck till 0,92. |
 | 1.0.0 | Första stabila versionen (W4): samma delar som 0.2.0, och taggen `v1.0.0`. Från och med nu gäller semver fullt ut: en borttagen eller omdöpt klass, variabel, element, attribut eller händelse är major. |
 | 0.2.0 | Beteendet (W3): `kh.js` med `<kh-dots>`, `<kh-header>`, `<kh-toolbar>`, `<kh-refresh>` och `<kh-segmented>`; menyn `kh-menu`, laddningen `kh-loading`, prickarna i en knapp som arbetar. Nya färger: `--kh-secondary`, `--kh-tertiary` (med `on-`), `--kh-toolbar`, `--kh-on-toolbar`. |
 | 0.1.0 | Grunden (W2): `tokens.css` ur android-ui:s `tokens.json`, utseendelagret `kh.css` med kort, rad, knapp, chip, segmentval, pill, meddelanderad, fält, dialog, ark, meddelande, tomt läge, avdelare och avatar, galleriet, skärmdumpar och beteendeprov. |
