@@ -891,6 +891,40 @@ kh-header:defined .kh-header__title {
 :is(.kh-header__name, .kh-header__title > :not(kh-dots), .kh-header__subtitle, .kh-header__probe) { text-box: trim-both text; }
 .kh-header__probe { position: absolute; visibility: hidden; white-space: nowrap; }
 
+/* ---------- Toppraden (AppTopBar, liten): <header class="kh-topbar"> ---------- */
+
+/*
+ * Underskärmens rad, som TopAppBar i EntityDetailScreen: 64 hög och fast överst medan sidan rullar,
+ * tillbakapilen (en kh-icon-btn, tonad som standard i Android) längst till vänster, rubriken – gärna med
+ * <kh-dots> före – och __actions till höger (appens status först, sedan åtgärderna). Utan pil börjar rubriken
+ * 16 från kanten. Toppskärmar använder <kh-header>.
+ */
+.kh-topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  block-size: var(--kh-header-collapsed);
+  padding-inline: var(--kh-space-xs);
+  background-color: var(--kh-background);
+  color: var(--kh-on-surface);
+}
+.kh-topbar__title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--kh-space-s);
+  min-inline-size: 0;
+  margin: 0 0 0 var(--kh-space-xs);
+  font: var(--kh-type-section-title);
+}
+.kh-topbar__title:first-child { margin-inline-start: var(--kh-space-m); }
+.kh-topbar__title > :not(kh-dots) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kh-topbar__title > kh-dots { --kh-dots-size: 6px; block-size: 11px; }
+.kh-topbar__actions { display: flex; flex: none; align-items: center; }
+
 /* ---------- Meny (AppMenuPopup): <div class="kh-menu" popover> ---------- */
 
 .kh-menu {
