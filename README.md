@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 0.2.0 (under arbete, 1.0.0 när sidhuvudet, flikraden och prickarna finns) ·
+**Version:** 1.0.0 (tagg `v1.0.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -26,8 +26,8 @@ Inga beroenden och inget byggsteg: två CSS-filer och ett skript.
 
 ## Använda
 
-**Utan byggsteg (Husjakt):** lägg en låst kopia av `src/tokens.css` och `src/kh.css` i appen
-(t.ex. `public/vendor/web-ui/`) och länka dem före appens egen stilfil:
+**Utan byggsteg (Husjakt):** lägg en låst kopia av `src/tokens.css`, `src/kh.css` och `src/kh.js` från en tagg i appen
+(t.ex. `public/vendor/web-ui/`) och länka stilfilerna före appens egen:
 
 ```html
 <link rel="stylesheet" href="/vendor/web-ui/tokens.css">
@@ -37,8 +37,8 @@ Inga beroenden och inget byggsteg: två CSS-filer och ett skript.
 ```
 
 **Via npm (Veckans mat):** `npm install github:Kodhast/web-ui#v<version>` och sedan
-`import '@kodhast/web-ui/tokens.css'; import '@kodhast/web-ui/kh.css'; import '@kodhast/web-ui/kh.js';`. Taggarna kommer med 1.0.0 (W4);
-paketet publiceras inte till ett register än.
+`import '@kodhast/web-ui/tokens.css'; import '@kodhast/web-ui/kh.css'; import '@kodhast/web-ui/kh.js';`.
+Paketet publiceras inte till ett register; taggen `v<version>` är versionen.
 
 ## Appen sätter
 
@@ -134,6 +134,9 @@ npm run jamfor -- ../android-ui/ui-components/src/test/screenshots   # Android b
 
 Galleriet: öppna `gallery/index.html` i en webbläsare (`?tema=ljust` eller `?tema=mork`).
 
+**En ny version:** höj `version` i `package.json` och lägg en rad i versionshistoriken i PR:en; efter sammanslagningen
+taggas sammanslagningscommiten på `main` med `v<version>`.
+
 **Nya tal i android-ui:** kopiera `tokens.json` från android-ui:s `main`, kör `npm run tokens` och
 `npm run skarmdumpar`, och höj versionen.
 
@@ -141,6 +144,7 @@ Galleriet: öppna `gallery/index.html` i en webbläsare (`?tema=ljust` eller `?t
 
 | Version | Ändring |
 |---|---|
+| 1.0.0 | Första stabila versionen (W4): samma delar som 0.2.0, och taggen `v1.0.0`. Från och med nu gäller semver fullt ut: en borttagen eller omdöpt klass, variabel, element, attribut eller händelse är major. |
 | 0.2.0 | Beteendet (W3): `kh.js` med `<kh-dots>`, `<kh-header>`, `<kh-toolbar>`, `<kh-refresh>` och `<kh-segmented>`; menyn `kh-menu`, laddningen `kh-loading`, prickarna i en knapp som arbetar. Nya färger: `--kh-secondary`, `--kh-tertiary` (med `on-`), `--kh-toolbar`, `--kh-on-toolbar`. |
 | 0.1.0 | Grunden (W2): `tokens.css` ur android-ui:s `tokens.json`, utseendelagret `kh.css` med kort, rad, knapp, chip, segmentval, pill, meddelanderad, fält, dialog, ark, meddelande, tomt läge, avdelare och avatar, galleriet, skärmdumpar och beteendeprov. |
 
