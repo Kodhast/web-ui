@@ -416,6 +416,26 @@ const TOOLBAR = `
   </kh-toolbar>
   <div class="kh-menu" id="m" popover><button class="kh-menu__item" id="val">Klistra in</button></div>`;
 
+test('topprad: 64 hög och fast överst, pilen 4 från kanten, rubriken 56 in och avkortad, åtgärderna 4 från högerkanten', async () => {
+  await mount(`<div id="rull" style="block-size: 200px; overflow-y: auto; inline-size: 360px">
+      <header class="kh-topbar" id="t"><button class="kh-icon-btn kh-icon-btn--tonal" id="pil" aria-label="Tillbaka"><svg><use href="#i-arrow-back"/></svg></button><h1 class="kh-topbar__title" id="rubrik"><kh-dots></kh-dots><span id="text">En mycket lång rubrik som inte får plats på en rad i toppraden</span></h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--compact" id="spara">Spara</button></div></header>
+      <header class="kh-topbar" id="u"><h1 class="kh-topbar__title" id="utan">Utan pil</h1></header>
+      <div style="block-size: 600px"></div>
+    </div>`);
+  const t = await box('#t');
+  assert.equal(t.height, tokens.header.collapsed);
+  assert.equal((await box('#pil')).x - t.x, 4);
+  assert.equal((await box('#rubrik')).x - t.x, 56);
+  assert.equal((await box('#utan')).x - t.x, 16, 'utan pil börjar rubriken 16 in');
+  assert.equal(t.right - (await box('#spara')).right, 4);
+  assert.equal(`${(await box('#text')).height}px`, await style('#rubrik', 'line-height'), 'en rad');
+  assert.ok(await page.evaluate(() => { const e = document.getElementById('text'); return e.scrollWidth > e.clientWidth; }), 'avkortad');
+  assert.equal(await style('#rubrik', 'font'), await page.evaluate(() => { const p = document.createElement('i'); p.className = 'kh-text-section-title'; document.body.append(p); const f = getComputedStyle(p).font; p.remove(); return f; }), 'rubriken i sectionTitle');
+  assert.equal(await style('#t', 'background-color'), await themeColor('--kh-background'));
+  await page.evaluate(() => { document.getElementById('rull').scrollTop = 150; });
+  assert.equal((await box('#t')).y, (await box('#rull')).y, 'står kvar överst när sidan rullar');
+});
+
 test('flikrad: vald flik visar namnet i primärfärgen, ett tryck byter flik och meddelar kh-select', async () => {
   await mount(TOOLBAR);
   await page.waitForTimeout(350);
