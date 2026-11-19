@@ -1,0 +1,32 @@
+/* Genererad av scripts/tokens.mjs ur tokens.json (android-ui). Ändra inte för hand. */
+:root {
+  --kh-space-xs: 4px;
+  --kh-space-s: 8px;
+  --kh-space-m: 12px;
+  --kh-space-l: 16px;
+  --kh-space-xl: 24px;
+  --kh-space-xxl: 32px;
+  --kh-icon-marker: 14px;
+  --kh-icon-pill: 16px;
+  --kh-icon-small: 18px;
+  --kh-icon-button: 20px;
+  --kh-icon-row: 22px;
+  --kh-icon-standard: 24px;
+  --kh-radius-card: 22px;
+  --kh-radius-row: 18px;
+  --kh-radius-pill: 9999px;
+  --kh-radius-field: 14px;
+  --kh-radius-menu: 16px;
+  --kh-radius-sheet: 28px 28px 0px 0px;
+  --kh-radius-small-tile: 10px;
+  --kh-radius-icon-tile: 40px;
+  --kh-radius-fab: 16px;
+  --kh-radius-dialog: 28px;
+  --kh-track-height: 8px;
+  --kh-track-progress-stroke: 2.5px;
+  --kh-depth-pressed-scale: 0.97;
+  --kh-header-expanded: 144px;
+  --kh-header-collapsed: 64px;
+  --kh-header-app-icon: 40px;
+  --kh-header-collapsed-app-icon: 32px;
+}
