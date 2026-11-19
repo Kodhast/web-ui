@@ -1,0 +1,794 @@
+/*
+ * web-ui – android-ui:s utseende som ren CSS (kh-*). Facit är android-ui:s komponenter och
+ * Roborazzi-bilder; talen kommer ur tokens.css (genererad ur android-ui:s tokens.json).
+ *
+ * Ingen färg står här. Appen sätter färgerna och typsnitten (variablerna nedan, motsvarar AppTheme)
+ * och väljer djup med klassen kh-depth. Se README → "Appen sätter".
+ */
+
+/* ---------- Appens tema: standardvärden för det som inte är färg ---------- */
+
+/* :where ger noll specificitet, så att appens :root alltid vinner oavsett ordning. Sätt dem på :root. */
+:where(:root) {
+  --kh-font-body: system-ui, sans-serif;
+  --kh-font-heading: var(--kh-font-body);
+
+  /* De namngivna textstilarna (AppTypography), som font-förkortning. Standard Material 3:s typskala. */
+  --kh-type-screen-title: 400 36px/44px var(--kh-font-heading);
+  --kh-type-big-number: 400 28px/36px var(--kh-font-heading);
+  --kh-type-headline: 400 24px/32px var(--kh-font-heading);
+  --kh-type-section-title: 400 22px/28px var(--kh-font-heading);
+  --kh-type-quantity: var(--kh-type-section-title);
+  --kh-type-item-title: 500 16px/24px var(--kh-font-body);
+  --kh-type-item-subtitle: 400 12px/16px var(--kh-font-body);
+  --kh-type-body: 400 16px/24px var(--kh-font-body);
+  --kh-type-body-medium: 400 14px/20px var(--kh-font-body); /* Material 3:s bodyMedium: meddelandets text */
+  --kh-type-pill: 500 12px/16px var(--kh-font-body);
+  --kh-type-caption: 500 11px/16px var(--kh-font-body);
+  --kh-type-button: 500 14px/20px var(--kh-font-heading);
+  --kh-tracking-screen-title: 0;
+  --kh-tracking-caption: 0.045em;
+
+  /* Kortstilen (AppCardStyle): luft, avstånd mellan innehållets delar, kontur (Fonder: 1px outline-variant). */
+  --kh-card-padding: var(--kh-space-m);
+  --kh-card-gap: var(--kh-space-xs);
+  --kh-card-border: none;
+
+  /* Knappstilen (AppButtonStyle): höjden; Fonder sätter 40px. */
+  --kh-button-height: 56px;
+
+  /* Avståndet mellan titel och undertext i en listrad (Dagboken: var(--kh-space-xs)). */
+  --kh-row-text-gap: 2px;
+}
+
+/*
+ * En tons färger gäller bara elementet som har tonen, som i Android: en pill i ett grönt kort är
+ * primärtonad tills den själv får en ton. Appen skriver sina toner som klasser, t.ex.
+ * .ton-gron { --kh-tone-container: …; --kh-tone-content: …; }
+ */
+@property --kh-tone-container { syntax: '*'; inherits: false; }
+@property --kh-tone-content { syntax: '*'; inherits: false; }
+
+/* ---------- Grund ---------- */
+
+.kh-app {
+  background: var(--kh-background);
+  color: var(--kh-on-background);
+  font: var(--kh-type-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.kh-text-screen-title { font: var(--kh-type-screen-title); letter-spacing: var(--kh-tracking-screen-title); }
+.kh-text-big-number { font: var(--kh-type-big-number); font-variant-numeric: tabular-nums; }
+.kh-text-headline { font: var(--kh-type-headline); }
+.kh-text-section-title { font: var(--kh-type-section-title); }
+.kh-text-quantity { font: var(--kh-type-quantity); font-variant-numeric: tabular-nums; }
+.kh-text-item-title { font: var(--kh-type-item-title); }
+.kh-text-item-subtitle { font: var(--kh-type-item-subtitle); color: var(--kh-on-surface-variant); }
+.kh-text-body { font: var(--kh-type-body); }
+.kh-text-caption { font: var(--kh-type-caption); letter-spacing: var(--kh-tracking-caption); }
+:is(.kh-text-screen-title, .kh-text-big-number, .kh-text-headline, .kh-text-section-title,
+    .kh-text-quantity, .kh-text-item-title, .kh-text-item-subtitle, .kh-text-body, .kh-text-caption) { margin: 0; }
+
+/*
+ * Compose trimmar radavståndet ovanför första och under sista raden (LineHeightStyle Trim.Both); text-box gör
+ * samma sak här, så att rader och kort får Androids höjd (Chrome 133 och senare).
+ */
+:is(.kh-text-screen-title, .kh-text-big-number, .kh-text-headline, .kh-text-section-title, .kh-text-quantity,
+    .kh-text-item-title, .kh-text-item-subtitle, .kh-text-body, .kh-text-caption,
+    .kh-row__title, .kh-row__subtitle, .kh-notice__title, .kh-notice__detail, .kh-field__support,
+    .kh-dialog__title, .kh-dialog__text, .kh-sheet__title, .kh-sheet__subtitle,
+    .kh-empty__title, .kh-empty__text, .kh-empty__note) {
+  text-box: trim-both text;
+}
+
+/* Ikonstorlekarna (IconSize). Ikonen är appens svg eller en mask; färgen är textens. */
+.kh-icon { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); flex: none; fill: currentColor; }
+.kh-icon--marker { inline-size: var(--kh-icon-marker); block-size: var(--kh-icon-marker); }
+.kh-icon--pill { inline-size: var(--kh-icon-pill); block-size: var(--kh-icon-pill); }
+.kh-icon--small { inline-size: var(--kh-icon-small); block-size: var(--kh-icon-small); }
+.kh-icon--button { inline-size: var(--kh-icon-button); block-size: var(--kh-icon-button); }
+.kh-icon--row { inline-size: var(--kh-icon-row); block-size: var(--kh-icon-row); }
+
+/* Bibliotekets egna ikoner (bock och pil) som mask, så att de tar textens färg. */
+:root {
+  --kh-mask-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  --kh-mask-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+}
+
+/* Tryckläget (Material 3:s state layer): ett lager i innehållets färg. */
+:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable) {
+  position: relative;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: -1;
+}
+:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action):not(:disabled):hover::after { opacity: 0.08; }
+:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action):not(:disabled):active::after { opacity: 0.1; }
+:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable):focus-visible {
+  outline: 2px solid var(--kh-primary);
+  outline-offset: 2px;
+}
+
+/* Det som inte räknas med eller inte går att välja (INACTIVE_ALPHA). */
+.kh-inactive { opacity: 0.55; }
+
+/* ---------- Kort (AppCard) ---------- */
+
+.kh-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kh-card-gap);
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--kh-card-padding);
+  border: var(--kh-card-border);
+  border-radius: var(--kh-radius-card);
+  background-color: var(--kh-card);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+:is(a, button).kh-card, .kh-card--clickable { cursor: pointer; }
+/* Ett tonat kort (AppCard(tone = …)) har ingen kontur. */
+.kh-card--tone {
+  border: none;
+  background-color: var(--kh-tone-container, var(--kh-primary-container));
+}
+
+/* ---------- Listrad (ItemRow) ---------- */
+
+.kh-row {
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-m);
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 56px;
+  margin: 0;
+  padding: var(--kh-space-s) var(--kh-space-m);
+  border: 0;
+  border-radius: var(--kh-radius-row);
+  background: none;
+  color: var(--kh-on-surface);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+:is(a, button).kh-row, .kh-row--clickable { cursor: pointer; }
+.kh-row--tinted { background-color: var(--kh-row-tint); }
+.kh-row--inactive { opacity: 0.55; }
+.kh-row__leading, .kh-row__trailing { display: flex; align-items: center; gap: var(--kh-space-s); flex: none; }
+.kh-row__leading { color: var(--kh-on-surface-variant); }
+.kh-row__text { display: flex; flex-direction: column; gap: var(--kh-row-text-gap); flex: 1; min-inline-size: 0; }
+.kh-row__title {
+  font: var(--kh-type-item-title);
+  color: var(--kh-on-surface);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.kh-row__subtitle { font: var(--kh-type-item-subtitle); color: var(--kh-on-surface-variant); }
+.kh-row__highlight { color: var(--kh-primary); }
+.kh-row--done :is(.kh-row__title, .kh-row__subtitle) { color: var(--kh-on-surface-variant); text-decoration: line-through; }
+/* En färgad vänsterkant (personens färg, en status): style="--kh-accent: …". */
+.kh-row--accent { position: relative; }
+.kh-row--accent::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 4px;
+  border-radius: 2px;
+  background: var(--kh-accent);
+}
+/* Pilen: raden öppnar en annan skärm. */
+.kh-chevron {
+  display: inline-block;
+  flex: none;
+  inline-size: var(--kh-icon-standard);
+  block-size: var(--kh-icon-standard);
+  background: currentColor;
+  -webkit-mask: var(--kh-mask-chevron) center / contain no-repeat;
+  mask: var(--kh-mask-chevron) center / contain no-repeat;
+}
+.kh-row .kh-chevron, .kh-row__trailing .kh-chevron { color: var(--kh-on-surface-variant); }
+.kh-chevron:dir(rtl) { transform: scaleX(-1); }
+
+/* ---------- Avdelare (AppDivider) ---------- */
+
+.kh-divider {
+  block-size: 1px;
+  margin: 0 var(--kh-space-m);
+  border: 0;
+  background: var(--kh-outline-variant);
+  flex: none;
+}
+
+/* ---------- Knapp (AppButton) ---------- */
+
+.kh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kh-space-s);
+  box-sizing: border-box;
+  min-block-size: var(--kh-button-height);
+  min-inline-size: 58px;
+  margin: 0;
+  padding: var(--kh-space-s) var(--kh-space-xl);
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-primary);
+  color: var(--kh-on-primary);
+  font: var(--kh-type-button);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-btn > svg { inline-size: var(--kh-icon-button); block-size: var(--kh-icon-button); flex: none; fill: currentColor; }
+.kh-btn--secondary { background-color: var(--kh-secondary-container); color: var(--kh-on-secondary-container); }
+.kh-btn--outlined {
+  background-color: transparent;
+  color: var(--kh-on-surface-variant);
+  box-shadow: inset 0 0 0 1px var(--kh-outline-variant);
+}
+.kh-btn--text {
+  background-color: transparent;
+  color: var(--kh-primary);
+  padding-inline: var(--kh-space-m);
+}
+.kh-btn--destructive { background-color: var(--kh-error); color: var(--kh-on-error); }
+/* Den lägre knappen för rubrikraden (compact); tryckytan är ändå 48. */
+.kh-btn--compact { min-block-size: 40px; }
+.kh-btn--compact::before { content: ''; position: absolute; inset: -4px 0; }
+.kh-btn--block { display: flex; inline-size: 100%; }
+.kh-btn:disabled:not([aria-busy='true']), .kh-btn[aria-disabled='true']:not([aria-busy='true']) {
+  background-color: color-mix(in srgb, var(--kh-on-surface) 10%, transparent);
+  color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent);
+  cursor: default;
+}
+.kh-btn:is(.kh-btn--text, .kh-btn--outlined):disabled:not([aria-busy='true']) { background-color: transparent; }
+.kh-btn--outlined:disabled { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kh-on-surface) 12%, transparent); }
+/* En knapp som arbetar (aria-busy) är inaktiv men behåller sina färger – upptagen, inte avstängd. */
+.kh-btn[aria-busy='true'] { cursor: progress; pointer-events: none; }
+
+/* ---------- Valchip (AppFilterChip) ---------- */
+
+.kh-chips { display: flex; flex-wrap: wrap; gap: var(--kh-space-s); }
+.kh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kh-space-s);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-block-size: 36px;
+  margin: 0;
+  padding: 0 var(--kh-space-l);
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--kh-outline-variant);
+  color: var(--kh-on-surface);
+  font: var(--kh-type-pill);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-chip:has(> svg:first-child), .kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) { padding-inline-start: var(--kh-space-s); }
+.kh-chip > svg { inline-size: var(--kh-icon-small); block-size: var(--kh-icon-small); flex: none; fill: currentColor; color: var(--kh-primary); }
+.kh-chip__label { overflow: hidden; text-overflow: ellipsis; min-inline-size: 0; }
+.kh-chip__value, .kh-chip__pending { margin-inline-start: calc(var(--kh-space-xs) - var(--kh-space-s)); }
+.kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) {
+  background-color: var(--kh-primary-container);
+  color: var(--kh-on-primary-container);
+  box-shadow: none;
+}
+/* Valt: bocken ersätter ikonen. */
+.kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) > svg { display: none; }
+.kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected)::before {
+  content: '';
+  inline-size: var(--kh-icon-small);
+  block-size: var(--kh-icon-small);
+  flex: none;
+  background: currentColor;
+  -webkit-mask: var(--kh-mask-check) center / contain no-repeat;
+  mask: var(--kh-mask-check) center / contain no-repeat;
+}
+/* Det aktiva bland flera valda: fylld primärfärg. */
+.kh-chip--emphasized:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) { background-color: var(--kh-primary); color: var(--kh-on-primary); }
+.kh-chip:disabled {
+  color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kh-on-surface) 12%, transparent);
+  cursor: default;
+}
+.kh-chip:disabled > svg { color: inherit; }
+.kh-chip:disabled:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) {
+  background-color: color-mix(in srgb, var(--kh-on-surface) 12%, transparent);
+  box-shadow: none;
+}
+/* Väntande (ChipPending): dämpad yta och streckad kant; läget bärs av ikon och text, inte bara färg. */
+.kh-chip--pending,
+.kh-chip--pending:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected) {
+  background-color: var(--kh-surface-variant);
+  color: var(--kh-on-surface-variant);
+  box-shadow: none;
+  outline: 1px dashed var(--kh-outline);
+  outline-offset: -1px;
+}
+.kh-chip--pending > svg { display: block; color: inherit; }
+.kh-chip--pending::before { display: none; }
+
+/* ---------- Segmentval (AppSegmentedChoice) ---------- */
+
+.kh-segmented { display: flex; inline-size: 100%; }
+.kh-segmented > * {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kh-space-s);
+  box-sizing: border-box;
+  min-inline-size: 48px;
+  min-block-size: 40px;
+  margin: 0;
+  margin-inline-start: -1px;
+  padding: 0 var(--kh-space-m);
+  border: 1px solid var(--kh-outline);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--kh-on-surface);
+  font: var(--kh-type-pill);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-segmented > :first-child { margin-inline-start: 0; border-start-start-radius: var(--kh-radius-pill); border-end-start-radius: var(--kh-radius-pill); }
+.kh-segmented > :last-child { border-start-end-radius: var(--kh-radius-pill); border-end-end-radius: var(--kh-radius-pill); }
+.kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) {
+  background-color: var(--kh-primary-container);
+  color: var(--kh-on-primary-container);
+}
+.kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true'])::before {
+  content: '';
+  inline-size: var(--kh-icon-small);
+  block-size: var(--kh-icon-small);
+  flex: none;
+  background: currentColor;
+  -webkit-mask: var(--kh-mask-check) center / contain no-repeat;
+  mask: var(--kh-mask-check) center / contain no-repeat;
+}
+
+/* ---------- Pill (InfoPill) ---------- */
+
+.kh-pills { display: flex; flex-wrap: wrap; gap: var(--kh-space-s); align-items: center; }
+.kh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kh-space-xs);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: var(--kh-space-xs) var(--kh-space-m);
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-tone-container, var(--kh-primary-container));
+  color: var(--kh-tone-content, var(--kh-on-primary-container));
+  font: var(--kh-type-pill);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.kh-pill > svg { inline-size: var(--kh-icon-pill); block-size: var(--kh-icon-pill); flex: none; fill: currentColor; }
+.kh-pill__text { overflow: hidden; text-overflow: ellipsis; }
+/* En klickbar pill har minst 48 tryckyta utan att se större ut. */
+:is(button.kh-pill, .kh-pill--clickable) { cursor: pointer; }
+:is(button.kh-pill, .kh-pill--clickable)::before { content: ''; position: absolute; inset: -12px -4px; }
+.kh-pill--square { border-radius: var(--kh-radius-small-tile); }
+
+/* ---------- Meddelanderad (NoticeBanner) ---------- */
+
+.kh-notice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--kh-space-m);
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--kh-card-padding);
+  border: 0;
+  border-radius: var(--kh-radius-card);
+  background-color: var(--kh-tone-container, var(--kh-primary-container));
+  color: var(--kh-tone-content, var(--kh-on-primary-container));
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+:is(a, button).kh-notice { cursor: pointer; }
+.kh-notice > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); flex: none; fill: currentColor; }
+.kh-notice__text { display: flex; flex-direction: column; align-items: flex-start; gap: var(--kh-space-xs); flex: 1; min-inline-size: 0; }
+.kh-notice__title { font: var(--kh-type-item-title); }
+.kh-notice__detail { font: var(--kh-type-caption); letter-spacing: var(--kh-tracking-caption); }
+.kh-notice .kh-chevron { color: inherit; }
+
+/* ---------- Textfält (AppTextField) ---------- */
+
+/*
+ * <label class="kh-field">
+ *   <input class="kh-field__input" placeholder=" "> <span class="kh-field__label">Namn</span>
+ *   <span class="kh-field__suffix">mg</span>
+ * </label>
+ * <p class="kh-field__support">Hjälptext</p>
+ * Etiketten står i fältet när det är tomt och på kanten när det har text eller fokus (placeholder=" " krävs).
+ * Fel: aria-invalid="true" på fältet och kh-field__support--error på texten under.
+ */
+.kh-field-group { display: flex; flex-direction: column; }
+.kh-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-s);
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 56px;
+  margin-block-start: 8px;
+  padding: 0 var(--kh-space-l);
+  border-radius: var(--kh-radius-field);
+  background-color: var(--kh-card);
+  box-shadow: inset 0 0 0 1px var(--kh-outline-variant);
+  color: var(--kh-on-surface);
+  cursor: text;
+  transition: box-shadow 150ms ease;
+}
+.kh-field__input {
+  flex: 1;
+  min-inline-size: 0;
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--kh-space-l) 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: var(--kh-type-body);
+  caret-color: var(--kh-primary);
+}
+textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: content; }
+.kh-field__input::placeholder { color: transparent; }
+.kh-field__label {
+  position: absolute;
+  inset-inline-start: calc(var(--kh-space-l) - var(--kh-space-xs));
+  inset-block-start: 16px;
+  max-inline-size: calc(100% - 2 * var(--kh-space-l));
+  padding: 0 var(--kh-space-xs);
+  color: var(--kh-on-surface-variant);
+  font: var(--kh-type-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 150ms ease, font 150ms ease, inset-block-start 150ms ease;
+}
+/* Etiketten på kanten: kanten går bakom den, fältets yta under. */
+.kh-field:has(.kh-field__input:focus, .kh-field__input:not(:placeholder-shown)) .kh-field__label {
+  inset-block-start: -8px;
+  font: var(--kh-type-item-subtitle);
+  background: linear-gradient(transparent 50%, var(--kh-card) 50%);
+}
+.kh-field__suffix { color: var(--kh-on-surface-variant); font: var(--kh-type-body); flex: none; }
+.kh-field > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); flex: none; fill: currentColor; color: var(--kh-on-surface-variant); }
+.kh-field:focus-within { box-shadow: inset 0 0 0 2px var(--kh-primary); }
+.kh-field:focus-within .kh-field__label { color: var(--kh-primary); }
+.kh-field:has(.kh-field__input[aria-invalid='true']) { box-shadow: inset 0 0 0 1px var(--kh-error); }
+.kh-field:has(.kh-field__input[aria-invalid='true']):focus-within { box-shadow: inset 0 0 0 2px var(--kh-error); }
+.kh-field:has(.kh-field__input[aria-invalid='true']) :is(.kh-field__label, .kh-field__input) { color: var(--kh-error); }
+.kh-field:has(.kh-field__input:disabled) { color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kh-on-surface) 12%, transparent); cursor: default; }
+.kh-field__support {
+  margin: 0;
+  padding: var(--kh-space-xs) var(--kh-space-l) 0;
+  color: var(--kh-on-surface-variant);
+  font: var(--kh-type-item-subtitle);
+}
+.kh-field__support--error { color: var(--kh-error); }
+
+/* ---------- Dialog (ConfirmDialog) ---------- */
+
+/* <dialog class="kh-dialog"> med showModal(). */
+.kh-dialog {
+  box-sizing: border-box;
+  inline-size: min(560px, calc(100vw - 2 * var(--kh-space-xl)));
+  min-inline-size: 280px;
+  max-inline-size: 560px;
+  margin: auto;
+  padding: var(--kh-space-xl);
+  border: 0;
+  border-radius: var(--kh-radius-card);
+  background-color: var(--kh-card);
+  color: var(--kh-on-surface);
+}
+.kh-dialog:not([open]) { display: none; }
+.kh-dialog[open] { display: flex; flex-direction: column; gap: var(--kh-space-l); }
+.kh-dialog::backdrop { background: color-mix(in srgb, var(--kh-scrim) 32%, transparent); }
+.kh-dialog__title { margin: 0; font: var(--kh-type-headline); color: var(--kh-on-surface); }
+.kh-dialog__text { margin: 0; font: var(--kh-type-body); color: var(--kh-on-surface-variant); }
+.kh-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--kh-space-s);
+  margin-block-start: var(--kh-space-s);
+}
+
+/* ---------- Ark (AppBottomSheet) ---------- */
+
+/* <dialog class="kh-sheet"> med showModal(); greppet överst ritas av arket. */
+.kh-sheet {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 640px;
+  max-block-size: calc(100dvh - 72px);
+  margin: auto auto 0;
+  padding: 48px var(--kh-space-xl) var(--kh-space-xl);
+  border: 0;
+  border-radius: var(--kh-radius-sheet);
+  background-color: var(--kh-card);
+  color: var(--kh-on-surface);
+  overflow: auto;
+}
+.kh-sheet:not([open]) { display: none; }
+.kh-sheet[open] { display: flex; flex-direction: column; gap: var(--kh-space-m); }
+.kh-sheet::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 22px;
+  inset-inline-start: calc(50% - 16px);
+  inline-size: 32px;
+  block-size: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--kh-on-surface-variant) 40%, transparent);
+}
+.kh-sheet::backdrop { background: color-mix(in srgb, var(--kh-scrim) 32%, transparent); }
+.kh-sheet__title { margin: 0; font: var(--kh-type-section-title); }
+.kh-sheet__subtitle { margin: 0; margin-block-start: calc(-1 * var(--kh-space-m)); font: var(--kh-type-item-subtitle); color: var(--kh-on-surface-variant); }
+/* Knappraden står fast i arkets botten. */
+.kh-sheet__footer {
+  position: sticky;
+  inset-block-end: calc(-1 * var(--kh-space-xl));
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-s);
+  margin: 0 calc(-1 * var(--kh-space-xl)) calc(-1 * var(--kh-space-xl));
+  padding: var(--kh-space-m) var(--kh-space-xl) var(--kh-space-xl);
+  background-color: var(--kh-card);
+}
+
+/* ---------- Meddelande (AppSnackbarHost) ---------- */
+
+.kh-snackbar-host {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: var(--kh-space-l) calc(var(--kh-space-l) + var(--kh-space-m));
+  pointer-events: none;
+}
+.kh-snackbar {
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-s);
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 600px;
+  min-block-size: 48px;
+  padding: var(--kh-space-xs) var(--kh-space-s) var(--kh-space-xs) var(--kh-space-l);
+  border-radius: var(--kh-radius-row);
+  background-color: var(--kh-inverse-surface);
+  color: var(--kh-inverse-on-surface);
+  font: var(--kh-type-body-medium);
+  pointer-events: auto;
+}
+.kh-snackbar__text { flex: 1; padding-block: 10px; }
+.kh-snackbar__action {
+  flex: none;
+  min-block-size: 40px;
+  margin: 0;
+  padding: 0 var(--kh-space-m);
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background: none;
+  color: var(--kh-inverse-primary);
+  font: var(--kh-type-button);
+  cursor: pointer;
+}
+
+/* ---------- Tomt läge (EmptyState) ---------- */
+
+.kh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kh-space-xl);
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding: var(--kh-space-xl);
+  text-align: center;
+}
+.kh-empty__message { display: flex; flex-direction: column; align-items: center; gap: var(--kh-space-xl); }
+.kh-empty__tile {
+  display: grid;
+  place-items: center;
+  inline-size: 120px;
+  block-size: 120px;
+  border-radius: var(--kh-radius-icon-tile);
+  background-color: var(--kh-primary-container);
+  color: var(--kh-on-primary-container);
+}
+.kh-empty__tile > svg { inline-size: 56px; block-size: 56px; fill: currentColor; }
+.kh-empty__texts { display: flex; flex-direction: column; align-items: center; gap: var(--kh-space-s); }
+.kh-empty__title { margin: 0; font: var(--kh-type-headline); color: var(--kh-on-background); }
+.kh-empty__text { margin: 0; font: var(--kh-type-body); color: var(--kh-on-surface-variant); }
+.kh-empty__actions { display: flex; flex-direction: column; gap: var(--kh-space-m); align-self: stretch; align-items: flex-start; }
+.kh-empty__note { margin: 0; align-self: stretch; font: var(--kh-type-item-subtitle); color: var(--kh-on-surface-variant); }
+.kh-empty--error .kh-empty__tile { background-color: var(--kh-error-container); color: var(--kh-on-error-container); }
+/* Samma budskap i mindre format, i ett kort (ett diagrams tomma läge). */
+.kh-empty--compact, .kh-empty--compact .kh-empty__message { gap: var(--kh-space-l); padding: var(--kh-space-l); }
+.kh-empty--compact .kh-empty__message { gap: var(--kh-space-m); padding: 0; }
+.kh-empty--compact .kh-empty__tile { inline-size: 48px; block-size: 48px; border-radius: var(--kh-radius-small-tile); }
+.kh-empty--compact .kh-empty__tile > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); }
+.kh-empty--compact .kh-empty__title { font: var(--kh-type-section-title); }
+/* Helskärm: budskapet i mitten, knapparna längst ned. */
+.kh-empty--fullscreen { min-block-size: 100%; padding: var(--kh-space-xxl) var(--kh-space-xl); }
+.kh-empty--fullscreen .kh-empty__message { flex: 1; justify-content: center; }
+.kh-empty--fullscreen .kh-empty__actions { align-items: stretch; }
+
+/* ---------- Avatar (AccountAvatar) ---------- */
+
+.kh-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 48px;
+  block-size: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background: none;
+  color: var(--kh-on-primary-container);
+  font: var(--kh-type-button);
+}
+.kh-avatar--clickable, button.kh-avatar, a.kh-avatar { cursor: pointer; }
+.kh-avatar__circle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-primary-container);
+  overflow: hidden;
+}
+.kh-avatar__circle > * { grid-area: 1 / 1; }
+.kh-avatar__circle > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.kh-avatar__circle > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); fill: currentColor; }
+/* Ansluten: pluppen nere till höger med en ring i ytan avataren står på. */
+.kh-avatar--online::before {
+  content: '';
+  position: absolute;
+  inset-block-end: 6px;
+  inset-inline-end: 6px;
+  z-index: 1;
+  inline-size: 12px;
+  block-size: 12px;
+  box-sizing: border-box;
+  border: 2px solid var(--kh-avatar-ring, var(--kh-background));
+  border-radius: var(--kh-radius-pill);
+  background: var(--kh-online, var(--kh-primary));
+}
+
+/* ---------- Djup (AppDepth): bara inom .kh-depth ---------- */
+
+/*
+ * Skuggornas oskärpa är Compose-radien × 1,15 + 1 (Androids omräkning från radie till sigma, gånger två för CSS).
+ * Appen sätter --kh-depth-highlight, -sheen, -shadow, -card-edge, -card-shadow och valfritt -card-sheen
+ * (alfa ingår), som i AppDepth. Utan .kh-depth är allt platt.
+ */
+.kh-depth {
+  --kh-lift-near: 0 1px 3px var(--kh-depth-shadow);
+  --kh-lift-far: 0 6px 17px -4px var(--kh-depth-shadow);
+  --kh-lift-selected: 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 60%, transparent);
+  --kh-lift-highlight: inset 0 1px 0 var(--kh-depth-highlight);
+  --kh-lift-sheen: linear-gradient(var(--kh-depth-sheen), transparent 35%);
+}
+
+/* Knappar: de fyllda och tonade lyfts; konturerade och textknappar bara krymper. */
+.kh-depth :is(.kh-btn:not(.kh-btn--outlined, .kh-btn--text)):not(:disabled, [aria-busy='true']) {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
+}
+.kh-depth .kh-btn--secondary:not(:disabled, [aria-busy='true']) {
+  box-shadow:
+    var(--kh-lift-highlight),
+    0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent),
+    0 6px 17px -4px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent);
+}
+.kh-depth :is(.kh-btn, .kh-chip, .kh-segmented > *):not(:disabled, [aria-busy='true']):active {
+  transform: scale(var(--kh-depth-pressed-scale));
+}
+.kh-depth .kh-btn:not(.kh-btn--outlined, .kh-btn--text):not(:disabled):active {
+  background-image: none;
+  box-shadow: none;
+}
+.kh-depth .kh-btn--outlined:not(:disabled):active { box-shadow: inset 0 0 0 1px var(--kh-outline-variant); }
+
+/* Valt chip och valt segment: skimmer och ljuskant; chipet en liten skugga, segmenten ingen (de sitter ihop). */
+.kh-depth .kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected):not(:disabled, .kh-chip--pending) {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-selected);
+}
+.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight);
+}
+.kh-depth :is(.kh-chip, .kh-segmented > *):active { background-image: none; }
+
+/* Kort: mjuk skugga och hårfin kant – inte ett tonat kort. En app med egen kontur (--kh-card-border)
+   sätter --kh-depth-card-edge: transparent, som AppCardStyle.border går före kanten. */
+.kh-depth .kh-card:not(.kh-card--tone) {
+  box-shadow:
+    inset 0 0 0 1px var(--kh-depth-card-edge),
+    0 1px 3px color-mix(in srgb, var(--kh-depth-card-shadow) 35%, transparent),
+    0 6px 22px -6px var(--kh-depth-card-shadow);
+  background-image: linear-gradient(var(--kh-depth-card-sheen, transparent), transparent 64px);
+}
+/* Ett klickbart kort krymper hälften så mycket som en knapp. */
+.kh-depth :is(a.kh-card, button.kh-card, .kh-card--clickable):active {
+  transform: scale(calc(1 - (1 - var(--kh-depth-pressed-scale)) / 2));
+}
+.kh-depth :is(button.kh-pill, .kh-pill--clickable):active { transform: scale(var(--kh-depth-pressed-scale)); }
+
+/* Fältet i fokus: en mjuk ring i primärfärgen utanför kanten (inte i felläget). */
+.kh-depth .kh-field:focus-within:not(:has(.kh-field__input[aria-invalid='true'], .kh-field__input[readonly])) {
+  box-shadow: inset 0 0 0 2px var(--kh-primary), 0 0 0 4px color-mix(in srgb, var(--kh-primary) 16%, transparent);
+}
+
+/* Det som flyter (meddelandet): skugga och hårfin kant. Dialogen och arket: bara kanten. */
+.kh-depth .kh-snackbar {
+  box-shadow:
+    inset 0 0 0 1px var(--kh-depth-card-edge),
+    0 2px 6px color-mix(in srgb, var(--kh-depth-card-shadow) 35%, transparent),
+    0 10px 29px -8px var(--kh-depth-card-shadow);
+}
+.kh-depth .kh-dialog { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge); }
+.kh-depth .kh-sheet { box-shadow: inset 0 1px 0 var(--kh-depth-card-edge); }
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label) { transition: none; }
+}

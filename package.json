@@ -1,0 +1,25 @@
+{
+  "name": "@kodhast/web-ui",
+  "version": "0.1.0",
+  "description": "android-ui:s utseende för webbapparna: tal, och kort, rader, knappar och de andra delarna som ren CSS.",
+  "license": "MIT",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/Kodhast/web-ui.git" },
+  "files": ["src/", "tokens.json"],
+  "exports": {
+    "./kh.css": "./src/kh.css",
+    "./tokens.css": "./src/tokens.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "style": "./src/kh.css",
+  "scripts": {
+    "tokens": "node scripts/tokens.mjs",
+    "kontroll": "node scripts/tokens.mjs --check && node --test test/*.test.mjs",
+    "skarmdumpar": "node scripts/skarmdumpar.mjs",
+    "jamfor": "node scripts/jamfor.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  },
+  "engines": { "node": ">=22" }
+}
