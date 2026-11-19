@@ -22,8 +22,7 @@ Roborazzi-bilderna i `android-ui/ui-components/src/test/screenshots`.
 
 Inga beroenden och inget byggsteg: två CSS-filer.
 
-**Webbläsare:** Chrome på dator och Chrome på Android (familjens telefoner är Galaxy S21 Ultra och S10).
-Andra webbläsare provas inte.
+**Webbläsare:** Chrome på dator och Chrome på Android. Andra webbläsare provas inte.
 
 ## Använda
 

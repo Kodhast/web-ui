@@ -14,8 +14,10 @@ Ett nej mjukas inte upp.
 issue och Mats ok ("kör" eller `plan-godkänd`). Små fixar och dokument går direkt till PR med raden
 `Liten ändring: <varför>`. Osäker → större. Skill `android:arbetsregler` är enda källan.
 
-**Webbläsare:** bara Chrome på dator och Chrome på Android (Galaxy S21 Ultra och S10). Ingen iOS, Safari
-eller Firefox att ta hänsyn till (Mats 2026-11-19).
+**Webbläsare och användare (Mats 2026-11-19):** bara Chrome på dator och Chrome på Android; mest telefonen.
+Ingen iOS, Safari eller Firefox att ta hänsyn till – Chrome-funktioner som `text-box` och `:has()` får användas
+utan reserv. Ingen hänsyn till skärmläsare (uppläsning) behövs. Vanlig användbarhet gäller fortfarande:
+tryckytor på minst 48, läsbar kontrast och små telefonskärmar.
 
 **Repot är publikt.** Inga personuppgifter, ingen riktig data ur apparna och inga hemligheter i kod,
 galleri, prov, commits eller issues. Galleriets data är påhittad.
