@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.1.0 (tagg `v1.1.0`) ·
+**Version:** 1.1.1 (tagg `v1.1.1`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -95,7 +95,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-field-group`, `kh-field` med `__input`, `__label`, `__suffix`, `kh-field__support` | `AppTextField` | `aria-invalid="true"`, `--error` på texten under, `disabled`, `textarea` |
 | `kh-dialog` med `__title`, `__text`, `__actions` | `ConfirmDialog` | `<dialog>` med `showModal()` |
 | `kh-sheet` med `__title`, `__subtitle`, `__footer` | `AppBottomSheet` | `<dialog>` med `showModal()` |
-| `kh-snackbar-host` + `kh-snackbar` med `__text`, `__action` | `AppSnackbarHost` | – |
+| `kh-snackbar-host` + `kh-snackbar` med `__text`, `__action` | `AppSnackbarHost` | står ovanför `kh-toolbar--fixed` när sidan har en |
 | `kh-empty` med `__message`, `__tile`, `__texts`, `__title`, `__text`, `__actions`, `__note` | `EmptyState` | `--error`, `--compact`, `--fullscreen` |
 | `kh-avatar` med `__circle` | `AccountAvatar` | `--online`, klickbar som `button` |
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
@@ -145,6 +145,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.1.1 | Meddelandet (`kh-snackbar-host`) står ovanför en fast flikrad (`kh-toolbar--fixed`), som i Android, i stället för under den. |
 | 1.1.0 | Ikonknappen `kh-icon-btn` (`AppIconButton`): vanlig och `--tonal`, valfri ton, med djup lyft och tryck till 0,92. |
 | 1.0.0 | Första stabila versionen (W4): samma delar som 0.2.0, och taggen `v1.0.0`. Från och med nu gäller semver fullt ut: en borttagen eller omdöpt klass, variabel, element, attribut eller händelse är major. |
 | 0.2.0 | Beteendet (W3): `kh.js` med `<kh-dots>`, `<kh-header>`, `<kh-toolbar>`, `<kh-refresh>` och `<kh-segmented>`; menyn `kh-menu`, laddningen `kh-loading`, prickarna i en knapp som arbetar. Nya färger: `--kh-secondary`, `--kh-tertiary` (med `on-`), `--kh-toolbar`, `--kh-on-toolbar`. |
