@@ -271,6 +271,23 @@ test('meddelande: omvänd yta, radens hörn, åtgärden i omvänd primärfärg, 
   assert.notEqual(await style('#a', 'box-shadow'), 'none');
 });
 
+test('meddelande: står ovanför en fast flikrad, annars nere vid kanten', async () => {
+  await mount('<div class="kh-snackbar-host" id="h"><div class="kh-snackbar"><span class="kh-snackbar__text">Sparat</span></div></div>');
+  const bottom = async () => page.evaluate(() => innerHeight - document.querySelector('#h .kh-snackbar').getBoundingClientRect().bottom);
+  assert.equal(await bottom(), 16);
+  await page.evaluate(() => {
+    const bar = document.createElement('kh-toolbar');
+    bar.className = 'kh-toolbar--fixed';
+    bar.id = 'fast-rad';
+    document.body.append(bar);
+  });
+  try {
+    assert.equal(await bottom(), 16 + 96, 'flikradens frigång under meddelandet');
+  } finally {
+    await page.evaluate(() => document.getElementById('fast-rad').remove());
+  }
+});
+
 test('tomt läge: ikonrutan 120 med ikonrutans hörn; fel och kompakt', async () => {
   await mount(`
     <div class="kh-empty" id="a"><div class="kh-empty__message"><div class="kh-empty__tile"></div><h3 class="kh-empty__title">Tomt</h3></div></div>
