@@ -98,13 +98,13 @@
 
 /* Tryckläget (Material 3:s state layer): ett lager i innehållets färg. */
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable) {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable) {
   position: relative;
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable)::after {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable)::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -116,11 +116,11 @@
   z-index: -1;
 }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action):not(:disabled):hover::after { opacity: 0.08; }
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item):not(:disabled):hover::after { opacity: 0.08; }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action):not(:disabled):active::after { opacity: 0.1; }
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item):not(:disabled):active::after { opacity: 0.1; }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-avatar--clickable):focus-visible {
+    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-avatar--clickable):focus-visible {
   outline: 2px solid var(--kh-primary);
   outline-offset: 2px;
 }
@@ -713,6 +713,330 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   background: var(--kh-online, var(--kh-primary));
 }
 
+/* ---------- Skuggor utan djup (Material 3:s nivåer), i scrimfärgen ---------- */
+
+:root {
+  --kh-elevation-1: 0 1px 2px color-mix(in srgb, var(--kh-scrim) 30%, transparent), 0 1px 3px 1px color-mix(in srgb, var(--kh-scrim) 15%, transparent);
+  --kh-elevation-2: 0 1px 2px color-mix(in srgb, var(--kh-scrim) 30%, transparent), 0 2px 6px 2px color-mix(in srgb, var(--kh-scrim) 15%, transparent);
+  --kh-elevation-3: 0 1px 3px color-mix(in srgb, var(--kh-scrim) 30%, transparent), 0 4px 8px 3px color-mix(in srgb, var(--kh-scrim) 15%, transparent);
+}
+
+/* ---------- Prickarna (BrandDots): <kh-dots>, kh.js ---------- */
+
+/*
+ * Två runda prickar med en prickbredd emellan, i primärfärgen (color på elementet byter). Med bouncing
+ * hoppar de i tur och ordning: period 900 ms, den andra 150 ms efter, höjd 70 % av diametern – stilla när
+ * systemets animeringar är avstängda. --kh-dots-size är diametern.
+ */
+kh-dots {
+  --kh-dots-size: 16px;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  inline-size: calc(var(--kh-dots-size) * 3);
+  block-size: calc(var(--kh-dots-size) * 1.7);
+  color: var(--kh-primary);
+}
+kh-dots > i {
+  inline-size: var(--kh-dots-size);
+  block-size: var(--kh-dots-size);
+  border-radius: var(--kh-radius-pill);
+  background: currentColor;
+}
+kh-dots[bouncing] { align-items: flex-end; }
+kh-dots[bouncing] > i { animation: kh-dot-jump 900ms linear infinite; }
+kh-dots[bouncing] > i:nth-child(2) { animation-delay: 150ms; }
+/* Uppe och nere på periodens första halva (en sinusbåge), stilla på den andra. */
+@keyframes kh-dot-jump {
+  0% { translate: 0 0; }
+  4.1667% { translate: 0 -18.12%; }
+  8.3333% { translate: 0 -35%; }
+  12.5% { translate: 0 -49.5%; }
+  16.6667% { translate: 0 -60.62%; }
+  20.8333% { translate: 0 -67.61%; }
+  25% { translate: 0 -70%; }
+  29.1667% { translate: 0 -67.61%; }
+  33.3333% { translate: 0 -60.62%; }
+  37.5% { translate: 0 -49.5%; }
+  41.6667% { translate: 0 -35%; }
+  45.8333% { translate: 0 -18.12%; }
+  50%, 100% { translate: 0 0; }
+}
+/* Laddning (AppLoading): prickarna mitt på ytan. */
+.kh-loading { display: grid; place-items: center; min-block-size: 100%; }
+/* En knapp som arbetar (AppButton(loading)): prickarna i knappens textfärg. */
+.kh-btn > kh-dots { --kh-dots-size: 10px; color: inherit; }
+
+/* ---------- Sidhuvudet (AppHeader): <kh-header>, kh.js ---------- */
+
+/*
+ * 144 högt i vila med appens ikon och namn överst, kontot till höger och rubriken stort under; när
+ * innehållet rullas krymper det med fingret till 64 och rubriken glider upp bredvid ikonen. kh.js sätter
+ * måtten (--kh-header-*) vid varje rullning. Ihopfällt med innehåll under (data-raised) får det kortens
+ * färg och skuggan (med djup) eller en hårfin linje (utan).
+ */
+@property --kh-header-lift {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+kh-header {
+  --kh-header-surface: color-mix(in srgb, var(--kh-card) calc(var(--kh-header-lift) * 100%), var(--kh-background));
+  --kh-avatar-ring: var(--kh-header-surface);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: block;
+  box-sizing: border-box;
+  block-size: var(--kh-header-height, var(--kh-header-expanded));
+  margin-block-end: calc(var(--kh-header-expanded) - var(--kh-header-height, var(--kh-header-expanded)));
+  overflow: clip;
+  background-color: var(--kh-header-surface);
+  color: var(--kh-on-surface);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--kh-outline-variant) calc(var(--kh-header-lift) * 100%), transparent);
+  transition: --kh-header-lift 200ms ease;
+}
+kh-header[data-raised] { --kh-header-lift: 1; }
+kh-header > * { position: absolute; margin: 0; }
+.kh-header__icon {
+  inset-inline-start: var(--kh-space-l);
+  inset-block-start: calc((var(--kh-header-collapsed) - var(--kh-header-icon-size, var(--kh-header-app-icon))) / 2);
+  inline-size: var(--kh-header-icon-size, var(--kh-header-app-icon));
+  block-size: var(--kh-header-icon-size, var(--kh-header-app-icon));
+  fill: currentColor;
+  object-fit: contain;
+}
+:is(.kh-header__name, .kh-header__trailing) {
+  inset-block-start: 0;
+  display: flex;
+  align-items: center;
+  block-size: var(--kh-header-collapsed);
+}
+.kh-header__name {
+  inset-inline-start: var(--kh-header-name-x, calc(var(--kh-space-l) + var(--kh-header-app-icon) + var(--kh-space-m)));
+  max-inline-size: var(--kh-header-name-max, none);
+  font: var(--kh-type-item-title);
+  opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.4, 1);
+}
+.kh-header__trailing { inset-inline-end: var(--kh-space-xs); }
+.kh-header__title {
+  inset-inline-start: var(--kh-header-title-x, var(--kh-space-l));
+  inset-block-start: var(--kh-header-title-y, var(--kh-header-collapsed));
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-s);
+  max-inline-size: var(--kh-header-title-max, calc(100% - 2 * var(--kh-space-l)));
+  font: var(--kh-type-screen-title);
+  letter-spacing: var(--kh-tracking-screen-title);
+}
+kh-header:defined .kh-header__title {
+  font-size: var(--kh-header-title-size);
+  line-height: var(--kh-header-title-line);
+  font-weight: var(--kh-header-title-weight);
+  letter-spacing: var(--kh-header-title-tracking);
+}
+.kh-header__title > kh-dots { --kh-dots-size: 6px; block-size: 11px; }
+:is(.kh-header__name, .kh-header__title > :not(kh-dots), .kh-header__subtitle) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kh-header__subtitle {
+  inset-inline-start: var(--kh-space-l);
+  inset-block-start: var(--kh-header-subtitle-y, auto);
+  max-inline-size: var(--kh-header-subtitle-max, calc(100% - 2 * var(--kh-space-l)));
+  font: var(--kh-type-item-subtitle);
+  color: var(--kh-on-surface-variant);
+  opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.33, 1);
+}
+:is(.kh-header__name, .kh-header__title > :not(kh-dots), .kh-header__subtitle, .kh-header__probe) { text-box: trim-both text; }
+.kh-header__probe { position: absolute; visibility: hidden; white-space: nowrap; }
+
+/* ---------- Meny (AppMenuPopup): <div class="kh-menu" popover> ---------- */
+
+.kh-menu {
+  inset: auto;
+  box-sizing: border-box;
+  min-inline-size: 112px;
+  max-inline-size: 280px;
+  margin: 0;
+  padding: var(--kh-space-s) 0;
+  border: 0;
+  border-radius: var(--kh-radius-menu);
+  background: var(--kh-card);
+  color: var(--kh-on-surface);
+  box-shadow: var(--kh-elevation-2);
+}
+.kh-menu:popover-open { display: flex; flex-direction: column; }
+/* Huvudknappens meny (kh.js förankrar den): ovanför knappen, linjerad med dess ytterkant. */
+.kh-menu--above { position-area: top span-left; position-try-fallbacks: flip-block, flip-inline; }
+.kh-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--kh-space-m);
+  box-sizing: border-box;
+  min-block-size: 48px;
+  margin: 0;
+  padding: 0 var(--kh-space-m);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: var(--kh-type-body);
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kh-menu__item > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); flex: none; fill: currentColor; }
+.kh-menu__item--destructive { color: var(--kh-error); }
+
+/* ---------- Flikraden (AppFloatingToolbar): <kh-toolbar>, kh.js ---------- */
+
+/*
+ * En flytande rad där vald flik visar ikon och namn och övriga bara ikon, och huvudknappen bredvid.
+ * Bakgrunden är --kh-toolbar / --kh-on-toolbar (ToolbarStyle.Toolbar); --surface, --tonal och --filled
+ * byter. Huvudknappen är --kh-secondary (ActionColor.Secondary); --tertiary byter. --fixed lägger raden
+ * längst ned på skärmen; innehållet behöver då --kh-toolbar-clearance plats under sig.
+ */
+:root { --kh-toolbar-clearance: 96px; }
+kh-toolbar {
+  --kh-toolbar-bg: var(--kh-toolbar);
+  --kh-toolbar-fg: var(--kh-on-toolbar);
+  --kh-toolbar-selected-bg: var(--kh-primary);
+  --kh-toolbar-selected-fg: var(--kh-on-primary);
+  --kh-toolbar-action-bg: var(--kh-secondary);
+  --kh-toolbar-action-fg: var(--kh-on-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kh-space-s);
+}
+kh-toolbar.kh-toolbar--fixed {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--kh-space-l) + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  pointer-events: none;
+}
+kh-toolbar.kh-toolbar--fixed > * { pointer-events: auto; }
+.kh-toolbar--surface { --kh-toolbar-bg: var(--kh-card); --kh-toolbar-fg: var(--kh-on-surface-variant); }
+.kh-toolbar--tonal { --kh-toolbar-bg: var(--kh-primary-container); --kh-toolbar-fg: var(--kh-on-primary-container); }
+.kh-toolbar--filled {
+  --kh-toolbar-bg: var(--kh-primary);
+  --kh-toolbar-fg: var(--kh-on-primary);
+  --kh-toolbar-selected-bg: var(--kh-on-primary);
+  --kh-toolbar-selected-fg: var(--kh-primary);
+}
+.kh-toolbar--tertiary { --kh-toolbar-action-bg: var(--kh-tertiary); --kh-toolbar-action-fg: var(--kh-on-tertiary); }
+.kh-toolbar__tabs {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  block-size: 64px;
+  padding: 0 var(--kh-space-s);
+  border-radius: var(--kh-radius-pill);
+  background: var(--kh-toolbar-bg);
+  color: var(--kh-toolbar-fg);
+  box-shadow: var(--kh-elevation-1);
+}
+.kh-toolbar__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  margin: 0;
+  padding: 0 var(--kh-space-m);
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: transparent;
+  color: inherit;
+  font: var(--kh-type-button);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+.kh-toolbar__tab > svg { inline-size: var(--kh-icon-row); block-size: var(--kh-icon-row); flex: none; fill: currentColor; }
+/* Namnet syns bara på vald flik och fäller ut fliken (animateContentSize). */
+.kh-toolbar__label {
+  max-inline-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-inline-size 300ms cubic-bezier(0.2, 0, 0, 1), margin 300ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms ease;
+}
+.kh-toolbar__tab:is([aria-selected='true'], [aria-current='page']) {
+  background-color: var(--kh-toolbar-selected-bg);
+  color: var(--kh-toolbar-selected-fg);
+}
+.kh-toolbar__tab:is([aria-selected='true'], [aria-current='page']) > .kh-toolbar__label {
+  max-inline-size: 12em;
+  margin-inline-start: var(--kh-space-xs);
+  opacity: 1;
+}
+/* Märket med antal syns bara på en ovald flik. */
+.kh-toolbar__badge {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-inline-size: 18px;
+  block-size: 18px;
+  margin-inline-start: var(--kh-space-xs);
+  padding: 0 5px;
+  border-radius: var(--kh-radius-pill);
+  background: var(--kh-secondary);
+  color: var(--kh-on-secondary);
+  font: var(--kh-type-caption);
+}
+.kh-toolbar__tab:is([aria-selected='true'], [aria-current='page']) > .kh-toolbar__badge { display: none; }
+.kh-toolbar__action {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 56px;
+  block-size: 56px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kh-radius-fab);
+  background-color: var(--kh-toolbar-action-bg);
+  color: var(--kh-toolbar-action-fg);
+  box-shadow: var(--kh-elevation-3);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-toolbar__action > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); fill: currentColor; }
+
+/* ---------- Dra ned för att uppdatera (AppPullToRefresh): <kh-refresh>, kh.js ---------- */
+
+/* Webbläsarens egen dra-ned-uppdatering stängs av där biblioteket tar gesten. */
+html:has(kh-refresh) { overscroll-behavior-y: contain; }
+kh-refresh { position: relative; display: block; }
+/* En rund behållare som följer dragningen ned från kanten (tröskeln 80) och stannar under uppdateringen. */
+.kh-refresh__indicator {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(50% - 24px);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--kh-radius-pill);
+  background: var(--kh-surface-container-high, var(--kh-card));
+  box-shadow: var(--kh-elevation-1);
+  pointer-events: none;
+  visibility: hidden;
+  translate: 0 calc(var(--kh-refresh-fraction, 0) * 80px - 48px);
+  transition: translate 300ms cubic-bezier(0.2, 0, 0, 1), visibility 0s 300ms;
+}
+kh-refresh[data-state] > .kh-refresh__indicator { visibility: visible; transition: translate 300ms cubic-bezier(0.2, 0, 0, 1), visibility 0s; }
+kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
+.kh-refresh__indicator > kh-dots { --kh-dots-size: 8px; }
+
 /* ---------- Djup (AppDepth): bara inom .kh-depth ---------- */
 
 /*
@@ -789,6 +1113,27 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
 .kh-depth .kh-dialog { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge); }
 .kh-depth .kh-sheet { box-shadow: inset 0 1px 0 var(--kh-depth-card-edge); }
 
+/* Sidhuvudet ihopfällt med innehåll under: skuggan (AppDepth.headerShadow, annars kortens) i stället för linjen. */
+.kh-depth kh-header {
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--kh-depth-header-shadow, var(--kh-depth-card-shadow)) calc(var(--kh-header-lift) * 100%), transparent);
+}
+/* Flikraden: en tydlig men mjuk skugga; vald flik skimmer och ljuskant, flikarna krymper nedtryckta. */
+.kh-depth .kh-toolbar__tabs { box-shadow: var(--kh-elevation-3); }
+.kh-depth .kh-toolbar__tab:is([aria-selected='true'], [aria-current='page']) {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight);
+}
+.kh-depth :is(.kh-toolbar__tab, .kh-toolbar__action):active { transform: scale(var(--kh-depth-pressed-scale)); }
+/* Huvudknappen: en fylld knapps djup, som sjunker in vid tryck. */
+.kh-depth .kh-toolbar__action {
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
+}
+.kh-depth .kh-toolbar__action:active { background-image: none; box-shadow: none; }
+/* Menyn: kortens hårfina kant. */
+.kh-depth .kh-menu { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge), var(--kh-elevation-2); }
+
 @media (prefers-reduced-motion: reduce) {
-  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label) { transition: none; }
+  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, kh-header) { transition: none; }
+  kh-dots[bouncing] > i { animation: none; }
 }

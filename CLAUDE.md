@@ -1,7 +1,7 @@
 # web-ui – projektets grundregler
 
-> android-ui:s utseende för webbapparna (Husjakt, Veckans mat) som ren CSS: `src/tokens.css` (talen, genererad
-> ur android-ui:s `tokens.json`) och `src/kh.css` (klasserna `kh-*`); senare egna element för beteendet.
+> android-ui:s utseende för webbapparna (Husjakt, Veckans mat) som ren CSS och egna element: `src/tokens.css` (talen, genererad
+> ur android-ui:s `tokens.json`), `src/kh.css` (klasserna `kh-*`) och `src/kh.js` (egna element för beteendet).
 > Vad som finns och hur en app använder det: [README.md](README.md). Planen: Kodhast/android-ui#93.
 
 **Svarslängd:** håll chattsvar minimala. Kod, commits och PR-beskrivningar skrivs normalt.

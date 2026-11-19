@@ -1,7 +1,7 @@
 {
   "name": "@kodhast/web-ui",
-  "version": "0.1.0",
-  "description": "android-ui:s utseende för webbapparna: tal, och kort, rader, knappar och de andra delarna som ren CSS.",
+  "version": "0.2.0",
+  "description": "android-ui:s utseende för webbapparna: tal, kort, rader, knappar och de andra delarna som ren CSS, och sidhuvud, flikrad, prickar och dra-ned som egna element.",
   "license": "MIT",
   "type": "module",
   "repository": { "type": "git", "url": "git+https://github.com/Kodhast/web-ui.git" },
@@ -9,6 +9,7 @@
   "exports": {
     "./kh.css": "./src/kh.css",
     "./tokens.css": "./src/tokens.css",
+    "./kh.js": "./src/kh.js",
     "./tokens.json": "./tokens.json"
   },
   "style": "./src/kh.css",
