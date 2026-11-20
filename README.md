@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.4.0 (tagg `v1.4.0`) ·
+**Version:** 1.5.0 (tagg `v1.5.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -99,7 +99,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-empty` med `__message`, `__tile`, `__texts`, `__title`, `__text`, `__actions`, `__note` | `EmptyState` | `--error`, `--compact`, `--fullscreen` |
 | `kh-avatar` med `__circle` | `AccountAvatar` | `--online`, klickbar som `button` |
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
-| `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg` |
+| `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg`. En knapp med `popovertarget` öppnar den förankrad under sig, linjerad med högerkanten (ovanför när det inte ryms); `kh.js` förankrar vid trycket, sätter `aria-expanded` och stänger menyn vid ett val. En app som själv anropar `togglePopover()` (t.ex. en knapp i en länk, med `preventDefault`) får samma förankring. |
 | `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
 | `kh-page` | – (bara webben) | Innehållets marginal: `--kh-space-l`, eller mer när fönstret är bredare än `--kh-page-max` |
 
@@ -151,6 +151,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.5.0 | Menyn vid valfri knapp: `kh-menu` förankras vid knappen som öppnar den med `popovertarget`, under knappen och linjerad med dess högerkant, ovanför när det inte ryms. Förut förankrades bara flikradens huvudknapps meny. Flikradens meny som förut. |
 | 1.4.0 | Versionen i sidhuvudet (android-ui #95, `AppIdentity.version`): `.kh-header__version` efter `__name` – litet (`kh-type-caption`), dämpat, på namnets baslinje, tonar bort med namnet och lämnas bort helt när den inte ryms bredvid ett helt namn. `kh.js` placerar den. Utan elementet är allt som förut. |
 | 1.3.0 | Bred skärm: `--kh-page-max` ställer `kh-header`, `kh-topbar` och nya `kh-page` i en spalt; nya kortrutnätet `kh-grid` (en spalt under 600, annars spalter om minst 300). Utan variabeln oförändrat. |
 | 1.2.0 | Toppraden `kh-topbar` (`AppTopBar`, liten) för underskärmar: tillbakapil, prickar och rubrik, åtgärder till höger. |

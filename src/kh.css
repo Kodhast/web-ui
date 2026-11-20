@@ -989,10 +989,13 @@ kh-header:defined .kh-header__title {
   background: var(--kh-card);
   color: var(--kh-on-surface);
   box-shadow: var(--kh-elevation-2);
+  /* kh.js förankrar menyn vid knappen som öppnar den: under knappen, linjerad med dess högerkant. */
+  position-area: bottom span-left;
+  position-try-fallbacks: flip-block, flip-inline;
 }
 .kh-menu:popover-open { display: flex; flex-direction: column; }
-/* Huvudknappens meny (kh.js förankrar den): ovanför knappen, linjerad med dess ytterkant. */
-.kh-menu--above { position-area: top span-left; position-try-fallbacks: flip-block, flip-inline; }
+/* Huvudknappens meny: ovanför knappen, linjerad med dess ytterkant. */
+.kh-menu--above { position-area: top span-left; }
 .kh-menu__item {
   display: flex;
   align-items: center;

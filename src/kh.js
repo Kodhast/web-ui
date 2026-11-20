@@ -241,15 +241,52 @@
     }
   };
 
-  /* ---------- Flikraden (AppFloatingToolbar) ---------- */
+  /* ---------- Menyn vid en knapp (AppDropdownMenu) ---------- */
 
   let anchors = 0;
+
+  /**
+   * En knapp med popovertarget mot en .kh-menu öppnar menyn förankrad vid knappen: under den och linjerad
+   * med dess högerkant, eller ovanför när det inte ryms (eller alltid med .kh-menu--above). Förankringen
+   * sätts vid varje tryck, så att en app som ritar om knappen eller menyn inte tappar den. Knappen får
+   * aria-expanded, och ett val i menyn stänger den (utom menuitemcheckbox).
+   */
+  function anchorMenu(button, menu) {
+    if (!button.style.anchorName) button.style.anchorName = `--kh-anchor-${++anchors}`;
+    menu.style.positionAnchor = button.style.anchorName;
+    if (menu.dataset.khAnchored === undefined) {
+      menu.dataset.khAnchored = '';
+      menu.addEventListener('toggle', (event) => {
+        const owner = document.querySelector(`[popovertarget="${CSS.escape(menu.id)}"]`);
+        owner?.setAttribute('aria-expanded', String(event.newState === 'open'));
+      });
+      menu.addEventListener('click', (event) => {
+        const item = event.target.closest('.kh-menu__item');
+        if (item && !item.matches('[role=menuitemcheckbox]')) menu.hidePopover();
+      });
+    }
+    button.setAttribute('aria-expanded', String(menu.matches(':popover-open')));
+  }
+
+  const menuFor = (button) => {
+    const menu = button && document.getElementById(button.getAttribute('popovertarget'));
+    return menu?.classList.contains('kh-menu') ? menu : null;
+  };
+
+  // Före knappens egen popover-öppning, så att menyn öppnar redan förankrad.
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest?.('[popovertarget]');
+    const menu = menuFor(button);
+    if (menu) anchorMenu(button, menu);
+  }, true);
+
+  /* ---------- Flikraden (AppFloatingToolbar) ---------- */
 
   /**
    * <kh-toolbar> med .kh-toolbar__tabs (flikarna .kh-toolbar__tab) och valfritt huvudknappen
    * .kh-toolbar__action. En flik som är en knapp väljs vid tryck (aria-selected) och meddelar kh-select;
    * en flik som är en länk lämnar valet åt appen (aria-current="page"). Huvudknappen med popovertarget
-   * öppnar en .kh-menu som förankras vid knappen; ett val i menyn stänger den.
+   * öppnar en .kh-menu ovanför sig (Menyn vid en knapp).
    */
   class KhToolbar extends HTMLElement {
     #onClick = (event) => {
@@ -262,19 +299,10 @@
     connectedCallback() {
       this.addEventListener('click', this.#onClick);
       const action = this.querySelector('.kh-toolbar__action[popovertarget]');
-      const menu = action && document.getElementById(action.getAttribute('popovertarget'));
-      if (action && menu && !menu.dataset.khAnchored) {
-        const name = `--kh-anchor-${++anchors}`;
-        action.style.anchorName = name;
-        menu.style.positionAnchor = name;
-        menu.dataset.khAnchored = '';
+      const menu = menuFor(action);
+      if (menu) {
         menu.classList.add('kh-menu--above');
-        action.setAttribute('aria-expanded', 'false');
-        menu.addEventListener('toggle', (event) => action.setAttribute('aria-expanded', String(event.newState === 'open')));
-        menu.addEventListener('click', (event) => {
-          const item = event.target.closest('.kh-menu__item');
-          if (item && !item.matches('[role=menuitemcheckbox]')) menu.hidePopover();
-        });
+        anchorMenu(action, menu);
       }
     }
 
