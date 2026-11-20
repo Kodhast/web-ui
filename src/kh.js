@@ -256,7 +256,8 @@
     menu.style.positionAnchor = button.style.anchorName;
     if (menu.dataset.khAnchored === undefined) {
       menu.dataset.khAnchored = '';
-      menu.addEventListener('toggle', (event) => {
+      // beforetoggle kommer i samma tur som öppningen (toggle först efteråt), så knappens läge stämmer direkt.
+      menu.addEventListener('beforetoggle', (event) => {
         const owner = document.querySelector(`[popovertarget="${CSS.escape(menu.id)}"]`);
         owner?.setAttribute('aria-expanded', String(event.newState === 'open'));
       });
