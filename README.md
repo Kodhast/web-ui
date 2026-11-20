@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.3.0 (tagg `v1.3.0`) ·
+**Version:** 1.4.0 (tagg `v1.4.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -109,7 +109,7 @@ Med `kh.js` (egna element, inga shadow DOM):
 |---|---|---|
 | `<kh-dots>` | `BrandDots` (`AppBrandStyle.dotLoading`, `headerDots`) | `bouncing` hoppar (stilla utan animeringar); `--kh-dots-size` är diametern, `color` färgen. I `kh-btn` med `aria-busy` (knappen som arbetar), i `kh-loading` (`AppLoading`) och före rubriken i sidhuvudet (synkar med `bouncing`). |
 | `kh-topbar` med `__title` (`<kh-dots>` + `<span>`), `__actions` | `AppTopBar(size = Small)` | Underskärmens rad: 64 hög och fast överst; tillbakapilen är en `kh-icon-btn` (`--tonal` som standard i Android, vanlig för Fonder, valfri tonklass); utan pil börjar rubriken 16 in; rubriken avkortas på en rad; `bouncing` på prickarna medan något hämtas. Toppskärmar använder `<kh-header>`. |
-| `<kh-header>` med `__icon`, `__name`, `__trailing`, `__title` (`<kh-dots>` + `<span>`), `__subtitle` | `AppHeader` | Krymper från 144 till 64 med sidans (eller närmaste rullande förälders, eller `scroller="#id"`) rullning, fäller ut högst upp; `data-raised` när innehåll ligger under; `collapsedFraction` läses. Kontot (`kh-avatar`) i `__trailing` får huvudets färg i ringen. |
+| `<kh-header>` med `__icon`, `__name`, `__version` (valfri), `__trailing`, `__title` (`<kh-dots>` + `<span>`), `__subtitle` | `AppHeader` | Krymper från 144 till 64 med sidans (eller närmaste rullande förälders, eller `scroller="#id"`) rullning, fäller ut högst upp; `data-raised` när innehåll ligger under; `collapsedFraction` läses. Kontot (`kh-avatar`) i `__trailing` får huvudets färg i ringen. |
 | `<kh-toolbar>` med `__tabs`, `__tab` (`__label`, `__badge`), `__action` | `AppFloatingToolbar` | En flik som är `button` väljs (`aria-selected`) och meddelar `kh-select`; en länk följer appens `aria-current="page"`. `__action` med `popovertarget` öppnar en `kh-menu` ovanför sig. `--surface`, `--tonal`, `--filled` (`ToolbarStyle`), `--tertiary` (`ActionColor`), `--fixed` längst ned (innehållet behöver `--kh-toolbar-clearance`). |
 | `<kh-refresh>` runt listan | `AppPullToRefresh` med prickar | Dragning högst upp: prickarna följer fingret, efter tröskeln meddelas `kh-refresh`; appen sätter `refreshing` medan den uppdaterar (inom 5 s). En uppdatering appen startat själv visar inga prickar här. |
 | `<kh-segmented>` | `AppSegmentedChoice` | Ett val i taget i barnens `aria-checked` (eller `aria-pressed`/`aria-selected`), med tryck och pilar; meddelar `kh-select` (`detail: { index, value }`). |
@@ -151,6 +151,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.4.0 | Versionen i sidhuvudet (android-ui #95, `AppIdentity.version`): `.kh-header__version` efter `__name` – litet (`kh-type-caption`), dämpat, på namnets baslinje, tonar bort med namnet och lämnas bort helt när den inte ryms bredvid ett helt namn. `kh.js` placerar den. Utan elementet är allt som förut. |
 | 1.3.0 | Bred skärm: `--kh-page-max` ställer `kh-header`, `kh-topbar` och nya `kh-page` i en spalt; nya kortrutnätet `kh-grid` (en spalt under 600, annars spalter om minst 300). Utan variabeln oförändrat. |
 | 1.2.0 | Toppraden `kh-topbar` (`AppTopBar`, liten) för underskärmar: tillbakapil, prickar och rubrik, åtgärder till höger. |
 | 1.1.1 | Meddelandet (`kh-snackbar-host`) står ovanför en fast flikrad (`kh-toolbar--fixed`), som i Android, i stället för under den. |
