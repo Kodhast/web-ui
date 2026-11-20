@@ -202,6 +202,19 @@ test('segmentval: ytterkanterna rundade, det valda i primärbehållaren med bock
   assert.equal((await box('#b')).height, 40);
 });
 
+test('segmentval med djup: sänkt spår, det valda en upphöjd pill med skugga', async () => {
+  await mount(`<div class="kh-segmented" id="s"><button id="a" role="radio" aria-checked="false">Ljust</button><button id="b" role="radio" aria-checked="true">Mörkt</button></div>`, { depth: true });
+  assert.equal(await style('#s', 'background-color'), await themeColor('--kh-row-tint'));
+  assert.match(await style('#s', 'box-shadow'), /inset/);
+  assert.equal(await style('#a', 'border-top-left-radius'), '9999px');
+  assert.equal(await style('#a', 'border-top-right-radius'), '9999px', 'varje segment är en egen pill');
+  assert.equal(await style('#a', 'border-top-width'), '0px');
+  assert.equal(await style('#b', 'background-color'), await themeColor('--kh-primary-container'));
+  assert.match(await style('#b', 'box-shadow'), /px.*px.*px/);
+  assert.equal(await style('#a', 'box-shadow'), 'none');
+  assert.equal((await box('#s')).height, 40);
+});
+
 test('pill: primärtonad som standard; en ton gäller bara elementet som har den', async () => {
   await mount(`<span class="kh-pill" id="a">3 kvar</span><span class="kh-pill ton-gron" id="b">Packad</span>
     <div class="kh-card kh-card--tone ton-gron"><span class="kh-pill" id="c">I kortet</span></div>`);
