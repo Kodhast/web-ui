@@ -242,6 +242,14 @@ test('textfält: fältets hörn, etiketten flyttar upp till kanten, fel i felfä
   await settle();
   const after = await box('#a .kh-field__label');
   assert.ok(after.y < before.y - 10, 'etiketten står på kanten när fältet har text');
+  const falt = await box('#a');
+  assert.equal(after.y + after.height / 2, falt.y, 'etiketten mitt på kantlinjen');
+  // En app med högre radhöjd för etiketten (Husjakt: 16px/22px): fortfarande mitt på kanten.
+  await page.evaluate(() => document.querySelector('#a').style.setProperty('--kh-type-item-subtitle', '400 16px/22px sans-serif'));
+  await settle();
+  const hog = await box('#a .kh-field__label');
+  assert.equal(hog.height, 22);
+  assert.equal(hog.y + hog.height / 2, falt.y, 'mitt på kanten också med högre rad');
   assert.equal(await style('#b .kh-field__label', 'color'), await themeColor('--kh-error'));
   await page.focus('#a input');
   await settle();

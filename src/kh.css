@@ -492,9 +492,13 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   transform-origin: left top;
   transition: transform 150ms ease, font 150ms ease, inset-block-start 150ms ease;
 }
-/* Etiketten på kanten: kanten går bakom den, fältets yta under. */
+/*
+ * Etiketten på kanten, mitt på kantlinjen som i AppTextField, vilken radhöjd appen än ger den:
+ * övre halvan genomskinlig, den nedre i fältets yta, så att kanten bryts bakom texten.
+ */
 .kh-field:has(.kh-field__input:focus, .kh-field__input:not(:placeholder-shown)) .kh-field__label {
-  inset-block-start: -8px;
+  inset-block-start: 0;
+  transform: translateY(-50%);
   font: var(--kh-type-item-subtitle);
   background: linear-gradient(transparent 50%, var(--kh-card) 50%);
 }
