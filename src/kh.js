@@ -123,6 +123,7 @@
         collapsedIcon: token(this, '--kh-header-collapsed-app-icon', 32),
         start: token(this, '--kh-space-l', 16),
         end: token(this, '--kh-space-xs', 4),
+        pageMax: token(this, '--kh-page-max', Infinity),
         gap: token(this, '--kh-space-m', 12),
         trailingGap: token(this, '--kh-space-s', 8),
         large: probe('var(--kh-type-screen-title)', 'var(--kh-tracking-screen-title)'),
@@ -141,11 +142,14 @@
       const trailing = this.querySelector(':scope > .kh-header__trailing');
       const trailingWidth = trailing?.offsetWidth ?? 0;
 
+      // Sidans spalt (--kh-page-max, som --kh-page-inset i kh.css): marginalen växer när fönstret är bredare.
+      const start = Math.max(m.start, (width - m.pageMax) / 2);
+      const end = m.end + start - m.start;
       const iconSize = lerp(m.icon, m.collapsedIcon, f);
-      const beside = hasIcon ? m.start + m.collapsedIcon + m.gap : m.start;
-      const endClearance = trailingWidth > 0 ? trailingWidth + m.end + m.trailingGap : m.start;
-      const nameX = m.start + (hasIcon ? iconSize + m.gap : 0);
-      const restWidth = Math.max(0, width - 2 * m.start);
+      const beside = hasIcon ? start + m.collapsedIcon + m.gap : start;
+      const endClearance = trailingWidth > 0 ? trailingWidth + end + m.trailingGap : start;
+      const nameX = start + (hasIcon ? iconSize + m.gap : 0);
+      const restWidth = Math.max(0, width - 2 * start);
       const sideways = Math.min(1, f / SIDEWAYS_BY);
       const titleWidth = lerp(restWidth, Math.max(0, width - beside - endClearance), sideways);
       const titleHeight = lerp(m.large.height, m.small.height, f);
@@ -159,7 +163,7 @@
       s.setProperty('--kh-header-icon-size', px(iconSize));
       s.setProperty('--kh-header-name-x', px(nameX));
       s.setProperty('--kh-header-name-max', px(Math.max(0, width - nameX - endClearance)));
-      s.setProperty('--kh-header-title-x', px(lerp(m.start, beside, sideways)));
+      s.setProperty('--kh-header-title-x', px(lerp(start, beside, sideways)));
       s.setProperty('--kh-header-title-y', px(titleY));
       s.setProperty('--kh-header-title-max', px(titleWidth));
       s.setProperty('--kh-header-title-size', px(lerp(m.large.size, m.small.size, f)));
