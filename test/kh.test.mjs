@@ -584,6 +584,37 @@ test('flikrad: huvudknappen öppnar menyn ovanför sig, och ett val stänger den
   await page.waitForFunction(() => document.getElementById('plus').getAttribute('aria-expanded') === 'false');
 });
 
+test('meny vid en knapp: öppnar under knappen linjerad med högerkanten, också när appen öppnar den själv', async () => {
+  await mount(`<div style="display: flex; justify-content: flex-end; inline-size: 360px">
+      <button class="kh-icon-btn" id="k" popovertarget="km" aria-label="Rösta"><svg></svg></button>
+    </div>
+    <a href="#lank" style="display: flex; justify-content: flex-end; inline-size: 360px">
+      <button class="kh-icon-btn" id="j" popovertarget="jm" aria-label="I en länk"><svg></svg></button>
+    </a>
+    <div class="kh-menu" id="km" popover><button class="kh-menu__item" role="menuitemradio" aria-checked="false" id="ja">Ja</button></div>
+    <div class="kh-menu" id="jm" popover><button class="kh-menu__item" id="jval">Nej</button></div>`);
+  const knapp = await box('#k');
+  await page.click('#k');
+  assert.equal(await page.evaluate(() => document.getElementById('km').matches(':popover-open')), true);
+  assert.equal(await page.getAttribute('#k', 'aria-expanded'), 'true');
+  const meny = await box('#km');
+  assert.ok(Math.abs(meny.top - knapp.bottom) <= 1, `menyn under knappen (${meny.top} mot ${knapp.bottom})`);
+  assert.ok(Math.abs(meny.right - knapp.right) <= 1, 'menyn linjerar med knappens högerkant');
+  await page.click('#ja');
+  assert.equal(await page.evaluate(() => document.getElementById('km').matches(':popover-open')), false, 'ett val stänger menyn');
+  assert.equal(await page.getAttribute('#k', 'aria-expanded'), 'false');
+  // En knapp i en länk: appen hindrar länken och öppnar menyn själv – förankringen följer ändå med.
+  await page.evaluate(() => document.getElementById('j').addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation(); document.getElementById('jm').togglePopover();
+  }));
+  await page.click('#j');
+  const j = await box('#j');
+  const jm = await box('#jm');
+  assert.equal(await page.evaluate(() => location.hash), '', 'länken följdes inte');
+  assert.ok(Math.abs(jm.top - j.bottom) <= 1 && Math.abs(jm.right - j.right) <= 1, 'förankrad vid knappen i länken');
+  await page.click('#jval');
+});
+
 test('segmentval: ett val i taget, med tryck och pilar, och kh-select', async () => {
   await mount(`<kh-segmented id="s" role="radiogroup">
     <button role="radio" aria-checked="true" id="s0">Ljust</button><button role="radio" aria-checked="false" id="s1">Mörkt</button><button role="radio" aria-checked="false" id="s2">System</button>
