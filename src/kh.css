@@ -821,6 +821,7 @@ kh-dots[bouncing] > i:nth-child(2) { animation-delay: 150ms; }
 kh-header {
   --kh-header-surface: color-mix(in srgb, var(--kh-card) calc(var(--kh-header-lift) * 100%), var(--kh-background));
   --kh-avatar-ring: var(--kh-header-surface);
+  --kh-page-inset: max(var(--kh-space-l), (100% - var(--kh-page-max, 100%)) / 2);
   position: sticky;
   inset-block-start: 0;
   z-index: 2;
@@ -837,7 +838,7 @@ kh-header {
 kh-header[data-raised] { --kh-header-lift: 1; }
 kh-header > * { position: absolute; margin: 0; }
 .kh-header__icon {
-  inset-inline-start: var(--kh-space-l);
+  inset-inline-start: var(--kh-page-inset);
   inset-block-start: calc((var(--kh-header-collapsed) - var(--kh-header-icon-size, var(--kh-header-app-icon))) / 2);
   inline-size: var(--kh-header-icon-size, var(--kh-header-app-icon));
   block-size: var(--kh-header-icon-size, var(--kh-header-app-icon));
@@ -851,19 +852,19 @@ kh-header > * { position: absolute; margin: 0; }
   block-size: var(--kh-header-collapsed);
 }
 .kh-header__name {
-  inset-inline-start: var(--kh-header-name-x, calc(var(--kh-space-l) + var(--kh-header-app-icon) + var(--kh-space-m)));
+  inset-inline-start: var(--kh-header-name-x, calc(var(--kh-page-inset) + var(--kh-header-app-icon) + var(--kh-space-m)));
   max-inline-size: var(--kh-header-name-max, none);
   font: var(--kh-type-item-title);
   opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.4, 1);
 }
-.kh-header__trailing { inset-inline-end: var(--kh-space-xs); }
+.kh-header__trailing { inset-inline-end: calc(var(--kh-page-inset) - var(--kh-space-l) + var(--kh-space-xs)); }
 .kh-header__title {
-  inset-inline-start: var(--kh-header-title-x, var(--kh-space-l));
+  inset-inline-start: var(--kh-header-title-x, var(--kh-page-inset));
   inset-block-start: var(--kh-header-title-y, var(--kh-header-collapsed));
   display: flex;
   align-items: center;
   gap: var(--kh-space-s);
-  max-inline-size: var(--kh-header-title-max, calc(100% - 2 * var(--kh-space-l)));
+  max-inline-size: var(--kh-header-title-max, calc(100% - 2 * var(--kh-page-inset)));
   font: var(--kh-type-screen-title);
   letter-spacing: var(--kh-tracking-screen-title);
 }
@@ -881,9 +882,9 @@ kh-header:defined .kh-header__title {
   white-space: nowrap;
 }
 .kh-header__subtitle {
-  inset-inline-start: var(--kh-space-l);
+  inset-inline-start: var(--kh-page-inset);
   inset-block-start: var(--kh-header-subtitle-y, auto);
-  max-inline-size: var(--kh-header-subtitle-max, calc(100% - 2 * var(--kh-space-l)));
+  max-inline-size: var(--kh-header-subtitle-max, calc(100% - 2 * var(--kh-page-inset)));
   font: var(--kh-type-item-subtitle);
   color: var(--kh-on-surface-variant);
   opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.33, 1);
@@ -907,7 +908,8 @@ kh-header:defined .kh-header__title {
   align-items: center;
   box-sizing: border-box;
   block-size: var(--kh-header-collapsed);
-  padding-inline: var(--kh-space-xs);
+  --kh-page-inset: max(var(--kh-space-l), (100% - var(--kh-page-max, 100%)) / 2);
+  padding-inline: calc(var(--kh-page-inset) - var(--kh-space-l) + var(--kh-space-xs));
   background-color: var(--kh-background);
   color: var(--kh-on-surface);
 }
@@ -924,6 +926,34 @@ kh-header:defined .kh-header__title {
 .kh-topbar__title > :not(kh-dots) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kh-topbar__title > kh-dots { --kh-dots-size: 6px; block-size: 11px; }
 .kh-topbar__actions { display: flex; flex: none; align-items: center; }
+
+/* ---------- Sidans bredd och kortrutnätet (webben; android-ui har inga fönsterklasser) ---------- */
+
+/*
+ * På bred skärm (Chrome på dator) står innehållet i en spalt i stället för över hela fönstret. Appen sätter
+ * --kh-page-max (innehållets bredd mellan marginalerna, t.ex. 1200px) på en förälder; utan den är allt som
+ * på telefonen. kh-header och kh-topbar ställer sitt innehåll i samma spalt men behåller bakgrunden kant i
+ * kant, och .kh-page ger innehållet samma marginal: --kh-space-l, eller mer när fönstret är bredare än spalten.
+ */
+.kh-page {
+  --kh-page-inset: max(var(--kh-space-l), (100% - var(--kh-page-max, 100%)) / 2);
+  box-sizing: border-box;
+  padding-inline: var(--kh-page-inset);
+}
+
+/*
+ * Kort i rutnät, som Material 3:s fönsterklasser: en spalt i kompakt (under 600), annars så många spalter om
+ * minst --kh-grid-min (300) som ryms. Korten står överst i sin rad och behåller sin egen höjd.
+ */
+.kh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--kh-grid-min, 300px)), 1fr));
+  align-items: start;
+  gap: var(--kh-space-l);
+}
+@media (max-width: 599.98px) {
+  .kh-grid { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* ---------- Meny (AppMenuPopup): <div class="kh-menu" popover> ---------- */
 

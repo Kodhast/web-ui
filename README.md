@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.2.0 (tagg `v1.2.0`) ·
+**Version:** 1.3.0 (tagg `v1.3.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -100,6 +100,8 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-avatar` med `__circle` | `AccountAvatar` | `--online`, klickbar som `button` |
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
 | `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg` |
+| `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
+| `kh-page` | – (bara webben) | Innehållets marginal: `--kh-space-l`, eller mer när fönstret är bredare än `--kh-page-max` |
 
 Med `kh.js` (egna element, inga shadow DOM):
 
@@ -120,6 +122,9 @@ Skillnader mot Android som är kända:
   med ögat, inte pixel för pixel.
 - **En knapp som arbetar** får prickarna när appen lägger `<kh-dots bouncing>` i den; biblioteket ritar dem inte själv.
 - **Sidhuvudets rubrik** byter storlek genom att textstorlek, radhöjd och vikt glider mellan de två stilarna, som Compose `lerp`.
+- **Bred skärm** finns bara här (android-ui har inga fönsterklasser, Mats ok 2026-11-20, Kodhast/Husjakt#457): appen
+  sätter `--kh-page-max` (innehållets bredd, t.ex. `1200px`) på en förälder, och `kh-header`, `kh-topbar` och
+  `kh-page` ställer innehållet i den spalten med bakgrunden kant i kant. Utan variabeln är allt som i telefonen.
 - **Flikraden** har bara rullgardinsmenyn (`ActionMenuStyle.Popup`, standard); FAB-menyn finns inte än.
 - **Skuggor utan djup** (flikraden, huvudknappen, menyn, dra-ned) är Material 3:s nivåer i `--kh-scrim`.
 - **En klickbar pill** får sin tryckyta på 48 utan att ta plats i layouten (Android tar platsen).
@@ -146,6 +151,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.3.0 | Bred skärm: `--kh-page-max` ställer `kh-header`, `kh-topbar` och nya `kh-page` i en spalt; nya kortrutnätet `kh-grid` (en spalt under 600, annars spalter om minst 300). Utan variabeln oförändrat. |
 | 1.2.0 | Toppraden `kh-topbar` (`AppTopBar`, liten) för underskärmar: tillbakapil, prickar och rubrik, åtgärder till höger. |
 | 1.1.1 | Meddelandet (`kh-snackbar-host`) står ovanför en fast flikrad (`kh-toolbar--fixed`), som i Android, i stället för under den. |
 | 1.1.0 | Ikonknappen `kh-icon-btn` (`AppIconButton`): vanlig och `--tonal`, valfri ton, med djup lyft och tryck till 0,92. |

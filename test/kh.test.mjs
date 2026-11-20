@@ -406,6 +406,65 @@ test('sidhuvud utan djup: en hårfin linje i stället för skuggan', async () =>
   assert.match(await style('#h', 'box-shadow'), /0px -1px 0px 0px inset/);
 });
 
+test('sidhuvud i en spalt: med --kh-page-max står innehållet i spalten och bakgrunden kant i kant', async () => {
+  await mount(`<div style="inline-size: 1000px; --kh-page-max: 600px">${HEADER.replace('<div class="kh-header__trailing">', '<div class="kh-header__trailing" id="trail">')}</div>`);
+  await frames();
+  const h = await box('#h');
+  const inset = (1000 - 600) / 2;
+  assert.equal(h.width, 1000, 'bakgrunden över hela bredden');
+  assert.equal((await box('#icon')).left - h.left, inset);
+  assert.equal((await box('#title')).left - h.left, inset);
+  assert.equal((await box('#sub')).left - h.left, inset);
+  assert.equal(h.right - (await box('#trail')).right, inset - tokens.spacing.l + tokens.spacing.xs);
+  await scrollTo('#r', tokens.header.expanded - tokens.header.collapsed);
+  assert.equal((await box('#title')).left - h.left, inset + tokens.header.collapsedAppIcon + tokens.spacing.m, 'ihopfälld bredvid ikonen i spalten');
+});
+
+test('sidhuvud: en spalt bredare än fönstret ger samma marginal som utan spalt', async () => {
+  await mount(`<div style="inline-size: 360px; --kh-page-max: 1200px">${HEADER}</div>`);
+  await frames();
+  const h = await box('#h');
+  assert.equal((await box('#icon')).left - h.left, tokens.spacing.l);
+  assert.equal((await box('#title')).left - h.left, tokens.spacing.l);
+});
+
+test('topprad i en spalt: pilen och åtgärderna följer spaltens kanter', async () => {
+  await mount(`<div style="inline-size: 1000px; --kh-page-max: 600px">
+      <header class="kh-topbar" id="t"><button class="kh-icon-btn" id="pil" aria-label="Tillbaka"><svg></svg></button><h1 class="kh-topbar__title">Huset</h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--compact" id="spara">Spara</button></div></header>
+    </div>`);
+  const t = await box('#t');
+  assert.equal(t.width, 1000);
+  assert.equal((await box('#pil')).x - t.x, 200 - tokens.spacing.l + tokens.spacing.xs);
+  assert.equal(t.right - (await box('#spara')).right, 200 - tokens.spacing.l + tokens.spacing.xs);
+});
+
+test('sidan: .kh-page har marginalen --kh-space-l, och mer när spalten är smalare än fönstret', async () => {
+  await mount('<div style="inline-size: 1000px; --kh-page-max: 600px"><div class="kh-page" id="a"><p id="pa">x</p></div></div><div style="inline-size: 360px"><div class="kh-page" id="b"><p id="pb">x</p></div></div>');
+  assert.equal((await box('#pa')).width, 600);
+  assert.equal((await box('#pa')).left - (await box('#a')).left, 200);
+  assert.equal((await box('#pb')).left - (await box('#b')).left, tokens.spacing.l);
+});
+
+test('kortrutnät: en spalt under 600, annars så många spalter om minst 300 som ryms', async () => {
+  const columns = () => page.evaluate(() => getComputedStyle(document.getElementById('g')).gridTemplateColumns.split(' ').length);
+  const GRID = (width, min = '') => `<div style="inline-size: ${width}px"><div class="kh-grid" id="g" style="${min}">${'<div class="kh-card">x</div>'.repeat(5)}</div></div>`;
+  try {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await mount(GRID(1200));
+    assert.equal(await columns(), 3);
+    assert.equal(await style('#g', 'row-gap'), `${tokens.spacing.l}px`);
+    await mount(GRID(652));
+    assert.equal(await columns(), 2);
+    await page.setViewportSize({ width: 599, height: 900 });
+    await mount(GRID(560, '--kh-grid-min: 200px'));
+    assert.equal(await columns(), 1, 'kompakt fönster: en spalt även med smalare kort');
+  } finally {
+    await page.setViewportSize({ width: 440, height: 900 });
+  }
+  await mount(GRID(408));
+  assert.equal(await columns(), 1);
+});
+
 const TOOLBAR = `
   <kh-toolbar id="t">
     <div class="kh-toolbar__tabs">
