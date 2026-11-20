@@ -1178,6 +1178,8 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
   --kh-lift-selected: 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 60%, transparent);
   --kh-lift-highlight: inset 0 1px 0 var(--kh-depth-highlight);
   --kh-lift-sheen: linear-gradient(var(--kh-depth-sheen), transparent 35%);
+  /* Segmentvalets glid: Expressives defaultSpatialSpec (dämpning 0,8, styvhet 380) som linear()-kurva, 0,5 s. */
+  --kh-segment-glide: 500ms linear(0, 0.091, 0.28, 0.483, 0.66, 0.796, 0.891, 0.953, 0.988, 1.007, 1.014, 1.015, 1.013, 1.01, 1.007, 1.005, 1.003, 1.001, 1.001, 1, 1);
 }
 
 /* Knappar: de fyllda och tonade lyfts; konturerade och textknappar bara krymper. */
@@ -1209,8 +1211,15 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 /*
  * Segmentvalet med djup (android-ui #97): segmenten ligger i stegarens sänkta spår (radtonen och en svag inre
  * skugga upptill) och det valda lyfts upp som en egen pill med knapparnas skugga. Spåret är 40 px som utan djup.
+ * Pillen är spårets ::before och glider till nytt val (android-ui #100): antal segment (2–4) och valt index läses
+ * ur barnen med :has(), så det fungerar också när appen sätter aria-pressed/-checked själv, utan kh.js.
  */
 .kh-depth .kh-segmented {
+  --kh-segment-count: 1;
+  --kh-segment-index: 0;
+  --kh-segment-direction: 1;
+  position: relative;
+  isolation: isolate;
   box-sizing: border-box;
   min-block-size: 40px;
   gap: 3px;
@@ -1219,20 +1228,67 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
   background-color: var(--kh-row-tint);
   box-shadow: inset 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent);
 }
+.kh-depth .kh-segmented:dir(rtl) { --kh-segment-direction: -1; }
+.kh-depth .kh-segmented:has(> :nth-child(2)) { --kh-segment-count: 2; }
+.kh-depth .kh-segmented:has(> :nth-child(3)) { --kh-segment-count: 3; }
+.kh-depth .kh-segmented:has(> :nth-child(4)) { --kh-segment-count: 4; }
+.kh-depth .kh-segmented:has(> :nth-child(2):is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true'])) { --kh-segment-index: 1; }
+.kh-depth .kh-segmented:has(> :nth-child(3):is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true'])) { --kh-segment-index: 2; }
+.kh-depth .kh-segmented:has(> :nth-child(4):is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true'])) { --kh-segment-index: 3; }
+.kh-depth .kh-segmented:has(> :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']))::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: calc((100% - 6px - (var(--kh-segment-count) - 1) * 3px) / var(--kh-segment-count));
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-primary-container);
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
+  transform: translateX(calc(var(--kh-segment-index) * (100% + 3px) * var(--kh-segment-direction)));
+  pointer-events: none;
+  transition: transform var(--kh-segment-glide), scale 150ms ease, box-shadow 150ms ease;
+}
+/* Pillen trycks med det valda segmentet. */
+.kh-depth .kh-segmented:has(> :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']):not(:disabled):active)::before {
+  scale: var(--kh-depth-pressed-scale);
+  background-image: none;
+  box-shadow: none;
+}
 .kh-depth .kh-segmented > *,
 .kh-depth .kh-segmented > :is(:first-child, :last-child) {
+  z-index: 1;
   min-block-size: 34px;
+  gap: 0;
   margin: 0;
   border: 0;
   border-radius: var(--kh-radius-pill);
   color: var(--kh-on-surface-variant);
+  transition: transform 150ms ease, color 300ms ease;
 }
 .kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) {
+  background-color: transparent;
   color: var(--kh-on-primary-container);
-  background-image: var(--kh-lift-sheen);
-  box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
 }
-.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']):active { box-shadow: none; }
+/* Bocken växer fram i det nya valet i stället för att texten hoppar åt sidan. */
+.kh-depth .kh-segmented > *::before {
+  content: '';
+  inline-size: 0;
+  block-size: var(--kh-icon-small);
+  flex: none;
+  margin-inline-end: 0;
+  opacity: 0;
+  background: currentColor;
+  -webkit-mask: var(--kh-mask-check) center / contain no-repeat;
+  mask: var(--kh-mask-check) center / contain no-repeat;
+  transition: inline-size 200ms ease, margin 200ms ease, opacity 200ms ease;
+}
+.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true'])::before {
+  inline-size: var(--kh-icon-small);
+  margin-inline-end: var(--kh-space-s);
+  opacity: 1;
+}
 .kh-depth :is(.kh-chip, .kh-segmented > *):active { background-image: none; }
 
 /* Ikonknappen krymper mer än en bred knapp för att trycket ska synas (0,97 → 0,92); den tonade lyfts som ett valt chip. */
@@ -1296,6 +1352,6 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 .kh-depth .kh-menu { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge), var(--kh-elevation-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
+  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-segmented > *::before, .kh-segmented::before, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
   kh-dots[bouncing] > i { animation: none; }
 }

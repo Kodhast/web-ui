@@ -56,6 +56,17 @@ const themeColor = (name) =>
 // Övergångarna (150 ms) får gå klart innan läget läses.
 const settle = () => page.waitForTimeout(200);
 const box = (selector) => page.evaluate((selector) => document.querySelector(selector).getBoundingClientRect().toJSON(), selector);
+/** Var segmentvalets pill (spårets ::before) ritas just nu: spårets ruta plus pillens läge, bredd och förskjutning. */
+const pillBox = (selector) =>
+  page.evaluate((selector) => {
+    const track = document.querySelector(selector);
+    const rect = track.getBoundingClientRect();
+    const pill = getComputedStyle(track, '::before');
+    const width = parseFloat(pill.width);
+    const { m41 } = new DOMMatrixReadOnly(pill.transform);
+    const start = pill.direction === 'rtl' ? rect.right - parseFloat(pill.right) - width : rect.left + parseFloat(pill.left);
+    return { left: start + m41, width };
+  }, selector);
 
 test('tokens.css har talen ur tokens.json', async () => {
   for (const [name, value] of Object.entries(tokens.spacing)) {
@@ -209,10 +220,46 @@ test('segmentval med djup: sänkt spår, det valda en upphöjd pill med skugga',
   assert.equal(await style('#a', 'border-top-left-radius'), '9999px');
   assert.equal(await style('#a', 'border-top-right-radius'), '9999px', 'varje segment är en egen pill');
   assert.equal(await style('#a', 'border-top-width'), '0px');
-  assert.equal(await style('#b', 'background-color'), await themeColor('--kh-primary-container'));
-  assert.match(await style('#b', 'box-shadow'), /px.*px.*px/);
+  // Pillen är spårets ::before och ligger under det valda segmentet.
+  assert.equal(await style('#s', 'background-color', '::before'), await themeColor('--kh-primary-container'));
+  assert.match(await style('#s', 'box-shadow', '::before'), /px.*px.*px/);
+  assert.equal(await style('#b', 'color'), await themeColor('--kh-on-primary-container'));
   assert.equal(await style('#a', 'box-shadow'), 'none');
   assert.equal((await box('#s')).height, 40);
+  await settle();
+  const pill = await pillBox('#s');
+  const chosen = await box('#b');
+  assert.ok(Math.abs(pill.left - chosen.left) <= 1 && Math.abs(pill.width - chosen.width) <= 1, `pillen ${JSON.stringify(pill)} under ${JSON.stringify(chosen)}`);
+});
+
+test('segmentval med djup: pillen glider till nytt val, också när appen sätter valet själv', async () => {
+  await mount(`<div class="kh-segmented" id="s"><button id="a" aria-pressed="true">Dag</button><button id="b" aria-pressed="false">Vecka</button><button id="c" aria-pressed="false">Månad</button><button id="d" aria-pressed="false">År</button></div>`, { depth: true });
+  await settle();
+  const start = (await pillBox('#s')).left;
+  await page.evaluate(() => {
+    document.getElementById('a').setAttribute('aria-pressed', 'false');
+    document.getElementById('c').setAttribute('aria-pressed', 'true');
+  });
+  // Glidet stoppas en fast tid in, så att provet inte beror på hur snabb maskinen är.
+  const seek = (time) =>
+    page.evaluate((time) => {
+      const glide = document.getAnimations().find((a) => a.transitionProperty === 'transform' && a.effect.pseudoElement === '::before');
+      glide.pause();
+      glide.currentTime = time;
+    }, time);
+  await seek(120);
+  const target = (await box('#c')).left;
+  const midway = (await pillBox('#s')).left;
+  assert.ok(midway > start && midway < target, `på väg: ${start} < ${midway} < ${target}`);
+  await seek(500);
+  assert.ok(Math.abs((await pillBox('#s')).left - target) <= 1, 'framme på Månad');
+});
+
+test('segmentval med djup: höger till vänster glider pillen åt vänster', async () => {
+  await mount(`<div class="kh-segmented" id="s" dir="rtl"><button id="a" aria-pressed="false">Ljust</button><button id="b" aria-pressed="false">Mörkt</button><button id="c" aria-pressed="true">Auto</button></div>`, { depth: true });
+  await settle();
+  const pill = await pillBox('#s');
+  assert.ok(Math.abs(pill.left - (await box('#c')).left) <= 1);
 });
 
 test('pill: primärtonad som standard; en ton gäller bara elementet som har den', async () => {

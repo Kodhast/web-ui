@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.6.1 (tagg `v1.6.1`) ·
+**Version:** 1.7.0 (tagg `v1.7.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -151,6 +151,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.7.0 | Segmentvalet animerar bytet (android-ui #100, 3.5.0): med `.kh-depth` är den valda pillen spårets `::before` och glider till nytt val med Expressives fjäder (`--kh-segment-glide`, `linear()`); texten byter färg och bocken växer fram i stället för att texten hoppar. Antal (2–4) och valt index läses med `:has()` ur barnens `aria-pressed/-checked/-selected`, så det fungerar också för en vanlig `.kh-segmented` som appen själv sätter valet i, utan kh.js; höger till vänster speglas. Pillen krymper när det valda segmentet trycks. Samma stillbild, inga omtagna skärmdumpar |
 | 1.6.1 | Textfältets etikett på kanten står mitt på kantlinjen vilken radhöjd appen än ger `--kh-type-item-subtitle` (`translateY(-50%)` i stället för fasta −8 px), så att kanten bryts bakom texten som i AppTextField. Med Husjakts 16/22 gick linjen förut genom texten. Omtagna: `AppTextField_lagen` |
 | 1.6.0 | Segmentvalet med mer djup (android-ui #97, 3.4.0): med `kh-depth` ligger `kh-segmented` i ett sänkt spår (`--kh-row-tint` och en svag inre skugga) och det valda segmentet lyfts som en egen pill med knapparnas skugga, skimmer och ljuskant; ovalda utan kontur i `--kh-on-surface-variant`. Samma höjd (40 px) och märkning. Utan `kh-depth` oförändrat. Omtagna: `Valda_djup` |
 | 1.5.0 | Menyn vid valfri knapp: `kh-menu` förankras vid knappen som öppnar den med `popovertarget`, under knappen och linjerad med dess högerkant, ovanför när det inte ryms. Förut förankrades bara flikradens huvudknapps meny. Flikradens meny som förut. |
