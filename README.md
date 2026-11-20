@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.5.0 (tagg `v1.5.0`) ·
+**Version:** 1.6.0 (tagg `v1.6.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -151,6 +151,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.6.0 | Segmentvalet med mer djup (android-ui #97, 3.4.0): med `kh-depth` ligger `kh-segmented` i ett sänkt spår (`--kh-row-tint` och en svag inre skugga) och det valda segmentet lyfts som en egen pill med knapparnas skugga, skimmer och ljuskant; ovalda utan kontur i `--kh-on-surface-variant`. Samma höjd (40 px) och märkning. Utan `kh-depth` oförändrat. Omtagna: `Valda_djup` |
 | 1.5.0 | Menyn vid valfri knapp: `kh-menu` förankras vid knappen som öppnar den med `popovertarget`, under knappen och linjerad med dess högerkant, ovanför när det inte ryms. Förut förankrades bara flikradens huvudknapps meny. Flikradens meny som förut. |
 | 1.4.0 | Versionen i sidhuvudet (android-ui #95, `AppIdentity.version`): `.kh-header__version` efter `__name` – litet (`kh-type-caption`), dämpat, på namnets baslinje, tonar bort med namnet och lämnas bort helt när den inte ryms bredvid ett helt namn. `kh.js` placerar den. Utan elementet är allt som förut. |
 | 1.3.0 | Bred skärm: `--kh-page-max` ställer `kh-header`, `kh-topbar` och nya `kh-page` i en spalt; nya kortrutnätet `kh-grid` (en spalt under 600, annars spalter om minst 300). Utan variabeln oförändrat. |

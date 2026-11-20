@@ -1196,15 +1196,39 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 }
 .kh-depth .kh-btn--outlined:not(:disabled):active { box-shadow: inset 0 0 0 1px var(--kh-outline-variant); }
 
-/* Valt chip och valt segment: skimmer och ljuskant; chipet en liten skugga, segmenten ingen (de sitter ihop). */
+/* Valt chip: skimmer, ljuskant och en liten skugga. */
 .kh-depth .kh-chip:is([aria-pressed='true'], [aria-checked='true'], .kh-chip--selected):not(:disabled, .kh-chip--pending) {
   background-image: var(--kh-lift-sheen);
   box-shadow: var(--kh-lift-highlight), var(--kh-lift-selected);
 }
-.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) {
-  background-image: var(--kh-lift-sheen);
-  box-shadow: var(--kh-lift-highlight);
+
+/*
+ * Segmentvalet med djup (android-ui #97): segmenten ligger i stegarens sänkta spår (radtonen och en svag inre
+ * skugga upptill) och det valda lyfts upp som en egen pill med knapparnas skugga. Spåret är 40 px som utan djup.
+ */
+.kh-depth .kh-segmented {
+  box-sizing: border-box;
+  min-block-size: 40px;
+  gap: 3px;
+  padding: 3px;
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-row-tint);
+  box-shadow: inset 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent);
 }
+.kh-depth .kh-segmented > *,
+.kh-depth .kh-segmented > :is(:first-child, :last-child) {
+  min-block-size: 34px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  color: var(--kh-on-surface-variant);
+}
+.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) {
+  color: var(--kh-on-primary-container);
+  background-image: var(--kh-lift-sheen);
+  box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
+}
+.kh-depth .kh-segmented > :is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']):active { box-shadow: none; }
 .kh-depth :is(.kh-chip, .kh-segmented > *):active { background-image: none; }
 
 /* Ikonknappen krymper mer än en bred knapp för att trycket ska synas (0,97 → 0,92); den tonade lyfts som ett valt chip. */
