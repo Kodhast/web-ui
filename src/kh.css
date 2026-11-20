@@ -857,6 +857,26 @@ kh-header > * { position: absolute; margin: 0; }
   font: var(--kh-type-item-title);
   opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.4, 1);
 }
+/*
+ * Versionen efter appnamnet (AppIdentity.version): litet och dämpat, på namnets baslinje, och tonar bort med
+ * namnet. kh.js lägger den efter namnets text (--kh-header-version-x) och döljer den helt, utan data-fits, när
+ * den inte ryms bredvid ett helt namn. Utan kh.js eller utan element syns inget.
+ */
+.kh-header__version {
+  inset-block-start: 0;
+  inset-inline-start: var(--kh-header-version-x, var(--kh-header-name-x, 0px));
+  display: flex;
+  align-items: center;
+  block-size: var(--kh-header-collapsed);
+  font: var(--kh-type-caption);
+  letter-spacing: var(--kh-tracking-caption);
+  color: var(--kh-on-surface-variant);
+  opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.4, 1);
+  transform: translateY(var(--kh-header-version-dy, 0px));
+  white-space: nowrap;
+  visibility: hidden;
+}
+.kh-header__version[data-fits] { visibility: visible; }
 .kh-header__trailing { inset-inline-end: calc(var(--kh-page-inset) - var(--kh-space-l) + var(--kh-space-xs)); }
 .kh-header__title {
   inset-inline-start: var(--kh-header-title-x, var(--kh-page-inset));
@@ -889,7 +909,7 @@ kh-header:defined .kh-header__title {
   color: var(--kh-on-surface-variant);
   opacity: clamp(0, 1 - var(--kh-header-f, 0) / 0.33, 1);
 }
-:is(.kh-header__name, .kh-header__title > :not(kh-dots), .kh-header__subtitle, .kh-header__probe) { text-box: trim-both text; }
+:is(.kh-header__name, .kh-header__version, .kh-header__title > :not(kh-dots), .kh-header__subtitle, .kh-header__probe) { text-box: trim-both text; }
 .kh-header__probe { position: absolute; visibility: hidden; white-space: nowrap; }
 
 /* ---------- Toppraden (AppTopBar, liten): <header class="kh-topbar"> ---------- */

@@ -399,6 +399,58 @@ test('sidhuvud: 144 i vila, krymper med fingret till 64 utan att innehållet hop
   assert.deepEqual(rgb(await style('#h', 'background-color')), rgb(await themeColor('--kh-background')));
 });
 
+const VERSION_HEADER = HEADER.replace('<span class="kh-header__name" id="name">Husjakt</span>', '<span class="kh-header__name" id="name">Husjakt</span><span class="kh-header__version" id="version">0.2.0</span>');
+
+test('sidhuvud med version: versionen står efter namnets text, på samma baslinje, litet och dämpat', async () => {
+  await mount(VERSION_HEADER);
+  await frames();
+  const name = await box('#name');
+  const version = await box('#version');
+  assert.equal(await page.locator('#version[data-fits]').count(), 1);
+  const textWidth = await page.evaluate(() => { const range = document.createRange(); range.selectNodeContents(document.querySelector('#name')); return range.getBoundingClientRect().width; });
+  assert.ok(Math.abs(version.left - (name.left + textWidth + tokens.spacing.xs)) <= 1, 'efter namnets text, ett xs-avstånd bort');
+  const baselines = await page.evaluate(() => ['#name', '#version'].map((id) => {
+    const element = document.querySelector(id);
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const probe = document.createElement('span');
+    probe.style.cssText = 'display: inline-block; inline-size: 0; block-size: 0';
+    range.collapse(false);
+    range.insertNode(probe);
+    const y = probe.getBoundingClientRect().bottom;
+    probe.remove();
+    return y;
+  }));
+  assert.ok(Math.abs(baselines[0] - baselines[1]) <= 1.5, `samma baslinje (${baselines})`);
+  const small = await page.evaluate(() => [getComputedStyle(document.querySelector('#name')).fontSize, getComputedStyle(document.querySelector('#version')).fontSize].map(parseFloat));
+  assert.ok(small[1] < small[0], 'mindre än namnet');
+  assert.deepEqual(rgb(await style('#version', 'color')), rgb(await themeColor('--kh-on-surface-variant')));
+});
+
+test('sidhuvud med version: tonar bort med namnet och följer det när sidan rullar', async () => {
+  await mount(VERSION_HEADER);
+  await frames();
+  assert.equal(await style('#version', 'opacity'), '1');
+  await scrollTo('#r', tokens.header.expanded - tokens.header.collapsed);
+  assert.equal(await style('#version', 'opacity'), '0');
+  assert.equal(await style('#name', 'opacity'), '0');
+});
+
+test('sidhuvud med version: ryms den inte bredvid ett helt namn lämnas den bort helt, namnet orört', async () => {
+  await mount(`<div style="inline-size: 200px">${VERSION_HEADER}</div>`);
+  await frames();
+  assert.equal(await page.locator('#version[data-fits]').count(), 0);
+  assert.equal(await style('#version', 'visibility'), 'hidden');
+  const name = await page.evaluate(() => { const e = document.querySelector('#name'); return e.scrollWidth <= e.clientWidth; });
+  assert.ok(name, 'namnet kapas inte för versionen');
+});
+
+test('sidhuvud utan version ser ut som förut', async () => {
+  await mount(HEADER);
+  await frames();
+  assert.equal(await page.locator('#r .kh-header__version').count(), 0);
+});
+
 test('sidhuvud utan djup: en hårfin linje i stället för skuggan', async () => {
   await mount(HEADER);
   await scrollTo('#r', 200);

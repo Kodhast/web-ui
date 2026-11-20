@@ -52,7 +52,8 @@
 
   /**
    * <kh-header> med barnen .kh-header__icon, .kh-header__name, .kh-header__trailing,
-   * .kh-header__title (gärna <kh-dots> och ett <span> med texten) och .kh-header__subtitle – alla utom
+   * .kh-header__version (appens version efter namnet), .kh-header__title (gärna <kh-dots> och ett <span> med
+   * texten) och .kh-header__subtitle – alla utom
    * rubriken valfria. Rullar sidan (eller närmaste förälder som rullar, eller den som attributet
    * scroller pekar ut) krymper huvudet med fingret från 144 till 64 och får kortens färg och skugga när
    * innehåll ligger under (data-raised). Huvudet tar alltid 144 i flödet, så innehållet hoppar inte.
@@ -84,6 +85,20 @@
       this.#resize.disconnect();
       cancelAnimationFrame(this.#frame);
       this.#frame = 0;
+    }
+
+    /** Versionen efter namnets text; ryms den inte bredvid ett helt namn lämnas den bort helt. */
+    #placeVersion(nameX, room) {
+      const version = this.querySelector(':scope > .kh-header__version');
+      if (!version) return;
+      const name = this.querySelector(':scope > .kh-header__name');
+      const nameWidth = name?.offsetWidth ?? 0;
+      const whole = !name || name.scrollWidth <= name.clientWidth;
+      const gap = this.#metrics.versionGap;
+      const fits = whole && nameWidth + gap + version.offsetWidth <= room;
+      this.style.setProperty('--kh-header-version-x', px(nameX + nameWidth + gap));
+      this.style.setProperty('--kh-header-version-dy', px(this.#metrics.versionDy));
+      version.toggleAttribute('data-fits', fits);
     }
 
     /** Hur långt huvudet fällts ihop, 0–1. */
@@ -125,11 +140,31 @@
         end: token(this, '--kh-space-xs', 4),
         pageMax: token(this, '--kh-page-max', Infinity),
         gap: token(this, '--kh-space-m', 12),
+        versionGap: token(this, '--kh-space-xs', 4),
+        versionDy: this.#versionDy(),
         trailingGap: token(this, '--kh-space-s', 8),
         large: probe('var(--kh-type-screen-title)', 'var(--kh-tracking-screen-title)'),
         small: probe('var(--kh-type-section-title)', 'normal')
       };
       this.#update();
+    }
+
+    /**
+     * Hur långt versionen ska flyttas så att dess baslinje möter namnets: båda är centrerade i raden med
+     * text-box trim, så baslinjen ligger (ascent - descent) / 2 under mitten i var sin stil.
+     */
+    #versionDy() {
+      const name = this.querySelector(':scope > .kh-header__name');
+      const version = this.querySelector(':scope > .kh-header__version');
+      if (!name || !version) return 0;
+      const context = document.createElement('canvas').getContext('2d');
+      const offset = (element) => {
+        const style = getComputedStyle(element);
+        context.font = style.font;
+        const metrics = context.measureText('Åg');
+        return (metrics.fontBoundingBoxAscent - metrics.fontBoundingBoxDescent) / 2;
+      };
+      return offset(name) - offset(version);
     }
 
     #update() {
@@ -163,6 +198,7 @@
       s.setProperty('--kh-header-icon-size', px(iconSize));
       s.setProperty('--kh-header-name-x', px(nameX));
       s.setProperty('--kh-header-name-max', px(Math.max(0, width - nameX - endClearance)));
+      this.#placeVersion(nameX, Math.max(0, width - nameX - endClearance));
       s.setProperty('--kh-header-title-x', px(lerp(start, beside, sideways)));
       s.setProperty('--kh-header-title-y', px(titleY));
       s.setProperty('--kh-header-title-max', px(titleWidth));
