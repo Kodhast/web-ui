@@ -699,6 +699,91 @@ test('segmentval: ett val i taget, med tryck och pilar, och kh-select', async ()
   assert.equal(await page.evaluate(() => document.activeElement.id), 's2');
 });
 
+test('textfält med ikonknapp: knappen 48 i fältet, ikonen 12 från kanten, fältet 56 högt; ett tryck flyttar inte fokus till fältet', async () => {
+  await mount('<label class="kh-field" id="f"><input class="kh-field__input" placeholder=" "><span class="kh-field__label">När?</span><button class="kh-icon-btn" type="button" aria-label="Välj" id="fb"><svg><use href="#i-clock"/></svg></button></label>');
+  const field = await box('#f');
+  const icon = await box('#fb svg');
+  const button = await box('#fb');
+  assert.equal(field.height, 56);
+  assert.equal(button.width, 48);
+  assert.equal(Math.round(field.right - icon.right), 12);
+  assert.equal(await style('#fb', 'color'), await themeColor('--kh-on-surface-variant'));
+  const clicked = page.evaluate(() => new Promise((done) => document.getElementById('fb').addEventListener('click', () => done(true), { once: true })));
+  await page.click('#fb');
+  assert.equal(await clicked, true);
+  assert.notEqual(await page.evaluate(() => document.activeElement.tagName), 'INPUT');
+});
+
+test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 56 höga; value läses och sätts', async () => {
+  await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
+  const wheels = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((w) => {
+    const r = w.getBoundingClientRect();
+    return { width: r.width, height: r.height, item: w.firstElementChild.offsetHeight, label: w.getAttribute('aria-label') };
+  }));
+  assert.deepEqual(wheels, [
+    { width: 100, height: 120, item: 56, label: 'Timme' },
+    { width: 100, height: 120, item: 56, label: 'Minut' },
+  ]);
+  assert.equal(await style('#t .kh-time-picker__wheel', 'background-color'), await themeColor('--kh-row-tint'));
+  assert.equal(await style('#t .kh-time-picker__wheel', 'border-top-left-radius'), `${tokens.radius.fab}px`);
+  assert.equal(await page.evaluate(() => document.getElementById('t').value), '07:30');
+  await page.evaluate(() => { document.getElementById('t').value = '23:05'; });
+  assert.equal(await page.evaluate(() => document.getElementById('t').value), '23:05');
+});
+
+test('tidsväljare: talet i mitten i on-surface, grannarna i outline', async () => {
+  await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
+  await settle();
+  const items = await page.evaluate(() => {
+    const wheel = document.querySelector('#t .kh-time-picker__wheel');
+    const middle = wheel.getBoundingClientRect().top + 60;
+    return [...wheel.children]
+      .map((item) => ({ text: item.textContent, at: item.getBoundingClientRect().top + 28 - middle, color: getComputedStyle(item).color }))
+      .filter((item) => Math.abs(item.at) < 60);
+  });
+  assert.deepEqual(items.map((item) => item.text), ['06', '07', '08']);
+  assert.equal(items[1].color, await themeColor('--kh-on-surface'));
+  assert.equal(items[0].color, await themeColor('--kh-outline'));
+  assert.equal(items[2].color, await themeColor('--kh-outline'));
+});
+
+test('tidsväljare: steget avrundar minuterna, också över timgränsen', async () => {
+  await mount('<kh-time-picker id="t" step="5" value="09:42"></kh-time-picker>');
+  assert.equal(await page.evaluate(() => document.getElementById('t').value), '09:40');
+  assert.equal(await page.evaluate(() => document.querySelectorAll('#t .kh-time-picker__wheel')[1].children.length % 12), 0, 'tolv minuter per varv');
+  await page.evaluate(() => { document.getElementById('t').value = '23:58'; });
+  assert.equal(await page.evaluate(() => document.getElementById('t').value), '00:00');
+});
+
+test('tidsväljare: pilarna och ett tryck på en granne rullar ett steg och meddelar change; hjulet går runt', async () => {
+  await mount('<kh-time-picker id="t" step="5" value="23:55"></kh-time-picker>');
+  const changes = () => page.evaluate(() => new Promise((done) => document.getElementById('t').addEventListener('change', (e) => done(e.target.value), { once: true })));
+  let changed = changes();
+  await page.focus('#t .kh-time-picker__wheel:last-of-type');
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await changed, '23:00');
+  changed = changes();
+  await page.keyboard.press('ArrowUp');
+  assert.equal(await changed, '23:55');
+  changed = changes();
+  const hours = await box('#t .kh-time-picker__wheel');
+  await page.mouse.click(hours.left + 50, hours.top + 112);
+  assert.equal(await changed, '00:55');
+});
+
+test('tidsväljare: i en stängd dialog visar hjulen rätt tid när dialogen öppnas', async () => {
+  await mount('<dialog class="kh-dialog" id="d"><h2 class="kh-dialog__title">Välj tid</h2><kh-time-picker id="t"></kh-time-picker></dialog>');
+  await page.evaluate(() => { document.getElementById('t').value = '18:15'; document.getElementById('d').showModal(); });
+  await settle();
+  const middle = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((wheel) => {
+    const center = wheel.getBoundingClientRect().top + 60;
+    return [...wheel.children].find((item) => Math.abs(item.getBoundingClientRect().top + 28 - center) < 2)?.textContent;
+  }));
+  assert.deepEqual(middle, ['18', '15']);
+  assert.equal(await style('#d .kh-dialog__title', 'font'), await style('.galleri-topp .kh-text-section-title', 'font'));
+  await page.evaluate(() => document.getElementById('d').close());
+});
+
 test('dra ned: efter tröskeln meddelas kh-refresh och prickarna står kvar tills uppdateringen är klar; före tröskeln inget', async () => {
   const touchPage = await browser.newPage({ viewport: { width: 440, height: 900 }, hasTouch: true });
   try {
