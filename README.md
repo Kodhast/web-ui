@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.8.0 (tagg `v1.8.0`) ·
+**Version:** 1.9.0 (tagg `v1.9.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -66,6 +66,7 @@ standardvärden – en app som saknar en färg ser det direkt. Galleriets testte
 | `--kh-card-padding`, `--kh-card-gap`, `--kh-card-border` | `AppCardStyle` (standard ReseApoteket och Dagboken) |
 | `--kh-button-height` | `AppButtonStyle.minHeight` (56; Fonder 40) |
 | `--kh-row-text-gap` | `LocalItemRowTextGap` (2; Dagboken 4) |
+| `--kh-foldout-surface` (valfri, standard `--kh-row-tint`) | ytan under en utfälld `kh-foldout` (Husjakt: `--kh-surface-variant` i mörkt läge) |
 
 **Toner** (`Tone`): appen skriver en klass per ton som sätter `--kh-tone-container` och
 `--kh-tone-content`, t.ex. `.ton-gron { --kh-tone-container: …; --kh-tone-content: …; }`, och sätter den
@@ -86,6 +87,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-row` med `__leading`, `__text`, `__title`, `__subtitle`, `__trailing`, `__highlight` | `ItemRow` | `--tinted`, `--done`, `--inactive`, `--accent` (`style="--kh-accent: …"`), klickbar som `a`/`button` eller `--clickable` |
 | `kh-chevron` | pilen i `ItemRow(navigates)` och `NoticeBanner` | – |
 | `kh-divider` | `AppDivider` | – |
+| `kh-foldout` med `__header` (en `button.kh-row` med `aria-expanded`), `__chevron`, `__content` | `Foldout` | Utfälld (`aria-expanded="true"`) ligger rubrik och innehåll på `--kh-foldout-surface` med radens hörn, chevronen vänds; innehållet visas bara när det står (eller utan `hidden`). Appen växlar `aria-expanded`. |
 | `kh-btn` | `AppButton` | `--secondary`, `--outlined`, `--text`, `--destructive`, `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
 | `kh-icon-btn` | `AppIconButton` | `--tonal` (platta i `secondary-container`), en tonklass (den tonade: platta och ikon; den vanliga: ikonen), `disabled`; 48 i tryckyta och form, ikonen 24, alltid `aria-label` |
 | `kh-chips` + `kh-chip` med `__label`, `__value`, `__pending` | `AppFilterChip`, `ChipRow` | `aria-pressed`/`aria-checked` (bocken ritas av biblioteket), `--emphasized`, `--pending`, `disabled` |
@@ -154,6 +156,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.9.0 | Utfällbar rad `kh-foldout` (Husjakt #518, variant A): utfälld ligger hela delen på en tonad yta (`--kh-foldout-surface`, standard `--kh-row-tint`) med radens hörn, så att det syns vad som hör till raden. Tryckläget hovrar bara med mus (`@media (hover: hover)`): i Chrome på Android fastnade det grå lagret efter ett tryck. Ny skärmdump: `Foldout_oppen` |
 | 1.8.0 | Tidsväljaren som rullhjul (android-ui #106: `TimePickerPopup` med `TimeScroll`): `<kh-time-picker>` med timme och minut i två hjul i segmentvalets nedsänkta spår, 100 × 120 med tal 56 höga i `--kh-type-time-wheel`; talet i mitten i `--kh-on-surface`, grannarna i `--kh-outline` (rullningsdriven animering). Hjulen går runt, `step` ger minuthjulets steg, `value` och `change`. Ikonknapp sist i textfältet: `kh-icon-btn` i `kh-field` (för kalendern som öppnar tidsväljaren). Nya skärmdumpar: `TimePickerPopup_oppen`, `TimePickerPopup_djup`, `Webb_textfalt_ikonknapp` |
 | 1.7.0 | Segmentvalet animerar bytet (android-ui #100, 3.5.0): med `.kh-depth` är den valda pillen spårets `::before` och glider till nytt val med Expressives fjäder (`--kh-segment-glide`, `linear()`); texten byter färg och bocken växer fram i stället för att texten hoppar. Antal (2–4) och valt index läses med `:has()` ur barnens `aria-pressed/-checked/-selected`, så det fungerar också för en vanlig `.kh-segmented` som appen själv sätter valet i, utan kh.js; höger till vänster speglas. Pillen krymper när det valda segmentet trycks. Samma stillbild, inga omtagna skärmdumpar |
 | 1.6.1 | Textfältets etikett på kanten står mitt på kantlinjen vilken radhöjd appen än ger `--kh-type-item-subtitle` (`translateY(-50%)` i stället för fasta −8 px), så att kanten bryts bakom texten som i AppTextField. Med Husjakts 16/22 gick linjen förut genom texten. Omtagna: `AppTextField_lagen` |

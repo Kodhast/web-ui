@@ -177,6 +177,39 @@
 </section>
 
 <section class="galleri-del">
+  <h2 class="kh-text-caption">Utfällbar rad · Foldout_oppen</h2>
+  <div class="ram" data-skarmdump="Foldout_oppen">
+    <div class="kh-card">
+      <div class="kh-foldout">
+        <button class="kh-row kh-foldout__header" type="button" aria-expanded="false" aria-controls="fold-1">
+          <div class="kh-row__text"><span class="kh-row__title">Kommentarer</span><span class="kh-row__subtitle">Fin tomt, men verkstaden saknas.</span></div>
+          <svg class="kh-icon kh-foldout__chevron"><use href="#i-expand"/></svg>
+        </button>
+        <div class="kh-foldout__content" id="fold-1" hidden></div>
+      </div>
+      <div class="kh-foldout">
+        <button class="kh-row kh-foldout__header" type="button" aria-expanded="true" aria-controls="fold-2">
+          <div class="kh-row__text"><span class="kh-row__title">Uppgifter</span><span class="kh-row__subtitle">Utgångspris, boarea och 4 till</span></div>
+          <svg class="kh-icon kh-foldout__chevron"><use href="#i-expand"/></svg>
+        </button>
+        <div class="kh-foldout__content" id="fold-2">
+          <div class="kh-row"><div class="kh-row__text"><span class="kh-row__title">Utgångspris</span><span class="kh-row__subtitle">2 450 000 kr</span></div></div>
+          <div class="kh-row"><div class="kh-row__text"><span class="kh-row__title">Boarea</span><span class="kh-row__subtitle">132 m²</span></div></div>
+          <div class="ark"><label class="kh-field"><input class="kh-field__input" placeholder=" "><span class="kh-field__label">Ny uppgift</span></label></div>
+        </div>
+      </div>
+      <div class="kh-foldout">
+        <button class="kh-row kh-foldout__header" type="button" aria-expanded="false" aria-controls="fold-3">
+          <div class="kh-row__text"><span class="kh-row__title">Annonser</span><span class="kh-row__subtitle">Två annonser</span></div>
+          <svg class="kh-icon kh-foldout__chevron"><use href="#i-expand"/></svg>
+        </button>
+        <div class="kh-foldout__content" id="fold-3" hidden></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
   <h2 class="kh-text-caption">Avdelare · AppDivider_i_kort</h2>
   <div class="ram" data-skarmdump="AppDivider_i_kort">
     <div class="kh-card">
@@ -661,6 +694,14 @@
   // Galleriet: valchip och segment växlar, så att lägena går att prova.
   for (const chip of document.querySelectorAll('.kh-chip[aria-pressed]')) {
     chip.addEventListener('click', () => chip.setAttribute('aria-pressed', String(chip.getAttribute('aria-pressed') !== 'true')));
+  }
+  // Utfällbara rader: ett tryck fäller ut och ihop.
+  for (const header of document.querySelectorAll('.kh-foldout__header')) {
+    header.addEventListener('click', () => {
+      const open = header.getAttribute('aria-expanded') !== 'true';
+      header.setAttribute('aria-expanded', String(open));
+      document.getElementById(header.getAttribute('aria-controls')).hidden = !open;
+    });
   }
   // Ramar som visar ett rullat läge (sidhuvudet): data-rull är hur långt.
   for (const frame of document.querySelectorAll('[data-rull]')) {

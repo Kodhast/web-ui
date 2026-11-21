@@ -40,6 +40,9 @@
 
   /* Avståndet mellan titel och undertext i en listrad (Dagboken: var(--kh-space-xs)). */
   --kh-row-text-gap: 2px;
+
+  /* Ytan under en utfälld kh-foldout: radens ton. Husjakt sätter --kh-surface-variant i mörkt läge. */
+  --kh-foldout-surface: var(--kh-row-tint);
 }
 
 /*
@@ -116,8 +119,14 @@
   transition: opacity 150ms ease;
   z-index: -1;
 }
-:is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
-    .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-icon-btn):not(:disabled):hover::after { opacity: 0.08; }
+/*
+ * Hovringen bara med mus: Chrome på Android behåller :hover efter ett tryck tills man trycker någon annanstans,
+ * så att lagret fastnade (Husjakt #518).
+ */
+@media (hover: hover) {
+  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
+      .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-icon-btn):not(:disabled):hover::after { opacity: 0.08; }
+}
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
     .kh-card--clickable, a.kh-card, button.kh-card, .kh-pill--clickable, button.kh-pill, .kh-snackbar__action, .kh-toolbar__tab, .kh-toolbar__action, .kh-menu__item, .kh-icon-btn):not(:disabled):active::after { opacity: 0.1; }
 :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-row--clickable, a.kh-row, button.kh-row,
@@ -215,6 +224,25 @@
 }
 .kh-row .kh-chevron, .kh-row__trailing .kh-chevron { color: var(--kh-on-surface-variant); }
 .kh-chevron:dir(rtl) { transform: scaleX(-1); }
+
+/* ---------- Utfällbar rad (Foldout) ---------- */
+
+/*
+ * <div class="kh-foldout">
+ *   <button class="kh-row kh-foldout__header" aria-expanded="false" aria-controls="x">
+ *     <div class="kh-row__text">…</div> <svg class="kh-icon kh-foldout__chevron">…</svg>
+ *   </button>
+ *   <div class="kh-foldout__content" id="x">…</div>  (bara när den är utfälld, eller hidden)
+ * </div>
+ * Utfälld (aria-expanded="true") ligger hela delen – rubrik och innehåll – på en tonad yta med radens hörn,
+ * så att det syns vad som hör till den; fält och kort på ytan behåller sin egen färg. Chevronen vänds.
+ */
+.kh-foldout { display: flex; flex-direction: column; border-radius: var(--kh-radius-row); transition: background-color 150ms ease; }
+.kh-foldout:has(> .kh-foldout__header[aria-expanded='true']) { background-color: var(--kh-foldout-surface); }
+.kh-foldout__chevron { flex: none; color: var(--kh-on-surface-variant); transition: transform 200ms ease; }
+.kh-foldout__header[aria-expanded='true'] .kh-foldout__chevron { transform: rotate(180deg); }
+.kh-foldout__content { display: flex; flex-direction: column; padding-block-end: var(--kh-space-s); }
+.kh-foldout__content[hidden] { display: none; }
 
 /* ---------- Avdelare (AppDivider) ---------- */
 
@@ -1404,6 +1432,6 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 .kh-depth .kh-menu { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge), var(--kh-elevation-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.kh-btn, .kh-chip, .kh-segmented > *, .kh-segmented > *::before, .kh-segmented::before, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
+  :is(.kh-foldout, .kh-foldout__chevron, .kh-btn, .kh-chip, .kh-segmented > *, .kh-segmented > *::before, .kh-segmented::before, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
   kh-dots[bouncing] > i { animation: none; }
 }
