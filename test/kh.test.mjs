@@ -771,15 +771,15 @@ test('tryckläget: hovring ger lagret med mus, men inte på en pekskärm (fastna
   }
 });
 
-test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 56 höga; value läses och sätts', async () => {
+test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 52 höga; value läses och sätts', async () => {
   await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
   const wheels = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((w) => {
     const r = w.getBoundingClientRect();
     return { width: r.width, height: r.height, item: w.firstElementChild.offsetHeight, label: w.getAttribute('aria-label') };
   }));
   assert.deepEqual(wheels, [
-    { width: 100, height: 120, item: 56, label: 'Timme' },
-    { width: 100, height: 120, item: 56, label: 'Minut' },
+    { width: 100, height: 120, item: 52, label: 'Timme' },
+    { width: 100, height: 120, item: 52, label: 'Minut' },
   ]);
   assert.equal(await style('#t .kh-time-picker__wheel', 'background-color'), await themeColor('--kh-row-tint'));
   assert.equal(await style('#t .kh-time-picker__wheel', 'border-top-left-radius'), `${tokens.radius.fab}px`);
@@ -788,20 +788,22 @@ test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 56 höga; 
   assert.equal(await page.evaluate(() => document.getElementById('t').value), '23:05');
 });
 
-test('tidsväljare: talet i mitten i on-surface, grannarna i outline', async () => {
+test('tidsväljare: talet i mitten i on-surface, grannarna i outline och mindre', async () => {
   await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
   await settle();
   const items = await page.evaluate(() => {
     const wheel = document.querySelector('#t .kh-time-picker__wheel');
     const middle = wheel.getBoundingClientRect().top + 60;
     return [...wheel.children]
-      .map((item) => ({ text: item.textContent, at: item.getBoundingClientRect().top + 28 - middle, color: getComputedStyle(item).color }))
+      .map((item) => { const r = item.getBoundingClientRect(); return { text: item.textContent, at: r.top + r.height / 2 - middle, height: r.height, color: getComputedStyle(item).color }; })
       .filter((item) => Math.abs(item.at) < 60);
   });
   assert.deepEqual(items.map((item) => item.text), ['06', '07', '08']);
   assert.equal(items[1].color, await themeColor('--kh-on-surface'));
   assert.equal(items[0].color, await themeColor('--kh-outline'));
   assert.equal(items[2].color, await themeColor('--kh-outline'));
+  assert.ok(Math.abs(items[1].height - 52) < 1, 'talet i mitten i full storlek');
+  assert.ok(Math.abs(items[0].height - 52 * 32 / 45) < 1, 'grannarna 32/45 av talet');
 });
 
 test('tidsväljare: steget avrundar minuterna, också över timgränsen', async () => {
@@ -834,10 +836,10 @@ test('tidsväljare: i en stängd dialog visar hjulen rätt tid när dialogen öp
   await settle();
   const middle = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((wheel) => {
     const center = wheel.getBoundingClientRect().top + 60;
-    return [...wheel.children].find((item) => Math.abs(item.getBoundingClientRect().top + 28 - center) < 2)?.textContent;
+    return [...wheel.children].find((item) => { const r = item.getBoundingClientRect(); return Math.abs(r.top + r.height / 2 - center) < 2; })?.textContent;
   }));
   assert.deepEqual(middle, ['18', '15']);
-  assert.equal(await style('#d .kh-dialog__title', 'font'), await style('.galleri-topp .kh-text-section-title', 'font'));
+  assert.equal(await style('#d .kh-dialog__title', 'font'), await page.evaluate(() => { const p = document.createElement('i'); p.className = 'kh-text-headline'; document.body.append(p); const f = getComputedStyle(p).font; p.remove(); return f; }), 'rubriken i headline som övriga dialoger');
   await page.evaluate(() => document.getElementById('d').close());
 });
 

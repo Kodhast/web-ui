@@ -26,7 +26,7 @@
   --kh-type-pill: 500 12px/16px var(--kh-font-body);
   --kh-type-caption: 500 11px/16px var(--kh-font-body);
   --kh-type-button: 500 14px/20px var(--kh-font-heading);
-  --kh-type-time-wheel: 400 57px/64px var(--kh-font-body); /* Material 3:s displayLarge: tidsväljarens tal */
+  --kh-type-time-wheel: 500 45px/52px var(--kh-font-body); /* AppTypography.timeWheelSelected: tidsväljarens tal i mitten och kolonet */
   --kh-tracking-screen-title: 0;
   --kh-tracking-caption: 0.045em;
 
@@ -837,8 +837,10 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
 
 /*
  * <kh-time-picker> i en kh-dialog: två hjul (timme och minut, 24 timmar) i segmentvalets nedsänkta spår,
- * som Material 3:s TimeScroll. kh.js bygger hjulen; varje tal är 56 högt och hjulet visar 120, så att
- * grannarna syns avskurna. Talet i mitten står i on-surface, grannarna i outline (en rullningsdriven animering).
+ * som Material 3:s TimeScroll. kh.js bygger hjulen; varje tal är 52 högt och hjulet visar 120, så att
+ * grannarna syns avskurna. Talet i mitten står i on-surface, grannarna i outline och mindre (en rullningsdriven
+ * animering): 32/45 av talet och vikt 400 som AppTypography.timeWheel i android-ui 3.12.0. Skalan i stället för
+ * font-size, så att animeringen inte nollställer de tabulära siffrorna.
  */
 .kh-time-picker {
   display: grid;
@@ -853,7 +855,7 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
 .kh-time-picker__wheel {
   box-sizing: border-box;
   block-size: 120px;
-  padding-block: 32px; /* (120 − 56) / 2: ett tal kan stå i mitten */
+  padding-block: 34px; /* (120 − 52) / 2: ett tal kan stå i mitten */
   overflow-y: auto;
   overscroll-behavior: contain;
   scroll-snap-type: y mandatory;
@@ -866,7 +868,7 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
 .kh-time-picker__item {
   display: grid;
   place-items: center;
-  block-size: 56px;
+  block-size: 52px;
   scroll-snap-align: center;
   color: var(--kh-outline);
   cursor: pointer;
@@ -875,11 +877,11 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   animation-timeline: view();
 }
 @keyframes kh-time-wheel {
-  0%, 30%, 70%, 100% { color: var(--kh-outline); }
-  50% { color: var(--kh-on-surface); }
+  0%, 30%, 70%, 100% { color: var(--kh-outline); scale: calc(32 / 45); font-weight: 400; }
+  50% { color: var(--kh-on-surface); scale: 1; font-weight: 500; }
 }
-/* Dialogen med tidsväljaren har TimePickerPopups mindre rubrik. */
-.kh-dialog:has(> .kh-time-picker) .kh-dialog__title { font: var(--kh-type-section-title); }
+/* Rubriken som i övriga dialoger, med luft ner till hjulen (TimePickerPopup, android-ui 3.12.0). */
+.kh-dialog:has(> .kh-time-picker) .kh-dialog__title { margin-block-end: var(--kh-space-s); }
 
 /* ---------- Ark (AppBottomSheet) ---------- */
 
