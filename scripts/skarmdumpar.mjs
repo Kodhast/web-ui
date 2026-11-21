@@ -37,6 +37,8 @@ try {
       if (time) {
         await frame.evaluate((element, ms) => {
           for (const animation of element.getAnimations({ subtree: true })) {
+            // Rullningsdrivna animeringar (oskärpan under toppraden) följer rullningen, inte klockan.
+            if (!(animation.timeline instanceof DocumentTimeline)) continue;
             if (animation instanceof CSSAnimation) {
               animation.pause();
               animation.currentTime = ms;

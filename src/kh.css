@@ -45,13 +45,15 @@
   --kh-foldout-surface: var(--kh-row-tint);
 
   /*
-   * Oskärpan bakom dialog och ark (AppBlur). 1 = på
+   * Oskärpan (AppBlur): bakom dialog och ark, och på innehållet som rullat in under sidhuvudet. 1 = på
    * (standard, som AppTheme(blur = AppBlur())), 0 = av (som blur = null): då dagens slöja och inget sudd.
    * Måtten är AppBlurs standardvärden; de står inte i tokens.json.
    */
   --kh-blur: 1;
   --kh-blur-behind-radius: 12px; /* behindRadius */
   --kh-blur-scrim: 20%; /* scrimAlpha: slöjan med oskärpa; utan är den 32 % */
+  --kh-blur-header-radius: 8px; /* headerRadius (android-ui 3.11.1) */
+  --kh-blur-header-fade: 24px; /* headerFade (android-ui 3.11.1) */
 }
 
 /* Den som bett systemet om mindre genomskinlighet får slöjan utan sudd (Android: energisparläget stänger av oskärpan). */
@@ -967,13 +969,32 @@ kh-header {
   box-sizing: border-box;
   block-size: var(--kh-header-height, var(--kh-header-expanded));
   margin-block-end: calc(var(--kh-header-expanded) - var(--kh-header-height, var(--kh-header-expanded)));
-  overflow: clip;
+  /* Bara i sidled: oskärpan under huvudet (::after) ligger nedanför det. Barnen når aldrig under nederkanten. */
+  overflow-x: clip;
   background-color: var(--kh-header-surface);
   color: var(--kh-on-surface);
   box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--kh-outline-variant) calc(var(--kh-header-lift) * 100%), transparent);
   transition: --kh-header-lift 200ms ease;
 }
 kh-header[data-raised] { --kh-header-lift: 1; }
+/*
+ * Progressiv oskärpa under sidhuvudet (underHeaderBlur): innehållet som rullat in under huvudet är suddigast vid
+ * nederkanten och skarpt --kh-blur-header-fade längre ned. Den tonar in med ihopfällningen (--kh-header-f), som
+ * overlappedFraction i Android; Android växer radien i stället, men det ser likadant ut och kostar mindre. I vila
+ * syns inget, och utan kh.js inte heller.
+ */
+:is(kh-header, .kh-topbar)::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  block-size: var(--kh-blur-header-fade);
+  pointer-events: none;
+  backdrop-filter: blur(calc(var(--kh-blur-header-radius) * 0.577 + 0.5px));
+  /* Masken läser bara alfa: helt suddigt överst, skarpt nederst. */
+  mask-image: linear-gradient(to bottom, currentColor, transparent);
+  opacity: calc(var(--kh-blur) * var(--kh-header-f, 0));
+}
 kh-header > * { position: absolute; margin: 0; }
 .kh-header__icon {
   inset-inline-start: var(--kh-page-inset);
@@ -1084,6 +1105,16 @@ kh-header:defined .kh-header__title {
 .kh-topbar__title > :not(kh-dots) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kh-topbar__title > kh-dots { --kh-dots-size: 6px; block-size: 11px; }
 .kh-topbar__actions { display: flex; flex: none; align-items: center; }
+/* Toppraden fäller inte ihop: oskärpan under den tonar in under rullningens första --kh-blur-header-fade (utan rullning: ingen). */
+.kh-topbar::after {
+  opacity: 0;
+  animation: kh-under-header linear both;
+  animation-timeline: scroll(nearest block);
+  animation-range: 0 var(--kh-blur-header-fade);
+}
+@keyframes kh-under-header {
+  to { opacity: var(--kh-blur); }
+}
 
 /* ---------- Sidans bredd och kortrutnätet (webben; android-ui har inga fönsterklasser) ---------- */
 
