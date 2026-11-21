@@ -10,9 +10,10 @@
  * - <kh-refresh>    Dra ned för att uppdatera (AppPullToRefresh med prickar).
  * - <kh-segmented>  Segmentvalet, ett val i taget (AppSegmentedChoice).
  * - <kh-time-picker> Tidsväljaren som rullhjul, timme och minut (TimePickerPopup).
+ * - <kh-stepper>    Antal med − och + (QuantityStepper).
  *
  * Val meddelas med händelsen kh-select (detail: { index, value }), en dragning med kh-refresh, en ny tid
- * i tidsväljaren med change.
+ * i tidsväljaren och ett nytt antal i stegaren med change.
  */
 (() => {
   if (customElements.get('kh-dots')) return;
@@ -721,4 +722,85 @@
     }
   }
   customElements.define('kh-time-picker', KhTimePicker);
+
+  /* ---------- Stegaren (QuantityStepper) ---------- */
+
+  /**
+   * <kh-stepper value="2" min="0" max="999" step="1" label="doser per dag">: − och + runt värdet. label säger
+   * vad som räknas och ger knapparnas namn ("Minska doser per dag"). Knappen som når gränsen stängs av. Ett tryck
+   * ändrar value och meddelar change; appen kan visa värdet med enhet genom att sätta egenskapen format till en
+   * funktion (value) => text ("4 h", "Ingen spärr" för 0). value läses och sätts som tal.
+   */
+  class KhStepper extends HTMLElement {
+    static observedAttributes = ['value', 'min', 'max', 'label', 'disabled'];
+    #minus = null;
+    #plus = null;
+    #value = null;
+    #format = null;
+
+    connectedCallback() {
+      if (!this.#minus) {
+        const button = (modifier, delta) => {
+          const element = document.createElement('button');
+          element.type = 'button';
+          element.className = `kh-stepper__button kh-stepper__button--${modifier}`;
+          element.addEventListener('click', () => this.#change(delta));
+          return element;
+        };
+        this.#minus = button('decrease', -1);
+        this.#plus = button('increase', 1);
+        this.#value = document.createElement('output');
+        this.#value.className = 'kh-stepper__value';
+        this.replaceChildren(this.#minus, this.#value, this.#plus);
+      }
+      this.#render();
+    }
+
+    attributeChangedCallback() {
+      if (this.#minus) this.#render();
+    }
+
+    #number(name, fallback) {
+      const value = Number(this.getAttribute(name));
+      return this.hasAttribute(name) && Number.isFinite(value) ? value : fallback;
+    }
+
+    get min() { return this.#number('min', 0); }
+    get max() { return this.#number('max', 999); }
+    get step() { return Math.max(1, this.#number('step', 1)); }
+
+    get value() {
+      return clamp(this.#number('value', this.min), this.min, this.max);
+    }
+
+    set value(value) {
+      this.setAttribute('value', String(clamp(Math.round(Number(value)), this.min, this.max)));
+    }
+
+    get format() { return this.#format; }
+
+    set format(format) {
+      this.#format = typeof format === 'function' ? format : null;
+      if (this.#minus) this.#render();
+    }
+
+    #change(direction) {
+      const next = clamp(this.value + direction * this.step, this.min, this.max);
+      if (next === this.value) return;
+      this.value = next;
+      this.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    #render() {
+      const value = this.value;
+      const label = this.getAttribute('label') ?? '';
+      const disabled = this.hasAttribute('disabled');
+      this.#minus.disabled = disabled || value <= this.min;
+      this.#plus.disabled = disabled || value >= this.max;
+      this.#minus.setAttribute('aria-label', `Minska ${label}`.trim());
+      this.#plus.setAttribute('aria-label', `Öka ${label}`.trim());
+      this.#value.textContent = this.#format ? this.#format(value) : String(value);
+    }
+  }
+  customElements.define('kh-stepper', KhStepper);
 })();

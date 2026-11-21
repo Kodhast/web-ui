@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.12.0 (tagg `v1.12.0`) ·
+**Version:** 1.13.0 (tagg `v1.13.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -17,7 +17,7 @@ Roborazzi-bilderna i `android-ui/ui-components/src/test/screenshots`.
 |---|---|---|
 | 1. Tal | `src/tokens.css` | Hörn, avstånd, ikonstorlekar, spår, tryckskalning, sidhuvudets höjder – genererad ur `tokens.json`, som är android-ui:s fil (ett test där håller den sann mot temat). |
 | 2. Utseende | `src/kh.css` | Klasserna `kh-*` nedan. Ingen shadow DOM: appen når allt. Ingen färg står i filen. |
-| 3. Beteende | `src/kh.js` | Sidhuvudet som krymper, flikraden med huvudknappens meny, prickarna, dra-ned, segmentvalet och tidsväljarens rullhjul som egna element utan shadow DOM. Ett skript utan beroenden och utan export. |
+| 3. Beteende | `src/kh.js` | Sidhuvudet som krymper, flikraden med huvudknappens meny, prickarna, dra-ned, segmentvalet, tidsväljarens rullhjul och stegaren som egna element utan shadow DOM. Ett skript utan beroenden och utan export. |
 | 4. Appen | appens egen CSS | Färgerna, typsnitten, textstorlekarna och djupets färger – motsvarar `AppTheme`. |
 
 Inga beroenden och inget byggsteg: två CSS-filer och ett skript.
@@ -86,6 +86,10 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 |---|---|---|
 | `kh-card` | `AppCard` | `--tone` (+ en tonklass), klickbar som `a`/`button` eller `--clickable` |
 | `kh-row` med `__leading`, `__text`, `__title`, `__subtitle`, `__trailing`, `__highlight` | `ItemRow` | `--tinted`, `--done`, `--inactive`, `--accent` (`style="--kh-accent: …"`), klickbar som `a`/`button` eller `--clickable` |
+| `<input type="checkbox" class="kh-check">` | `MorphingCheck` | 40 stort; ringen fjädrar till en fylld kaka med bock. Med `kh-depth` skugga, skimmer och nedtryckt krympning. |
+| `<label class="kh-row kh-check-row">` med `kh-check` i `__leading` | `CheckRow` | Hela raden kryssar; ikryssad är den klar (överstruken) och tonad. `--plain` behåller raden (kryss = ta med). Egen öppna-yta: krysset med `aria-label` i en vanlig `kh-row`. |
+| `<input type="checkbox" role="switch" class="kh-switch">` | `SwitchControl` | Material 3:s växel 52 × 32; `disabled` i de inaktiva färgerna. Med `kh-depth` sänkt spår och lyft knopp. |
+| `<label class="kh-row kh-switch-row">` med `kh-switch` sist | `SwitchRow` | Hela raden växlar; `--inactive` tonar ned texten men inte växeln. |
 | `kh-chevron` | pilen i `ItemRow(navigates)` och `NoticeBanner` | – |
 | `kh-divider` | `AppDivider` | – |
 | `kh-foldout` med `__header` (en `button.kh-row` med `aria-expanded`), `__chevron`, `__content` | `Foldout` | Utfälld (`aria-expanded="true"`) ligger rubrik och innehåll på `--kh-foldout-surface` med radens hörn, chevronen vänds; innehållet visas bara när det står (eller utan `hidden`). Appen växlar `aria-expanded`. |
@@ -118,6 +122,7 @@ Med `kh.js` (egna element, inga shadow DOM):
 | `<kh-refresh>` runt listan | `AppPullToRefresh` med prickar | Dragning högst upp: prickarna följer fingret, efter tröskeln meddelas `kh-refresh`; appen sätter `refreshing` medan den uppdaterar (inom 5 s). En uppdatering appen startat själv visar inga prickar här. |
 | `<kh-swipe label="Radera">` runt en rad (`tone="hide"` för dölj/arkivera) | `SwipeToDelete`, `SwipeToHide` | Svep åt vänster med finger eller penna (inte mus, inte från kantzonen 24 px): raden följer fingret med `label` på felfärgen (`tone="hide"`: primärtonen) bakom; efter en tredjedel av bredden eller ett snabbt drag meddelas `kh-swipe` och raden glider tillbaka. Svep åt höger går till sidan; elementet har `data-own-swipe="left"` för sidans eget sidledssvep. Raden ska också ha Radera synligt. |
 | `<kh-segmented>` | `AppSegmentedChoice` | Ett val i taget i barnens `aria-checked` (eller `aria-pressed`/`aria-selected`), med tryck och pilar; meddelar `kh-select` (`detail: { index, value }`). |
+| `<kh-stepper value="2" min="0" max="999" step="1" label="doser per dag">` | `QuantityStepper` | − och + i radtonens spår; knappen vid gränsen stängs av, `disabled` stänger båda. Knapparnas namn ur `label` ("Minska doser per dag"). Meddelar `change`; `value` läses och sätts som tal, egenskapen `format` (`(v) => text`) visar värdet med enhet (`valueText`). Knapparna 44, `--kh-stepper-button: 48px` för full tryckyta. Etiketten bredvid (`showLabel`): `<div class="kh-stepper-field">` med `<span class="kh-stepper-field__label" aria-hidden="true">`. |
 | `<kh-time-picker value="07:30" step="5">` i en `kh-dialog` | `TimePickerPopup` (rullhjul, android-ui #106) | Timme och minut som två hjul i segmentvalets spår (`--kh-row-tint`), 24 timmar, som går runt. Rullas med fingret, mushjulet, pilarna upp och ned eller ett tryck på talet ovanför eller under. `value` läses och sätts som `"HH:MM"` (också medan dialogen är stängd); `step` är minuthjulets steg (standard 1) och en tid mellan stegen avrundas till närmaste. `change` meddelas när hjulet stannat på en ny tid. Dialogens rubrik får `--kh-type-section-title` som i Android; Avbryt och OK är `kh-btn--text`. |
 
 Skillnader mot Android som är kända:
@@ -166,6 +171,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.13.0 | Kryss, växel och stegare som i android-ui: `kh-check` (`MorphingCheck`, ringen fjädrar till en kaka med bock) och `kh-check-row` (`CheckRow`, klar och tonad när ikryssad, `--plain`), `kh-switch` och `kh-switch-row` (`SwitchControl`, `SwitchRow`, `--inactive`), `<kh-stepper>` och `kh-stepper-field` (`QuantityStepper`, `format`, `--kh-stepper-button`); alla med djup i `kh-depth`. Nya skärmdumpar: `CheckRow_varianter`, `SwitchRow_varianter`, `QuantityStepper_varianter`, `QuantityStepper_etikett`, `Webb_kryssrad_djup`, `Webb_reglage_djup`, `Webb_stegare_djup` |
 | 1.12.0 | Progressiv oskärpa under sidhuvudet som i android-ui 3.11.1 (#105): innehållet som rullat in under `kh-header` och `kh-topbar` är suddigt vid kanten (radie 8) och skarpt 24 längre ned; tonar in med rullningen, `--kh-blur: 0` stänger av. `kh-header` klipper bara i sidled. Nya skärmdumpar: `EntityListScreen_rullad`, `Webb_topprad_rullad` |
 | 1.11.0 | Oskärpa bakom dialog och ark som i android-ui 3.8.0 (#104): `kh-dialog` och `kh-sheet` suddar innehållet bakom (`AppBlur.behindRadius` 12) och slöjan blir 20 %. `--kh-blur: 0` stänger av. Nya skärmdumpar: `AppBottomSheet_oskarpa`, `ConfirmDialog_oskarpa` (hela fönstret, `data-helskarm`) |
 | 1.10.0 | Samma radering av en rad som i android-ui 3.9.0 (#118): `<kh-swipe>` (svep åt vänster, `kh-swipe`-händelsen, `tone="hide"`), `kh-foldout__actions` och `kh-btn--destructive-text`. Nya skärmdumpar: `Foldout_radera`, `SwipeToDelete_svept` |

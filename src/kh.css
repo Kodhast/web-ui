@@ -49,6 +49,9 @@
    * (standard, som AppTheme(blur = AppBlur())), 0 = av (som blur = null): då dagens slöja och inget sudd.
    * Måtten är AppBlurs standardvärden; de står inte i tokens.json.
    */
+  /* Material 3 Expressive: fastSpatialSpec, den fjädrande rörelsen (krysset, växelns knopp). */
+  --kh-spring-fast: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+
   --kh-blur: 1;
   --kh-blur-behind-radius: 12px; /* behindRadius */
   --kh-blur-scrim: 20%; /* scrimAlpha: slöjan med oskärpa; utan är den 32 % */
@@ -113,6 +116,8 @@
 /* Bibliotekets egna ikoner (bock och pil) som mask, så att de tar textens färg. */
 :root {
   --kh-mask-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  --kh-mask-add: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");
+  --kh-mask-remove: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13H5v-2h14v2z'/%3E%3C/svg%3E");
   --kh-mask-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
 }
 
@@ -291,6 +296,199 @@ kh-swipe > :not(.kh-swipe__background) {
   transform: translateX(var(--kh-swipe-offset, 0px));
 }
 kh-swipe[data-state='returning'] > :not(.kh-swipe__background) { transition: transform 200ms ease; }
+
+/* ---------- Kryss (MorphingCheck) och kryssrad (CheckRow) ---------- */
+
+/*
+ * <input type="checkbox" class="kh-check">: 40 stort, en ring i primärfärgen som fjädrar till en fylld kaka med
+ * bock (Material 3:s Cookie9Sided) när den kryssas. Kakan är en månghörning med lika många hörn som cirkeln, så att
+ * formen glider mellan dem. Står krysset i en .kh-check-row är hela raden tryckytan (en <label>).
+ */
+:where(:root) {
+  --kh-check-circle: polygon(50.0% 0.0%, 51.7% 0.0%, 53.5% 0.1%, 55.2% 0.3%, 57.0% 0.5%, 58.7% 0.8%, 60.4% 1.1%, 62.1% 1.5%, 63.8% 1.9%, 65.5% 2.4%, 67.1% 3.0%, 68.7% 3.6%, 70.3% 4.3%, 71.9% 5.1%, 73.5% 5.9%, 75.0% 6.7%, 76.5% 7.6%, 78.0% 8.5%, 79.4% 9.5%, 80.8% 10.6%, 82.1% 11.7%, 83.5% 12.8%, 84.7% 14.0%, 86.0% 15.3%, 87.2% 16.5%, 88.3% 17.9%, 89.4% 19.2%, 90.5% 20.6%, 91.5% 22.0%, 92.4% 23.5%, 93.3% 25.0%, 94.1% 26.5%, 94.9% 28.1%, 95.7% 29.7%, 96.4% 31.3%, 97.0% 32.9%, 97.6% 34.5%, 98.1% 36.2%, 98.5% 37.9%, 98.9% 39.6%, 99.2% 41.3%, 99.5% 43.0%, 99.7% 44.8%, 99.9% 46.5%, 100.0% 48.3%, 100.0% 50.0%, 100.0% 51.7%, 99.9% 53.5%, 99.7% 55.2%, 99.5% 57.0%, 99.2% 58.7%, 98.9% 60.4%, 98.5% 62.1%, 98.1% 63.8%, 97.6% 65.5%, 97.0% 67.1%, 96.4% 68.7%, 95.7% 70.3%, 94.9% 71.9%, 94.1% 73.5%, 93.3% 75.0%, 92.4% 76.5%, 91.5% 78.0%, 90.5% 79.4%, 89.4% 80.8%, 88.3% 82.1%, 87.2% 83.5%, 86.0% 84.7%, 84.7% 86.0%, 83.5% 87.2%, 82.1% 88.3%, 80.8% 89.4%, 79.4% 90.5%, 78.0% 91.5%, 76.5% 92.4%, 75.0% 93.3%, 73.5% 94.1%, 71.9% 94.9%, 70.3% 95.7%, 68.7% 96.4%, 67.1% 97.0%, 65.5% 97.6%, 63.8% 98.1%, 62.1% 98.5%, 60.4% 98.9%, 58.7% 99.2%, 57.0% 99.5%, 55.2% 99.7%, 53.5% 99.9%, 51.7% 100.0%, 50.0% 100.0%, 48.3% 100.0%, 46.5% 99.9%, 44.8% 99.7%, 43.0% 99.5%, 41.3% 99.2%, 39.6% 98.9%, 37.9% 98.5%, 36.2% 98.1%, 34.5% 97.6%, 32.9% 97.0%, 31.3% 96.4%, 29.7% 95.7%, 28.1% 94.9%, 26.5% 94.1%, 25.0% 93.3%, 23.5% 92.4%, 22.0% 91.5%, 20.6% 90.5%, 19.2% 89.4%, 17.9% 88.3%, 16.5% 87.2%, 15.3% 86.0%, 14.0% 84.7%, 12.8% 83.5%, 11.7% 82.1%, 10.6% 80.8%, 9.5% 79.4%, 8.5% 78.0%, 7.6% 76.5%, 6.7% 75.0%, 5.9% 73.5%, 5.1% 71.9%, 4.3% 70.3%, 3.6% 68.7%, 3.0% 67.1%, 2.4% 65.5%, 1.9% 63.8%, 1.5% 62.1%, 1.1% 60.4%, 0.8% 58.7%, 0.5% 57.0%, 0.3% 55.2%, 0.1% 53.5%, 0.0% 51.7%, 0.0% 50.0%, 0.0% 48.3%, 0.1% 46.5%, 0.3% 44.8%, 0.5% 43.0%, 0.8% 41.3%, 1.1% 39.6%, 1.5% 37.9%, 1.9% 36.2%, 2.4% 34.5%, 3.0% 32.9%, 3.6% 31.3%, 4.3% 29.7%, 5.1% 28.1%, 5.9% 26.5%, 6.7% 25.0%, 7.6% 23.5%, 8.5% 22.0%, 9.5% 20.6%, 10.6% 19.2%, 11.7% 17.9%, 12.8% 16.5%, 14.0% 15.3%, 15.3% 14.0%, 16.5% 12.8%, 17.9% 11.7%, 19.2% 10.6%, 20.6% 9.5%, 22.0% 8.5%, 23.5% 7.6%, 25.0% 6.7%, 26.5% 5.9%, 28.1% 5.1%, 29.7% 4.3%, 31.3% 3.6%, 32.9% 3.0%, 34.5% 2.4%, 36.2% 1.9%, 37.9% 1.5%, 39.6% 1.1%, 41.3% 0.8%, 43.0% 0.5%, 44.8% 0.3%, 46.5% 0.1%, 48.3% 0.0%);
+  --kh-check-cookie: polygon(50.0% 0.0%, 51.7% 0.1%, 53.5% 0.3%, 55.2% 0.7%, 56.9% 1.2%, 58.5% 1.9%, 60.1% 2.7%, 61.5% 3.7%, 62.9% 4.9%, 64.2% 6.3%, 65.0% 8.7%, 67.2% 7.4%, 69.1% 7.1%, 70.9% 7.1%, 72.7% 7.3%, 74.4% 7.7%, 76.1% 8.2%, 77.7% 8.9%, 79.3% 9.7%, 80.8% 10.6%, 82.1% 11.7%, 83.4% 12.9%, 84.6% 14.2%, 85.7% 15.5%, 86.6% 17.0%, 87.4% 18.6%, 88.1% 20.2%, 88.6% 21.9%, 88.9% 23.7%, 89.0% 25.6%, 88.1% 28.0%, 90.6% 28.4%, 92.2% 29.4%, 93.6% 30.6%, 94.8% 31.9%, 95.9% 33.3%, 96.9% 34.8%, 97.7% 36.3%, 98.3% 37.9%, 98.9% 39.6%, 99.2% 41.3%, 99.5% 43.0%, 99.5% 44.8%, 99.5% 46.5%, 99.3% 48.3%, 98.9% 50.0%, 98.3% 51.7%, 97.6% 53.3%, 96.7% 54.9%, 95.5% 56.4%, 93.3% 57.6%, 95.0% 59.6%, 95.6% 61.4%, 95.9% 63.2%, 96.0% 64.9%, 95.9% 66.7%, 95.7% 68.5%, 95.3% 70.2%, 94.8% 71.8%, 94.1% 73.5%, 93.3% 75.0%, 92.4% 76.5%, 91.3% 77.9%, 90.1% 79.2%, 88.8% 80.3%, 87.4% 81.4%, 85.9% 82.4%, 84.3% 83.2%, 82.6% 83.8%, 80.8% 84.2%, 78.3% 83.7%, 78.3% 86.2%, 77.6% 88.0%, 76.7% 89.6%, 75.6% 91.0%, 74.4% 92.3%, 73.1% 93.5%, 71.7% 94.6%, 70.3% 95.5%, 68.7% 96.3%, 67.1% 97.0%, 65.4% 97.5%, 63.7% 97.9%, 62.0% 98.1%, 60.2% 98.2%, 58.5% 98.1%, 56.7% 97.9%, 55.0% 97.5%, 53.3% 96.9%, 51.6% 95.9%, 50.0% 94.0%, 48.4% 95.9%, 46.7% 96.9%, 45.0% 97.5%, 43.3% 97.9%, 41.5% 98.1%, 39.8% 98.2%, 38.0% 98.1%, 36.3% 97.9%, 34.6% 97.5%, 32.9% 97.0%, 31.3% 96.3%, 29.7% 95.5%, 28.3% 94.6%, 26.9% 93.5%, 25.6% 92.3%, 24.4% 91.0%, 23.3% 89.6%, 22.4% 88.0%, 21.7% 86.2%, 21.7% 83.7%, 19.2% 84.2%, 17.4% 83.8%, 15.7% 83.2%, 14.1% 82.4%, 12.6% 81.4%, 11.2% 80.3%, 9.9% 79.2%, 8.7% 77.9%, 7.6% 76.5%, 6.7% 75.0%, 5.9% 73.5%, 5.2% 71.8%, 4.7% 70.2%, 4.3% 68.5%, 4.1% 66.7%, 4.0% 64.9%, 4.1% 63.2%, 4.4% 61.4%, 5.0% 59.6%, 6.7% 57.6%, 4.5% 56.4%, 3.3% 54.9%, 2.4% 53.3%, 1.7% 51.7%, 1.1% 50.0%, 0.7% 48.3%, 0.5% 46.5%, 0.5% 44.8%, 0.5% 43.0%, 0.8% 41.3%, 1.1% 39.6%, 1.7% 37.9%, 2.3% 36.3%, 3.1% 34.8%, 4.1% 33.3%, 5.2% 31.9%, 6.4% 30.6%, 7.8% 29.4%, 9.4% 28.4%, 11.9% 28.0%, 11.0% 25.6%, 11.1% 23.7%, 11.4% 21.9%, 11.9% 20.2%, 12.6% 18.6%, 13.4% 17.0%, 14.3% 15.5%, 15.4% 14.2%, 16.6% 12.9%, 17.9% 11.7%, 19.2% 10.6%, 20.7% 9.7%, 22.3% 8.9%, 23.9% 8.2%, 25.6% 7.7%, 27.3% 7.3%, 29.1% 7.1%, 30.9% 7.1%, 32.8% 7.4%, 35.0% 8.7%, 35.8% 6.3%, 37.1% 4.9%, 38.5% 3.7%, 39.9% 2.7%, 41.5% 1.9%, 43.1% 1.2%, 44.8% 0.7%, 46.5% 0.3%, 48.3% 0.1%);
+}
+.kh-check {
+  appearance: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 40px;
+  block-size: 40px;
+  margin: 4px;
+  border: 2.5px solid var(--kh-primary);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 350ms var(--kh-spring-fast), transform 150ms ease;
+}
+.kh-check::before, .kh-check::after { content: ''; position: absolute; inset: -1.25px; }
+/* Kakan: ritas innanför ringens halva linjebredd och glider från cirkel till kaka. */
+.kh-check::before {
+  background: var(--kh-primary);
+  clip-path: var(--kh-check-circle);
+  opacity: 0;
+  transition: clip-path 350ms var(--kh-spring-fast), opacity 350ms var(--kh-spring-fast);
+}
+.kh-check::after {
+  inset: 0;
+  margin: auto;
+  inline-size: var(--kh-icon-row);
+  block-size: var(--kh-icon-row);
+  background: var(--kh-on-primary);
+  -webkit-mask: var(--kh-mask-check) center / contain no-repeat;
+  mask: var(--kh-mask-check) center / contain no-repeat;
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+.kh-check:checked { border-color: transparent; }
+.kh-check:checked::before { clip-path: var(--kh-check-cookie); opacity: 1; }
+.kh-check:checked::after { opacity: 1; }
+.kh-check:focus-visible { outline: 2px solid var(--kh-primary); outline-offset: 2px; }
+.kh-check:disabled { cursor: default; }
+
+/*
+ * <label class="kh-row kh-check-row"> med krysset i .kh-row__leading: ikryssad är raden klar (överstruken, dämpad)
+ * och tonad, som CheckRow(done = checked, tinted = checked). .kh-check-row--plain behåller raden som den är (ett val
+ * där kryss betyder "ta med", Fonders import). Med en egen öppna-yta: krysset ensamt i __leading med aria-label och
+ * raden som en vanlig .kh-row.
+ */
+.kh-check-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kh-check-row > .kh-row__leading, .kh-row__leading:has(> .kh-check) { inline-size: 48px; justify-content: center; }
+.kh-check-row:not(.kh-check-row--plain):has(.kh-check:checked) { background-color: var(--kh-row-tint); }
+.kh-check-row:not(.kh-check-row--plain):has(.kh-check:checked) :is(.kh-row__title, .kh-row__subtitle) {
+  color: var(--kh-on-surface-variant);
+  text-decoration: line-through;
+}
+.kh-check-row:has(.kh-check:disabled) { cursor: default; }
+
+/* ---------- Växel (SwitchControl) och reglagerad (SwitchRow) ---------- */
+
+/*
+ * <input type="checkbox" role="switch" class="kh-switch">: Material 3:s växel, 52 × 32. Av: kantat spår och en
+ * liten knopp i outline; på: spåret i primärfärgen och en större knopp i on-primary; nedtryckt växer knoppen.
+ * I en <label class="kh-row kh-switch-row"> är hela raden tryckytan; .kh-switch-row--inactive tonar ned texten men
+ * inte växeln (den ska gå att slå på igen).
+ */
+.kh-switch {
+  --kh-switch-knob: 16px;
+  appearance: none;
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 52px;
+  block-size: 32px;
+  margin: 8px 0;
+  border: 2px solid var(--kh-outline);
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-surface-variant);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.kh-switch::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 14px;
+  inline-size: var(--kh-switch-knob);
+  block-size: var(--kh-switch-knob);
+  border-radius: 50%;
+  background-color: var(--kh-outline);
+  translate: -50% -50%;
+  transition: inset-inline-start 300ms var(--kh-spring-fast), inline-size 150ms ease, block-size 150ms ease, background-color 150ms ease;
+}
+.kh-switch:checked { --kh-switch-knob: 24px; border-color: var(--kh-primary); background-color: var(--kh-primary); }
+.kh-switch:checked::before { inset-inline-start: 34px; background-color: var(--kh-on-primary); }
+.kh-switch:not(:disabled):active, .kh-switch-row:not(:has(.kh-switch:disabled)):active .kh-switch { --kh-switch-knob: 28px; }
+.kh-switch:focus-visible { outline: 2px solid var(--kh-primary); outline-offset: 2px; }
+/* Inaktiv: Material 3:s inaktiva färger. */
+.kh-switch:disabled { border-color: color-mix(in srgb, var(--kh-on-surface) 12%, transparent); background-color: color-mix(in srgb, var(--kh-surface-variant) 12%, transparent); cursor: default; }
+.kh-switch:disabled::before { background-color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent); }
+.kh-switch:disabled:checked { border-color: transparent; background-color: color-mix(in srgb, var(--kh-on-surface) 12%, transparent); }
+.kh-switch:disabled:checked::before { background-color: var(--kh-card); }
+.kh-switch-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kh-switch-row:has(.kh-switch:disabled) { cursor: default; }
+.kh-switch-row--inactive .kh-row__text { opacity: 0.55; }
+
+/* ---------- Stegaren (QuantityStepper): <kh-stepper>, kh.js ---------- */
+
+/*
+ * Antal − och + i radtonens spår: två runda knappar i kortens färg och värdet emellan (quantity-stilen, minst 48
+ * brett). Knapparna är 44 (ReseApoteket); --kh-stepper-button: 48px ger full tryckyta (Dagboken). kh.js bygger
+ * knapparna och stänger av den som når gränsen. .kh-stepper-field ställer etiketten bredvid (showLabel).
+ */
+kh-stepper {
+  --kh-stepper-button: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kh-space-xs);
+  padding: var(--kh-space-xs);
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-row-tint);
+}
+.kh-stepper__button {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: var(--kh-stepper-button);
+  block-size: var(--kh-stepper-button);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kh-radius-pill);
+  background-color: var(--kh-card);
+  color: var(--kh-on-surface);
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.kh-stepper__button::before {
+  content: '';
+  inline-size: var(--kh-icon-standard);
+  block-size: var(--kh-icon-standard);
+  background: currentColor;
+  -webkit-mask: var(--kh-mask-remove) center / contain no-repeat;
+  mask: var(--kh-mask-remove) center / contain no-repeat;
+}
+.kh-stepper__button--increase::before { -webkit-mask-image: var(--kh-mask-add); mask-image: var(--kh-mask-add); }
+.kh-stepper__button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: -1;
+}
+.kh-stepper__button:not(:disabled):active::after { opacity: 0.1; }
+@media (hover: hover) {
+  .kh-stepper__button:not(:disabled):hover::after { opacity: 0.08; }
+}
+.kh-stepper__button:focus-visible { outline: 2px solid var(--kh-primary); outline-offset: 2px; }
+/* Inaktiv: Material 3:s FilledIconButton (on-surface 12 % och 38 %). */
+.kh-stepper__button:disabled {
+  background-color: color-mix(in srgb, var(--kh-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--kh-on-surface) 38%, transparent);
+  cursor: default;
+}
+.kh-stepper__value {
+  min-inline-size: 48px;
+  font: var(--kh-type-quantity);
+  color: var(--kh-on-surface);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.kh-stepper-field { display: inline-flex; align-items: center; gap: var(--kh-space-m); }
+.kh-stepper-field__label { font: var(--kh-type-item-title); color: var(--kh-on-surface-variant); }
 
 /* ---------- Avdelare (AppDivider) ---------- */
 
@@ -1493,6 +1691,21 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
     0 2px 6px color-mix(in srgb, var(--kh-depth-card-shadow) 35%, transparent),
     0 10px 29px -8px var(--kh-depth-card-shadow);
 }
+/* Kakan med djup: skugga och ljuskant som tonar in med fyllningen; krysset sjunker in nedtryckt. */
+.kh-depth .kh-check { transition: border-color 350ms var(--kh-spring-fast), transform 150ms ease, filter 350ms ease; }
+.kh-depth .kh-check:checked { filter: drop-shadow(0 1px 2px var(--kh-depth-shadow)); }
+.kh-depth .kh-check:checked::before { background-image: var(--kh-lift-sheen); }
+.kh-depth :is(.kh-check:not(:disabled):active, .kh-check-row:not(:has(.kh-check:disabled)):active .kh-check) { transform: scale(var(--kh-depth-pressed-scale)); }
+/* Växeln med djup: sänkt spår; påslagen skimrar spåret och knoppen lyfts med knapparnas skugga. */
+.kh-depth .kh-switch { box-shadow: inset 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent); }
+.kh-depth .kh-switch:checked:not(:disabled) { background-image: var(--kh-lift-sheen); }
+.kh-depth .kh-switch:checked:not(:disabled)::before { box-shadow: var(--kh-lift-near), var(--kh-lift-highlight); }
+.kh-depth .kh-switch:checked:not(:disabled):active::before, .kh-depth .kh-switch-row:active .kh-switch:checked:not(:disabled)::before { box-shadow: none; }
+/* Stegaren med djup: sänkt spår och upphöjda knoppar som krymper nedtryckta, som ikonknapparna. */
+.kh-depth kh-stepper { box-shadow: inset 0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent); }
+.kh-depth .kh-stepper__button:not(:disabled) { box-shadow: var(--kh-lift-selected), var(--kh-lift-highlight); background-image: var(--kh-lift-sheen); }
+.kh-depth .kh-stepper__button:not(:disabled):active { transform: scale(calc(1 - (1 - var(--kh-depth-pressed-scale)) * 8 / 3)); box-shadow: none; background-image: none; }
+
 .kh-depth .kh-dialog { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge); }
 .kh-depth .kh-sheet { box-shadow: inset 0 1px 0 var(--kh-depth-card-edge); }
 
@@ -1517,6 +1730,6 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
 .kh-depth .kh-menu { box-shadow: inset 0 0 0 1px var(--kh-depth-card-edge), var(--kh-elevation-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.kh-foldout, .kh-foldout__chevron, .kh-btn, .kh-chip, .kh-segmented > *, .kh-segmented > *::before, .kh-segmented::before, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header) { transition: none; }
+  :is(.kh-foldout, .kh-foldout__chevron, .kh-btn, .kh-chip, .kh-segmented > *, .kh-segmented > *::before, .kh-segmented::before, .kh-card, .kh-pill, .kh-field, .kh-field__label, .kh-toolbar__tab, .kh-toolbar__label, .kh-toolbar__action, .kh-icon-btn, kh-header, .kh-check, .kh-check::before, .kh-check::after, .kh-switch, .kh-switch::before, .kh-stepper__button) { transition: none; }
   kh-dots[bouncing] > i { animation: none; }
 }
