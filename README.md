@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.9.0 (tagg `v1.9.0`) ·
+**Version:** 1.10.0 (tagg `v1.10.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -88,7 +88,8 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-chevron` | pilen i `ItemRow(navigates)` och `NoticeBanner` | – |
 | `kh-divider` | `AppDivider` | – |
 | `kh-foldout` med `__header` (en `button.kh-row` med `aria-expanded`), `__chevron`, `__content` | `Foldout` | Utfälld (`aria-expanded="true"`) ligger rubrik och innehåll på `--kh-foldout-surface` med radens hörn, chevronen vänds; innehållet visas bara när det står (eller utan `hidden`). Appen växlar `aria-expanded`. |
-| `kh-btn` | `AppButton` | `--secondary`, `--outlined`, `--text`, `--destructive`, `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
+| `kh-foldout__actions` sist i `__content`, med `kh-btn--destructive-text` sist | `Foldout(actions, delete)` | Radens knappar; Radera i felfärgen sist, som frågar i `kh-dialog` (android-ui #118). |
+| `kh-btn` | `AppButton` | `--secondary`, `--outlined`, `--text`, `--destructive`, `--destructive-text` (Radera sist bland en rads knappar), `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
 | `kh-icon-btn` | `AppIconButton` | `--tonal` (platta i `secondary-container`), en tonklass (den tonade: platta och ikon; den vanliga: ikonen), `disabled`; 48 i tryckyta och form, ikonen 24, alltid `aria-label` |
 | `kh-chips` + `kh-chip` med `__label`, `__value`, `__pending` | `AppFilterChip`, `ChipRow` | `aria-pressed`/`aria-checked` (bocken ritas av biblioteket), `--emphasized`, `--pending`, `disabled` |
 | `kh-segmented` | `AppSegmentedChoice` | barnen med `aria-checked`/`aria-pressed`/`aria-selected` |
@@ -114,6 +115,7 @@ Med `kh.js` (egna element, inga shadow DOM):
 | `<kh-header>` med `__icon`, `__name`, `__version` (valfri), `__trailing`, `__title` (`<kh-dots>` + `<span>`), `__subtitle` | `AppHeader` | Krymper från 144 till 64 med sidans (eller närmaste rullande förälders, eller `scroller="#id"`) rullning, fäller ut högst upp; `data-raised` när innehåll ligger under; `collapsedFraction` läses. Kontot (`kh-avatar`) i `__trailing` får huvudets färg i ringen. |
 | `<kh-toolbar>` med `__tabs`, `__tab` (`__label`, `__badge`), `__action` | `AppFloatingToolbar` | En flik som är `button` väljs (`aria-selected`) och meddelar `kh-select`; en länk följer appens `aria-current="page"`. `__action` med `popovertarget` öppnar en `kh-menu` ovanför sig. `--surface`, `--tonal`, `--filled` (`ToolbarStyle`), `--tertiary` (`ActionColor`), `--fixed` längst ned (innehållet behöver `--kh-toolbar-clearance`). |
 | `<kh-refresh>` runt listan | `AppPullToRefresh` med prickar | Dragning högst upp: prickarna följer fingret, efter tröskeln meddelas `kh-refresh`; appen sätter `refreshing` medan den uppdaterar (inom 5 s). En uppdatering appen startat själv visar inga prickar här. |
+| `<kh-swipe label="Radera">` runt en rad (`tone="hide"` för dölj/arkivera) | `SwipeToDelete`, `SwipeToHide` | Svep åt vänster med finger eller penna (inte mus, inte från kantzonen 24 px): raden följer fingret med `label` på felfärgen (`tone="hide"`: primärtonen) bakom; efter en tredjedel av bredden eller ett snabbt drag meddelas `kh-swipe` och raden glider tillbaka. Svep åt höger går till sidan; elementet har `data-own-swipe="left"` för sidans eget sidledssvep. Raden ska också ha Radera synligt. |
 | `<kh-segmented>` | `AppSegmentedChoice` | Ett val i taget i barnens `aria-checked` (eller `aria-pressed`/`aria-selected`), med tryck och pilar; meddelar `kh-select` (`detail: { index, value }`). |
 | `<kh-time-picker value="07:30" step="5">` i en `kh-dialog` | `TimePickerPopup` (rullhjul, android-ui #106) | Timme och minut som två hjul i segmentvalets spår (`--kh-row-tint`), 24 timmar, som går runt. Rullas med fingret, mushjulet, pilarna upp och ned eller ett tryck på talet ovanför eller under. `value` läses och sätts som `"HH:MM"` (också medan dialogen är stängd); `step` är minuthjulets steg (standard 1) och en tid mellan stegen avrundas till närmaste. `change` meddelas när hjulet stannat på en ny tid. Dialogens rubrik får `--kh-type-section-title` som i Android; Avbryt och OK är `kh-btn--text`. |
 
@@ -156,6 +158,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.10.0 | Samma radering av en rad som i android-ui 3.9.0 (#118): `<kh-swipe>` (svep åt vänster, `kh-swipe`-händelsen, `tone="hide"`), `kh-foldout__actions` och `kh-btn--destructive-text`. Nya skärmdumpar: `Foldout_radera`, `SwipeToDelete_svept` |
 | 1.9.0 | Utfällbar rad `kh-foldout` (Husjakt #518, variant A): utfälld ligger hela delen på en tonad yta (`--kh-foldout-surface`, standard `--kh-row-tint`) med radens hörn, så att det syns vad som hör till raden. Tryckläget hovrar bara med mus (`@media (hover: hover)`): i Chrome på Android fastnade det grå lagret efter ett tryck. Ny skärmdump: `Foldout_oppen` |
 | 1.8.0 | Tidsväljaren som rullhjul (android-ui #106: `TimePickerPopup` med `TimeScroll`): `<kh-time-picker>` med timme och minut i två hjul i segmentvalets nedsänkta spår, 100 × 120 med tal 56 höga i `--kh-type-time-wheel`; talet i mitten i `--kh-on-surface`, grannarna i `--kh-outline` (rullningsdriven animering). Hjulen går runt, `step` ger minuthjulets steg, `value` och `change`. Ikonknapp sist i textfältet: `kh-icon-btn` i `kh-field` (för kalendern som öppnar tidsväljaren). Nya skärmdumpar: `TimePickerPopup_oppen`, `TimePickerPopup_djup`, `Webb_textfalt_ikonknapp` |
 | 1.7.0 | Segmentvalet animerar bytet (android-ui #100, 3.5.0): med `.kh-depth` är den valda pillen spårets `::before` och glider till nytt val med Expressives fjäder (`--kh-segment-glide`, `linear()`); texten byter färg och bocken växer fram i stället för att texten hoppar. Antal (2–4) och valt index läses med `:has()` ur barnens `aria-pressed/-checked/-selected`, så det fungerar också för en vanlig `.kh-segmented` som appen själv sätter valet i, utan kh.js; höger till vänster speglas. Pillen krymper när det valda segmentet trycks. Samma stillbild, inga omtagna skärmdumpar |

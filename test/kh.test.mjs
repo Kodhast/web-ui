@@ -880,3 +880,53 @@ test('dra ned: efter tröskeln meddelas kh-refresh och prickarna står kvar till
     await touchPage.close();
   }
 });
+
+test('svep åt vänster: efter en tredjedel eller ett snabbt drag meddelas kh-swipe och raden glider tillbaka; kort, åt höger eller lodrätt inget', async () => {
+  const touchPage = await browser.newPage({ viewport: { width: 440, height: 900 }, hasTouch: true });
+  try {
+    await touchPage.goto(`${gallery}?tema=ljust`);
+    await touchPage.evaluate(() => {
+      document.body.innerHTML = '<div class="kh-card" style="inline-size: 360px; margin: 40px"><kh-swipe id="s" label="Radera"><div class="kh-row" id="r"><div class="kh-row__text"><span class="kh-row__title">Promenad</span></div></div></kh-swipe></div>';
+      window.swipes = 0;
+      document.getElementById('s').addEventListener('kh-swipe', () => { window.swipes++; });
+    });
+    const drag = (dx, dy = 0, startX = 300) => touchPage.evaluate(({ dx, dy, startX }) => {
+      const target = document.getElementById('r');
+      const touch = (x, y) => new Touch({ identifier: 1, target, clientX: x, clientY: y });
+      const fire = (type, x, y) => target.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true, touches: type === 'touchend' ? [] : [touch(x, y)], changedTouches: [touch(x, y)]
+      }));
+      const steps = 10;
+      fire('touchstart', startX, 60);
+      for (let i = 1; i <= steps; i++) fire('touchmove', startX + (dx * i) / steps, 60 + (dy * i) / steps);
+      fire('touchend', startX + dx, 60 + dy);
+    }, { dx, dy, startX });
+    const swipes = () => touchPage.evaluate(() => window.swipes);
+
+    await drag(-30);
+    assert.equal(await swipes(), 0, 'under 40 px räcker inte ens ett snabbt drag');
+    await drag(-160);
+    assert.equal(await swipes(), 1);
+    assert.equal(await touchPage.evaluate(() => document.getElementById('s').style.getPropertyValue('--kh-swipe-offset')), '0px', 'raden glider tillbaka');
+    await drag(160);
+    assert.equal(await swipes(), 1, 'åt höger tar aldrig bort');
+    await drag(-30, 200);
+    assert.equal(await swipes(), 1, 'lodrätt är rullning');
+    await drag(-200, 0, 430);
+    assert.equal(await swipes(), 1, 'inget svep från kantzonen');
+    assert.equal(await touchPage.evaluate(() => document.getElementById('s').dataset.ownSwipe), 'left');
+    assert.equal(await touchPage.evaluate(() => document.querySelector('#s > .kh-swipe__background').textContent), 'Radera');
+  } finally {
+    await touchPage.close();
+  }
+});
+
+test('rad som går att radera: Radera i felfärgen sist bland radens knappar; svepets bakgrund felfärgad, dölj i primärtonen', async () => {
+  const buttons = await page.evaluate(() => [...document.querySelectorAll('[data-skarmdump="Foldout_radera"] .kh-foldout__actions .kh-btn')].map((b) => b.textContent));
+  assert.deepEqual(buttons, ['Bevaka alternativ', 'Radera']);
+  assert.equal(await style('[data-skarmdump="Foldout_radera"] .kh-btn--destructive-text', 'color'), await themeColor('--kh-error'));
+  assert.equal(await style('[data-skarmdump="Foldout_radera"] .kh-btn--destructive-text', 'background-color'), 'rgba(0, 0, 0, 0)');
+  assert.equal(await style('[data-skarmdump="Foldout_radera"] kh-swipe .kh-swipe__background', 'display'), 'none', 'syns bara medan raden dras');
+  assert.equal(await style('[data-skarmdump="SwipeToDelete_svept"] kh-swipe .kh-swipe__background', 'background-color'), await themeColor('--kh-error-container'));
+  assert.equal(await style('[data-skarmdump="SwipeToDelete_svept"] kh-swipe[tone="hide"] .kh-swipe__background', 'background-color'), await themeColor('--kh-primary-container'));
+});
