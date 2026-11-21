@@ -978,3 +978,63 @@ test('oskärpa under toppraden: ingen utan rullning, full efter 24 px', async ()
   await frames();
   assert.equal(await style('#t', 'opacity', '::after'), '1');
 });
+
+test('kryssrad: hela raden kryssar, kakan ersätter ringen, ikryssad är raden klar och tonad utom --plain', async () => {
+  await mount(`<div class="kh-card">
+    <label class="kh-row kh-check-row" id="a"><span class="kh-row__leading"><input type="checkbox" class="kh-check" id="ka"></span><span class="kh-row__text"><span class="kh-row__title" id="ta">Mjölk</span></span></label>
+    <label class="kh-row kh-check-row kh-check-row--plain" id="b"><span class="kh-row__leading"><input type="checkbox" class="kh-check" id="kb" checked></span><span class="kh-row__text"><span class="kh-row__title" id="tb">Ta med</span></span></label></div>`);
+  assert.equal((await box('#ka')).width, 40);
+  assert.equal((await box('#a .kh-row__leading')).width, 48, 'krysset i en 48 bred plats, så att titlarna linjerar');
+  assert.equal(await style('#ka', 'opacity', '::before'), '0', 'okryssad: bara ringen');
+  await page.click('#ta');
+  assert.equal(await page.evaluate(() => document.getElementById('ka').checked), true, 'ett tryck på titeln kryssar');
+  await page.waitForTimeout(400);
+  assert.equal(await style('#ka', 'opacity', '::before'), '1');
+  assert.match(await style('#ka', 'clip-path', '::before'), /^polygon/);
+  assert.equal(await style('#ka', 'border-top-color'), 'rgba(0, 0, 0, 0)', 'ringen borta');
+  assert.match(await style('#ta', 'text-decoration-line'), /line-through/);
+  assert.equal(await style('#a', 'background-color'), await themeColor('--kh-row-tint'));
+  assert.doesNotMatch(await style('#tb', 'text-decoration-line'), /line-through/, '--plain: kryss betyder ta med');
+  assert.equal(await style('#b', 'background-color'), 'rgba(0, 0, 0, 0)');
+});
+
+test('reglagerad: hela raden växlar, 52 × 32, knoppen växer och flyttas påslagen, inaktiv tonar bara texten', async () => {
+  await mount(`<div class="kh-card">
+    <label class="kh-row kh-switch-row kh-switch-row--inactive" id="a"><span class="kh-row__text"><span class="kh-row__title" id="t">Påminnelser</span></span><input type="checkbox" role="switch" class="kh-switch" id="s"></label></div>`);
+  const s = await box('#s');
+  assert.deepEqual([s.width, s.height], [52, 32]);
+  assert.equal(await style('#s', 'width', '::before'), '16px');
+  await page.click('#t');
+  assert.equal(await page.evaluate(() => document.getElementById('s').checked), true);
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(350);
+  assert.equal(await style('#s', 'width', '::before'), '24px');
+  assert.equal(await style('#s', 'background-color'), await themeColor('--kh-primary'));
+  assert.equal(await style('#a .kh-row__text', 'opacity'), '0.55');
+  assert.equal(await style('#s', 'opacity'), '1', 'växeln tonas inte ned');
+});
+
+test('stegare: − och + inom gränserna, change, knappen vid gränsen av, namn ur label, format', async () => {
+  await mount('<kh-stepper id="q" value="1" min="0" max="2" label="portioner"></kh-stepper>');
+  const minus = '#q .kh-stepper__button--decrease';
+  const plus = '#q .kh-stepper__button--increase';
+  assert.equal(await page.getAttribute(minus, 'aria-label'), 'Minska portioner');
+  assert.equal(await page.getAttribute(plus, 'aria-label'), 'Öka portioner');
+  assert.equal((await box(minus)).width, 44);
+  await page.evaluate(() => {
+    window.stegen = [];
+    document.getElementById('q').addEventListener('change', (e) => window.stegen.push(e.target.value));
+  });
+  await page.click(plus);
+  assert.equal(await page.textContent('#q .kh-stepper__value'), '2');
+  assert.equal(await page.isDisabled(plus), true, 'vid max går det inte att öka');
+  await page.click(minus);
+  await page.click(minus);
+  assert.equal(await page.isDisabled(minus), true);
+  assert.deepEqual(await page.evaluate(() => window.stegen), [2, 1, 0]);
+  await page.evaluate(() => { document.getElementById('q').format = (v) => (v === 0 ? 'Ingen spärr' : `${v} h`); });
+  assert.equal(await page.textContent('#q .kh-stepper__value'), 'Ingen spärr');
+  await page.evaluate(() => document.getElementById('q').style.setProperty('--kh-stepper-button', '48px'));
+  assert.equal((await box(minus)).width, 48);
+  assert.equal(await style('#q', 'background-color'), await themeColor('--kh-row-tint'));
+});

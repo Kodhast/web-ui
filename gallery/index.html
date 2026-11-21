@@ -177,6 +177,75 @@
 </section>
 
 <section class="galleri-del">
+  <h2 class="kh-text-caption">Kryssrader · CheckRow_varianter</h2>
+  <div class="ram" data-skarmdump="CheckRow_varianter">
+    <div class="kh-card">
+      <label class="kh-row kh-check-row"><span class="kh-row__leading"><input type="checkbox" class="kh-check"></span><span class="kh-row__text"><span class="kh-row__title">Alvedon 500 mg</span><span class="kh-row__subtitle">9 tabletter</span></span></label>
+      <label class="kh-row kh-check-row kh-row--accent" style="--kh-accent: var(--kh-primary)"><span class="kh-row__leading"><input type="checkbox" class="kh-check" checked></span><span class="kh-row__text"><span class="kh-row__title">Solkräm</span><span class="kh-row__subtitle">1 tub</span></span></label>
+      <label class="kh-row kh-check-row"><span class="kh-row__leading"><input type="checkbox" class="kh-check"></span><span class="kh-row__text"><span class="kh-row__title">Levaxin 50 µg</span><span class="kh-row__subtitle">9 tabletter</span></span><span class="kh-row__trailing"><span class="kh-pill">Ändrad</span></span></label>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Kryssrader med djup · Webb_kryssrad_djup</h2>
+  <div class="ram kh-depth" data-skarmdump="Webb_kryssrad_djup">
+    <div class="kh-card">
+      <label class="kh-row kh-check-row"><span class="kh-row__leading"><input type="checkbox" class="kh-check"></span><span class="kh-row__text"><span class="kh-row__title">Havregryn</span><span class="kh-row__subtitle">1 paket</span></span></label>
+      <label class="kh-row kh-check-row"><span class="kh-row__leading"><input type="checkbox" class="kh-check" checked></span><span class="kh-row__text"><span class="kh-row__title">Mjölk</span><span class="kh-row__subtitle">3 liter</span></span></label>
+      <label class="kh-row kh-check-row kh-check-row--plain"><span class="kh-row__leading"><input type="checkbox" class="kh-check" checked></span><span class="kh-row__text"><span class="kh-row__title">Ta med: Morötter</span><span class="kh-row__subtitle">kh-check-row--plain</span></span></label>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Reglagerader · SwitchRow_varianter</h2>
+  <div class="ram" data-skarmdump="SwitchRow_varianter">
+    <div class="kh-card">
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Påminnelser</span><span class="kh-row__subtitle">Varje dag 08:00</span></span><input type="checkbox" role="switch" class="kh-switch" checked></label>
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Kvällsdos</span></span><input type="checkbox" role="switch" class="kh-switch"></label>
+      <label class="kh-row kh-switch-row kh-switch-row--inactive"><span class="kh-row__text"><span class="kh-row__title">Mående</span><span class="kh-row__subtitle">Av</span></span><input type="checkbox" role="switch" class="kh-switch"></label>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Reglagerader med djup, låst · Webb_reglage_djup</h2>
+  <div class="ram kh-depth" data-skarmdump="Webb_reglage_djup">
+    <div class="kh-card">
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Matlåda</span><span class="kh-row__subtitle">Räkna med en portion till</span></span><input type="checkbox" role="switch" class="kh-switch" checked></label>
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Veckomeny på söndag</span></span><input type="checkbox" role="switch" class="kh-switch"></label>
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Låst på</span></span><input type="checkbox" role="switch" class="kh-switch" checked disabled></label>
+      <label class="kh-row kh-switch-row"><span class="kh-row__text"><span class="kh-row__title">Låst av</span></span><input type="checkbox" role="switch" class="kh-switch" disabled></label>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Stegare · QuantityStepper_varianter</h2>
+  <div class="ram" data-skarmdump="QuantityStepper_varianter">
+    <div><kh-stepper value="2" label="doser per dag"></kh-stepper></div>
+    <div><kh-stepper value="0" label="tabletter" disabled></kh-stepper></div>
+    <div><kh-stepper value="4" label="minsta tid mellan doser" id="stegare-timmar" style="--kh-stepper-button: 48px"></kh-stepper></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Stegare med etikett · QuantityStepper_etikett</h2>
+  <div class="ram" data-skarmdump="QuantityStepper_etikett">
+    <div class="kh-stepper-field"><kh-stepper value="2" label="doser per dag"></kh-stepper><span class="kh-stepper-field__label" aria-hidden="true">doser per dag</span></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Stegare med djup · Webb_stegare_djup</h2>
+  <div class="ram kh-depth" data-skarmdump="Webb_stegare_djup">
+    <div><kh-stepper value="4" label="portioner" min="1" max="12"></kh-stepper></div>
+    <div><kh-stepper value="1" label="portioner" min="1" max="12"></kh-stepper></div>
+  </div>
+</section>
+
+<section class="galleri-del">
   <h2 class="kh-text-caption">Utfällbar rad · Foldout_oppen</h2>
   <div class="ram" data-skarmdump="Foldout_oppen">
     <div class="kh-card">
@@ -812,6 +881,8 @@
   for (const button of document.querySelectorAll('[data-stang]')) {
     button.addEventListener('click', () => button.closest('dialog').close());
   }
+  // Stegaren med enhet (valueText): timmar.
+  customElements.whenDefined('kh-stepper').then(() => { document.getElementById('stegare-timmar').format = (h) => (h === 0 ? 'Ingen spärr' : `${h} h`); });
   // Provet med dra-ned: uppdateringen tar en sekund.
   document.addEventListener('kh-refresh', (e) => {
     e.target.setAttribute('refreshing', '');
