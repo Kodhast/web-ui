@@ -714,6 +714,46 @@ test('textfält med ikonknapp: knappen 48 i fältet, ikonen 12 från kanten, fä
   assert.notEqual(await page.evaluate(() => document.activeElement.tagName), 'INPUT');
 });
 
+test('utfällbar rad: utfälld ligger rubrik och innehåll på radens tonade yta med radens hörn, och chevronen vänds', async () => {
+  await mount(`<div class="kh-card">
+    <div class="kh-foldout" id="fo"><button class="kh-row kh-foldout__header" id="foh" type="button" aria-expanded="false" aria-controls="foc">
+      <div class="kh-row__text"><span class="kh-row__title">Uppgifter</span></div><svg class="kh-icon kh-foldout__chevron" id="fop"><use href="#i-expand"/></svg></button>
+      <div class="kh-foldout__content" id="foc" hidden><label class="kh-field" id="fof"><input class="kh-field__input" placeholder=" "><span class="kh-field__label">Ny</span></label></div></div></div>`);
+  assert.equal(await style('#fo', 'background-color'), 'rgba(0, 0, 0, 0)');
+  assert.equal(await style('#foc', 'display'), 'none');
+  await page.evaluate(() => { document.getElementById('foh').setAttribute('aria-expanded', 'true'); document.getElementById('foc').hidden = false; });
+  // Chevronen vänds på 200 ms.
+  await page.waitForTimeout(300);
+  assert.equal(await style('#fo', 'background-color'), await themeColor('--kh-row-tint'));
+  assert.equal(await style('#fo', 'border-top-left-radius'), `${tokens.radius.row}px`);
+  assert.equal(await style('#fof', 'background-color'), await themeColor('--kh-card'), 'fältet behåller sin färg på ytan');
+  assert.match(await style('#fop', 'transform'), /^matrix\(-1, /);
+  await page.evaluate(() => document.getElementById('fo').style.setProperty('--kh-foldout-surface', 'var(--kh-surface-variant)'));
+  await settle();
+  assert.equal(await style('#fo', 'background-color'), await themeColor('--kh-surface-variant'), 'appen väljer ytan');
+});
+
+test('tryckläget: hovring ger lagret med mus, men inte på en pekskärm (fastnade i Chrome på Android)', async () => {
+  const html = '<button class="kh-row" id="hv" type="button"><div class="kh-row__text"><span class="kh-row__title">Rad</span></div></button>';
+  await mount(html);
+  await page.hover('#hv');
+  await settle();
+  assert.equal(await style('#hv', 'opacity', '::after'), '0.08');
+  const context = await browser.newContext({ viewport: { width: 400, height: 800 }, isMobile: true, hasTouch: true });
+  const touch = await context.newPage();
+  try {
+    await touch.goto(`${gallery}?tema=ljust`);
+    await touch.evaluate((html) => document.body.insertAdjacentHTML('afterbegin', html), html);
+    await touch.tap('#hv');
+    // Trycket (::after 0.1 under :active) tonar bort på 150 ms.
+    await touch.waitForTimeout(400);
+    assert.equal(await touch.evaluate(() => matchMedia('(hover: hover)').matches), false);
+    assert.equal(await touch.evaluate(() => getComputedStyle(document.getElementById('hv'), '::after').opacity), '0');
+  } finally {
+    await context.close();
+  }
+});
+
 test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 56 höga; value läses och sätts', async () => {
   await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
   const wheels = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((w) => {
