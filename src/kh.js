@@ -472,6 +472,130 @@
   }
   customElements.define('kh-refresh', KhRefresh);
 
+  /* ---------- Svep åt vänster (SwipeToDelete, SwipeToHide) ---------- */
+
+  /** Så nära skärmens kant startar inget svep: där ligger telefonens bakåtgest. */
+  const SWIPE_EDGE = 24;
+  /** Så långt fingret rör sig innan svepets riktning avgörs. */
+  const SWIPE_DECIDE = 10;
+  /** Så stor del av bredden ett långsamt drag måste gå. */
+  const SWIPE_THRESHOLD = 1 / 3;
+  /** Ett snabbt drag (px per ms) räcker även kort, men aldrig under SWIPE_FAST_MIN px. */
+  const SWIPE_FAST = 0.5;
+  const SWIPE_FAST_MIN = 40;
+
+  /**
+   * <kh-swipe label="Radera"> runt en rad (en kh-foldout eller kh-row på ett kort): svep åt vänster med finger
+   * eller penna drar raden undan och visar label på felfärgen bakom. Släpps raden efter en tredjedel av bredden,
+   * eller efter ett snabbt drag, meddelas kh-swipe (bubblar), och raden glider tillbaka – appen frågar i en
+   * kh-dialog innan något raderas (android-ui:s SwipeToDelete). Med tone="hide" är bakgrunden primärtonen och appen
+   * döljer raden direkt, med Ångra (SwipeToHide). Svep åt höger tas aldrig: det går vidare till sidan. Med musen
+   * finns inget svep; raden ska alltid också ha Radera synligt (kh-btn--destructive-text sist i det utfällda).
+   * Ett svep åt vänster som avgjorts här förbrukas (preventDefault), och elementet har data-own-swipe="left", så att
+   * en sidas eget sidledssvep kan låta det vara.
+   */
+  class KhSwipe extends HTMLElement {
+    static observedAttributes = ['label'];
+
+    #background = null;
+    #start = null;
+    #direction = null;
+    #offset = 0;
+    #lastX = 0;
+    #lastTime = 0;
+    #speed = 0;
+
+    #onStart = (event) => {
+      if (event.touches.length !== 1) return;
+      const { clientX, clientY } = event.touches[0];
+      if (clientX < SWIPE_EDGE || clientX > innerWidth - SWIPE_EDGE) return;
+      if (event.target.closest('input, textarea, select, [contenteditable]')) return;
+      this.#start = { x: clientX, y: clientY };
+      this.#direction = null;
+      this.#lastX = clientX;
+      this.#lastTime = event.timeStamp;
+      this.#speed = 0;
+    };
+
+    #onMove = (event) => {
+      if (!this.#start) return;
+      const { clientX, clientY } = event.touches[0];
+      const dx = clientX - this.#start.x;
+      const dy = clientY - this.#start.y;
+      if (!this.#direction) {
+        if (Math.hypot(dx, dy) < SWIPE_DECIDE) return;
+        // Lodrätt är rullning, åt höger är sidans; bara vänster är radens.
+        this.#direction = Math.abs(dx) > Math.abs(dy) && dx < 0 ? 'left' : 'other';
+        if (this.#direction === 'left') this.dataset.state = 'dragging';
+      }
+      if (this.#direction !== 'left') return;
+      if (event.cancelable) event.preventDefault();
+      const elapsed = event.timeStamp - this.#lastTime;
+      if (elapsed > 0) this.#speed = (this.#lastX - clientX) / elapsed;
+      this.#lastX = clientX;
+      this.#lastTime = event.timeStamp;
+      this.#move(Math.min(0, dx));
+    };
+
+    #onEnd = () => {
+      if (!this.#start) return;
+      const dragged = this.#direction === 'left';
+      this.#start = null;
+      this.#direction = null;
+      if (!dragged) return;
+      const distance = -this.#offset;
+      const swiped = distance >= this.offsetWidth * SWIPE_THRESHOLD || (this.#speed >= SWIPE_FAST && distance >= SWIPE_FAST_MIN);
+      this.dataset.state = 'returning';
+      this.#move(0);
+      if (swiped) this.dispatchEvent(new CustomEvent('kh-swipe', { bubbles: true }));
+    };
+
+    #onReturned = (event) => {
+      if (event.target.parentElement === this && this.dataset.state === 'returning') delete this.dataset.state;
+    };
+
+    connectedCallback() {
+      if (!this.#background) {
+        this.#background = this.querySelector(':scope > .kh-swipe__background');
+        if (!this.#background) {
+          this.#background = document.createElement('div');
+          this.#background.className = 'kh-swipe__background';
+          this.#background.setAttribute('aria-hidden', 'true');
+          this.prepend(this.#background);
+        }
+        this.#label();
+      }
+      this.dataset.ownSwipe = 'left';
+      this.addEventListener('touchstart', this.#onStart, { passive: true });
+      this.addEventListener('touchmove', this.#onMove, { passive: false });
+      this.addEventListener('touchend', this.#onEnd);
+      this.addEventListener('touchcancel', this.#onEnd);
+      this.addEventListener('transitionend', this.#onReturned);
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener('touchstart', this.#onStart);
+      this.removeEventListener('touchmove', this.#onMove);
+      this.removeEventListener('touchend', this.#onEnd);
+      this.removeEventListener('touchcancel', this.#onEnd);
+      this.removeEventListener('transitionend', this.#onReturned);
+    }
+
+    attributeChangedCallback() {
+      if (this.#background) this.#label();
+    }
+
+    #label() {
+      this.#background.textContent = this.getAttribute('label') ?? 'Radera';
+    }
+
+    #move(offset) {
+      this.#offset = offset;
+      this.style.setProperty('--kh-swipe-offset', `${offset}px`);
+    }
+  }
+  customElements.define('kh-swipe', KhSwipe);
+
   /* ---------- Tidsväljaren som rullhjul (TimePickerPopup) ---------- */
 
   // Hjulet går runt: talen står i flera varv (minst 200 tal, så att en snärt med fingret inte når änden), och

@@ -243,6 +243,38 @@
 .kh-foldout__header[aria-expanded='true'] .kh-foldout__chevron { transform: rotate(180deg); }
 .kh-foldout__content { display: flex; flex-direction: column; padding-block-end: var(--kh-space-s); }
 .kh-foldout__content[hidden] { display: none; }
+/* Radens knappar sist i det utfällda: appens först, Radera (kh-btn--destructive-text) sist (android-ui #118). */
+.kh-foldout__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--kh-space-s); padding-inline: var(--kh-space-m); }
+
+/* ---------- Svep åt vänster (SwipeToDelete, SwipeToHide) ---------- */
+
+/*
+ * <kh-swipe label="Radera"> <div class="kh-foldout">…</div> </kh-swipe>   (tone="hide": Dölj/Arkivera)
+ * Raden följer fingret (--kh-swipe-offset); bakom syns label i högerkanten på felfärgen, bara medan den dras.
+ * Raden får kortets yta, så att bakgrunden bara syns där den dragits undan.
+ */
+kh-swipe { display: block; position: relative; overflow: hidden; border-radius: var(--kh-radius-row); touch-action: pan-y; }
+.kh-swipe__background {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding-inline: var(--kh-space-l);
+  border-radius: inherit;
+  background-color: var(--kh-error-container);
+  color: var(--kh-on-error-container);
+  font: var(--kh-type-button);
+}
+kh-swipe[tone='hide'] .kh-swipe__background { background-color: var(--kh-primary-container); color: var(--kh-on-primary-container); }
+kh-swipe[data-state] .kh-swipe__background { display: flex; }
+kh-swipe > :not(.kh-swipe__background) {
+  position: relative;
+  border-radius: inherit;
+  background-color: var(--kh-card);
+  transform: translateX(var(--kh-swipe-offset, 0px));
+}
+kh-swipe[data-state='returning'] > :not(.kh-swipe__background) { transition: transform 200ms ease; }
 
 /* ---------- Avdelare (AppDivider) ---------- */
 
@@ -289,6 +321,8 @@
   padding-inline: var(--kh-space-m);
 }
 .kh-btn--destructive { background-color: var(--kh-error); color: var(--kh-on-error); }
+/* Radera sist bland en rads åtgärder (DestructiveText); frågar sedan i kh-dialog. */
+.kh-btn--destructive-text { background-color: transparent; color: var(--kh-error); padding-inline: var(--kh-space-m); }
 /* Den lägre knappen för rubrikraden (compact); tryckytan är ändå 48. */
 .kh-btn--compact { min-block-size: 40px; }
 .kh-btn--compact::before { content: ''; position: absolute; inset: -4px 0; }
