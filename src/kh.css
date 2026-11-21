@@ -43,6 +43,20 @@
 
   /* Ytan under en utfälld kh-foldout: radens ton. Husjakt sätter --kh-surface-variant i mörkt läge. */
   --kh-foldout-surface: var(--kh-row-tint);
+
+  /*
+   * Oskärpan bakom dialog och ark (AppBlur). 1 = på
+   * (standard, som AppTheme(blur = AppBlur())), 0 = av (som blur = null): då dagens slöja och inget sudd.
+   * Måtten är AppBlurs standardvärden; de står inte i tokens.json.
+   */
+  --kh-blur: 1;
+  --kh-blur-behind-radius: 12px; /* behindRadius */
+  --kh-blur-scrim: 20%; /* scrimAlpha: slöjan med oskärpa; utan är den 32 % */
+}
+
+/* Den som bett systemet om mindre genomskinlighet får slöjan utan sudd (Android: energisparläget stänger av oskärpan). */
+@media (prefers-reduced-transparency: reduce) {
+  :where(:root) { --kh-blur: 0; }
 }
 
 /*
@@ -601,7 +615,14 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
 }
 .kh-dialog:not([open]) { display: none; }
 .kh-dialog[open] { display: flex; flex-direction: column; gap: var(--kh-space-l); }
-.kh-dialog::backdrop { background: color-mix(in srgb, var(--kh-scrim) 32%, transparent); }
+/*
+ * Slöjan bakom dialog och ark, med temats oskärpa (--kh-blur): innehållet bakom suddas och slöjan blir svagare.
+ * Android räknar radien som Skia: standardavvikelsen är radie × 0,577 + 0,5 (CSS blur() tar standardavvikelsen).
+ */
+:is(.kh-dialog, .kh-sheet)::backdrop {
+  background: color-mix(in srgb, var(--kh-scrim) calc(32% - var(--kh-blur) * (32% - var(--kh-blur-scrim))), transparent);
+  backdrop-filter: blur(calc(var(--kh-blur) * (var(--kh-blur-behind-radius) * 0.577 + 0.5px)));
+}
 .kh-dialog__title { margin: 0; font: var(--kh-type-headline); color: var(--kh-on-surface); }
 .kh-dialog__text { margin: 0; font: var(--kh-type-body); color: var(--kh-on-surface-variant); }
 .kh-dialog__actions {
@@ -688,7 +709,6 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   border-radius: 2px;
   background: color-mix(in srgb, var(--kh-on-surface-variant) 40%, transparent);
 }
-.kh-sheet::backdrop { background: color-mix(in srgb, var(--kh-scrim) 32%, transparent); }
 .kh-sheet__title { margin: 0; font: var(--kh-type-section-title); }
 .kh-sheet__subtitle { margin: 0; margin-block-start: calc(-1 * var(--kh-space-m)); font: var(--kh-type-item-subtitle); color: var(--kh-on-surface-variant); }
 /* Knappraden står fast i arkets botten. */

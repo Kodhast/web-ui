@@ -22,6 +22,8 @@ try {
     for (const frame of frames) {
       const name = await frame.getAttribute('data-skarmdump');
       await frame.scrollIntoViewIfNeeded();
+      // Helskärmsbilder: ramen överst i fönstret, så att dess innehåll ligger bakom slöjan.
+      if ((await frame.getAttribute('data-helskarm')) !== null) await frame.evaluate((element) => element.scrollIntoView({ block: 'start' }));
       // data-klick: öppna (t.ex. huvudknappens meny) före bilden.
       const click = await frame.getAttribute('data-klick');
       if (click) {
@@ -46,8 +48,11 @@ try {
       }
       // data-animera: rullningsdrivna animeringar (tidsväljarens tal) visar sitt läge; 'disabled' skulle spola dem till slutet.
       const animate = time || (await frame.getAttribute('data-animera')) !== null;
-      await frame.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: animate ? 'allow' : 'disabled' });
+      // data-helskarm: en modal dialog eller ett ark ritas över hela fönstret, så bilden tas av fönstret.
+      const shot = (await frame.getAttribute('data-helskarm')) !== null ? page : frame;
+      await shot.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: animate ? 'allow' : 'disabled' });
       await page.evaluate(() => document.querySelectorAll(':popover-open').forEach((p) => p.hidePopover()));
+      await page.evaluate(() => document.querySelectorAll('dialog:modal').forEach((d) => d.close()));
     }
     console.log(`${frames.length} skärmdumpar (${suffix}).`);
     await page.close();

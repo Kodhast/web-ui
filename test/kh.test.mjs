@@ -317,6 +317,23 @@ test('dialog: öppnas modalt med nedtonad bakgrund, kortets hörn och kortfärg'
   assert.equal(await style('#a', 'display'), 'none');
 });
 
+test('oskärpa bakom dialog och ark: suddat och svagare slöja; --kh-blur: 0 ger slöjan utan sudd', async () => {
+  for (const cls of ['kh-dialog', 'kh-sheet']) {
+    await mount(`<dialog class="${cls}" id="a"><p>x</p></dialog>`);
+    await page.evaluate(() => document.getElementById('a').showModal());
+    // AppBlur: radien 12 och slöjan 0,2; standardavvikelsen är radien × 0,577 + 0,5 (Skia).
+    assert.equal(await style('#a', 'backdrop-filter', '::backdrop'), 'blur(7.424px)', cls);
+    assert.match(await style('#a', 'background-color', '::backdrop'), / \/ 0\.2\)$/, cls);
+    await page.evaluate(() => document.getElementById('a').close());
+    await page.evaluate(() => document.documentElement.style.setProperty('--kh-blur', '0'));
+    await page.evaluate(() => document.getElementById('a').showModal());
+    assert.equal(await style('#a', 'backdrop-filter', '::backdrop'), 'blur(0px)', cls);
+    assert.match(await style('#a', 'background-color', '::backdrop'), / \/ 0\.32\)$/, cls);
+    await page.evaluate(() => document.getElementById('a').close());
+    await page.evaluate(() => document.documentElement.style.removeProperty('--kh-blur'));
+  }
+});
+
 test('ark: rundat upptill, i botten, med grepp', async () => {
   await mount('<dialog class="kh-sheet" id="a"><h2 class="kh-sheet__title">Ändra mängd</h2></dialog>');
   await page.evaluate(() => document.getElementById('a').showModal());
