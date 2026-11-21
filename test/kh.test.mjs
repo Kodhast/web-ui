@@ -699,6 +699,21 @@ test('segmentval: ett val i taget, med tryck och pilar, och kh-select', async ()
   assert.equal(await page.evaluate(() => document.activeElement.id), 's2');
 });
 
+test('textfält med ikonknapp: knappen 48 i fältet, ikonen 12 från kanten, fältet 56 högt; ett tryck flyttar inte fokus till fältet', async () => {
+  await mount('<label class="kh-field" id="f"><input class="kh-field__input" placeholder=" "><span class="kh-field__label">När?</span><button class="kh-icon-btn" type="button" aria-label="Välj" id="fb"><svg><use href="#i-clock"/></svg></button></label>');
+  const field = await box('#f');
+  const icon = await box('#fb svg');
+  const button = await box('#fb');
+  assert.equal(field.height, 56);
+  assert.equal(button.width, 48);
+  assert.equal(Math.round(field.right - icon.right), 12);
+  assert.equal(await style('#fb', 'color'), await themeColor('--kh-on-surface-variant'));
+  const clicked = page.evaluate(() => new Promise((done) => document.getElementById('fb').addEventListener('click', () => done(true), { once: true })));
+  await page.click('#fb');
+  assert.equal(await clicked, true);
+  assert.notEqual(await page.evaluate(() => document.activeElement.tagName), 'INPUT');
+});
+
 test('tidsväljare: två hjul i spåret, 100 breda och 120 höga, tal 56 höga; value läses och sätts', async () => {
   await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
   const wheels = await page.evaluate(() => [...document.querySelectorAll('#t .kh-time-picker__wheel')].map((w) => {
