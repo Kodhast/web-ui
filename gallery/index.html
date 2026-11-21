@@ -30,9 +30,9 @@
   .rad { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
   .ikonrad { gap: 8px; }
   .scrim { background: color-mix(in srgb, var(--kh-scrim) 32%, var(--kh-background)); min-block-size: 280px; justify-content: flex-end; }
-  .ram .kh-dialog, .ram .kh-sheet { position: static; inset: auto; }
-  .ram .kh-sheet { margin: 0 -16px -16px; inline-size: calc(100% + 32px); max-inline-size: none; position: relative; }
-  .ram .kh-dialog { inline-size: auto; min-inline-size: 0; margin: 0 24px; }
+  .ram .kh-dialog:not(:modal), .ram .kh-sheet:not(:modal) { position: static; inset: auto; }
+  .ram .kh-sheet:not(:modal) { margin: 0 -16px -16px; inline-size: calc(100% + 32px); max-inline-size: none; position: relative; }
+  .ram .kh-dialog:not(:modal) { inline-size: auto; min-inline-size: 0; margin: 0 24px; }
   .ram .kh-snackbar-host { position: static; padding: 0 12px; }
   /* Ramar med ett eget rullande innehåll (sidhuvudet) och helskärmsramar (flikraden med meny). */
   .ram--skarm { padding: 0; block-size: 320px; gap: 0; }
@@ -468,6 +468,35 @@
 </section>
 
 <section class="galleri-del">
+  <h2 class="kh-text-caption">Ark med oskärpa · AppBottomSheet_oskarpa</h2>
+  <div class="ram kh-depth" data-skarmdump="AppBottomSheet_oskarpa" data-klick=".oppna" data-helskarm>
+    <button class="kh-btn kh-btn--secondary kh-btn--compact oppna" type="button" data-oppna="ark-oskarpa">Öppna arket</button>
+    <div class="kh-card"><div class="prov"><span class="kh-text-item-title">Havregryn</span><span class="kh-text-item-subtitle">Skafferi · 1 paket</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Mjölk</span><span class="kh-text-item-subtitle">Kyl · 3 liter</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morötter</span><span class="kh-text-item-subtitle">Grönt · 1 kg</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Lax</span><span class="kh-text-item-subtitle">Fisk · 4 bitar</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Ris</span><span class="kh-text-item-subtitle">Skafferi · 1 paket</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Ost</span><span class="kh-text-item-subtitle">Kyl · 1 bit</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Äpplen</span><span class="kh-text-item-subtitle">Grönt · 6 st</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Bröd</span><span class="kh-text-item-subtitle">Bröd · 1 limpa</span></div></div>
+    <dialog class="kh-sheet" id="ark-oskarpa" aria-labelledby="ark-oskarpa-rubrik">
+      <h2 class="kh-sheet__title" id="ark-oskarpa-rubrik">Ändra mängd</h2>
+      <p class="kh-text-body">Innehållet bakom är suddigt och slöjan svagare.</p>
+      <div class="kh-sheet__footer"><button class="kh-btn kh-btn--text" type="button" data-stang>Stäng</button></div>
+    </dialog>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Dialog med oskärpa · ConfirmDialog_oskarpa</h2>
+  <div class="ram kh-depth" data-skarmdump="ConfirmDialog_oskarpa" data-klick=".oppna" data-helskarm>
+    <button class="kh-btn kh-btn--secondary kh-btn--compact oppna" type="button" data-oppna="dialog-oskarpa">Öppna dialogen</button>
+    <div class="kh-card"><div class="prov"><span class="kh-text-item-title">Havregryn</span><span class="kh-text-item-subtitle">Skafferi · 1 paket</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Mjölk</span><span class="kh-text-item-subtitle">Kyl · 3 liter</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morötter</span><span class="kh-text-item-subtitle">Grönt · 1 kg</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Lax</span><span class="kh-text-item-subtitle">Fisk · 4 bitar</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Ris</span><span class="kh-text-item-subtitle">Skafferi · 1 paket</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Ost</span><span class="kh-text-item-subtitle">Kyl · 1 bit</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Äpplen</span><span class="kh-text-item-subtitle">Grönt · 6 st</span></div></div><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Bröd</span><span class="kh-text-item-subtitle">Bröd · 1 limpa</span></div></div>
+    <dialog class="kh-dialog" id="dialog-oskarpa" aria-labelledby="dialog-oskarpa-rubrik">
+      <h2 class="kh-dialog__title" id="dialog-oskarpa-rubrik">Radera Lax?</h2>
+      <p class="kh-dialog__text">Raden försvinner för gott.</p>
+      <div class="kh-dialog__actions">
+        <button class="kh-btn kh-btn--text" type="button" data-stang>Avbryt</button>
+        <button class="kh-btn" type="button" data-stang>Radera</button>
+      </div>
+    </dialog>
+  </div>
+</section>
+
+<section class="galleri-del">
   <h2 class="kh-text-caption">Meddelande med djup · AppSnackbarHost_djup</h2>
   <div class="ram kh-depth" data-skarmdump="AppSnackbarHost_djup">
     <div class="kh-snackbar-host">
@@ -749,6 +778,13 @@
   // Ramar som visar ett rullat läge (sidhuvudet): data-rull är hur långt.
   for (const frame of document.querySelectorAll('[data-rull]')) {
     frame.querySelector('.rullar').scrollTop = Number(frame.dataset.rull);
+  }
+  // Dialog och ark med oskärpa: öppnas modalt, så att slöjan (::backdrop) ritas.
+  for (const button of document.querySelectorAll('[data-oppna]')) {
+    button.addEventListener('click', () => document.getElementById(button.dataset.oppna).showModal());
+  }
+  for (const button of document.querySelectorAll('[data-stang]')) {
+    button.addEventListener('click', () => button.closest('dialog').close());
   }
   // Provet med dra-ned: uppdateringen tar en sekund.
   document.addEventListener('kh-refresh', (e) => {
