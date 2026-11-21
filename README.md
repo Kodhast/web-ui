@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.11.0 (tagg `v1.11.0`) ·
+**Version:** 1.12.0 (tagg `v1.12.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -56,7 +56,7 @@ standardvärden – en app som saknar en färg ser det direkt. Galleriets testte
 | `--kh-error`, `--kh-on-error`, `--kh-error-container`, `--kh-on-error-container` | fel och radering |
 | `--kh-inverse-surface`, `--kh-inverse-on-surface`, `--kh-inverse-primary` | meddelandet |
 | `--kh-scrim` | bakom dialog och ark |
-| `--kh-blur` (standard `1`; `0` = av) | `AppTheme(blur = AppBlur())` / `blur = null`: oskärpan bakom dialog och ark |
+| `--kh-blur` (standard `1`; `0` = av) | `AppTheme(blur = AppBlur())` / `blur = null`: oskärpan bakom dialog och ark och under sidhuvudet |
 | `--kh-card`, `--kh-row-tint`, `--kh-online` (standard primary) | `ExtendedColors.card`, `.rowTint`, `.online` |
 | `--kh-toolbar`, `--kh-on-toolbar` | `ExtendedColors.toolbar`, `.onToolbar` (flikraden) |
 | `--kh-surface-container-high` (valfri, standard `--kh-card`) | dra-ned-prickarnas behållare |
@@ -138,6 +138,10 @@ Skillnader mot Android som är kända:
 - **Oskärpan bakom dialog och ark** (`AppBlur`, android-ui #104) är `backdrop-filter` på `::backdrop`: 12 i radie (som
   standardavvikelse 7,4, Skias omräkning) och slöjan 20 % i stället för 32 %. Android stänger av den i energisparläget;
   här stängs den av med `prefers-reduced-transparency` eller `--kh-blur: 0`. Måtten står inte i `tokens.json`.
+- **Oskärpan under sidhuvudet** (`underHeaderBlur`, android-ui #105, 3.11.1) är ett band under `kh-header` och `kh-topbar`
+  med `backdrop-filter` (radie 8) och en mask som tonar till skarpt på 24. Android låter radien växa med
+  `overlappedFraction`; här tonar bandet in (med ihopfällningen i `kh-header`, de första 24 px rullning under
+  `kh-topbar`). I vila syns ingen oskärpa.
 - **En klickbar pill** får sin tryckyta på 48 utan att ta plats i layouten (Android tar platsen).
 
 ## Utveckla
@@ -162,6 +166,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.12.0 | Progressiv oskärpa under sidhuvudet som i android-ui 3.11.1 (#105): innehållet som rullat in under `kh-header` och `kh-topbar` är suddigt vid kanten (radie 8) och skarpt 24 längre ned; tonar in med rullningen, `--kh-blur: 0` stänger av. `kh-header` klipper bara i sidled. Nya skärmdumpar: `EntityListScreen_rullad`, `Webb_topprad_rullad` |
 | 1.11.0 | Oskärpa bakom dialog och ark som i android-ui 3.8.0 (#104): `kh-dialog` och `kh-sheet` suddar innehållet bakom (`AppBlur.behindRadius` 12) och slöjan blir 20 %. `--kh-blur: 0` stänger av. Nya skärmdumpar: `AppBottomSheet_oskarpa`, `ConfirmDialog_oskarpa` (hela fönstret, `data-helskarm`) |
 | 1.10.0 | Samma radering av en rad som i android-ui 3.9.0 (#118): `<kh-swipe>` (svep åt vänster, `kh-swipe`-händelsen, `tone="hide"`), `kh-foldout__actions` och `kh-btn--destructive-text`. Nya skärmdumpar: `Foldout_radera`, `SwipeToDelete_svept` |
 | 1.9.0 | Utfällbar rad `kh-foldout` (Husjakt #518, variant A): utfälld ligger hela delen på en tonad yta (`--kh-foldout-surface`, standard `--kh-row-tint`) med radens hörn, så att det syns vad som hör till raden. Tryckläget hovrar bara med mus (`@media (hover: hover)`): i Chrome på Android fastnade det grå lagret efter ett tryck. Ny skärmdump: `Foldout_oppen` |

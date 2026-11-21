@@ -947,3 +947,34 @@ test('rad som går att radera: Radera i felfärgen sist bland radens knappar; sv
   assert.equal(await style('[data-skarmdump="SwipeToDelete_svept"] kh-swipe .kh-swipe__background', 'background-color'), await themeColor('--kh-error-container'));
   assert.equal(await style('[data-skarmdump="SwipeToDelete_svept"] kh-swipe[tone="hide"] .kh-swipe__background', 'background-color'), await themeColor('--kh-primary-container'));
 });
+
+test('oskärpa under sidhuvudet: ingen i vila, tonar in med ihopfällningen, 8 suddigt och 24 lång', async () => {
+  await mount(HEADER);
+  await frames();
+  const after = (prop) => style('#h', prop, '::after');
+  assert.equal(await after('opacity'), '0', 'i vila syns ingen oskärpa');
+  // AppBlur 3.11.1: headerRadius 8 (standardavvikelse 8 × 0,577 + 0,5) och headerFade 24.
+  assert.equal(await after('backdrop-filter'), 'blur(5.116px)');
+  assert.equal(await after('height'), '24px');
+  await scrollTo('#r', 40);
+  assert.equal(await after('opacity'), '0.5', 'halvvägs ihopfällt: halvt intonad');
+  await scrollTo('#r', 200);
+  assert.equal(await after('opacity'), '1');
+  const header = await box('#h');
+  const blur = await page.evaluate(() => {
+    const h = document.getElementById('h');
+    return parseFloat(getComputedStyle(h, '::after').top);
+  });
+  assert.equal(blur, header.height, 'oskärpan börjar vid sidhuvudets nederkant');
+  await page.evaluate(() => document.documentElement.style.setProperty('--kh-blur', '0'));
+  assert.equal(await after('opacity'), '0', '--kh-blur: 0 stänger av');
+  await page.evaluate(() => document.documentElement.style.removeProperty('--kh-blur'));
+});
+
+test('oskärpa under toppraden: ingen utan rullning, full efter 24 px', async () => {
+  await mount(`<div id="r" style="block-size: 300px; overflow-y: auto"><header class="kh-topbar" id="t"><h1 class="kh-topbar__title"><span>Rätt</span></h1></header><div style="block-size: 1200px"></div></div>`);
+  assert.equal(await style('#t', 'opacity', '::after'), '0');
+  await page.evaluate(() => { document.getElementById('r').scrollTop = 100; });
+  await frames();
+  assert.equal(await style('#t', 'opacity', '::after'), '1');
+});
