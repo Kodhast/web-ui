@@ -44,7 +44,9 @@ try {
           }
         }, Number(time));
       }
-      await frame.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: time ? 'allow' : 'disabled' });
+      // data-animera: rullningsdrivna animeringar (tidsväljarens tal) visar sitt läge; 'disabled' skulle spola dem till slutet.
+      const animate = time || (await frame.getAttribute('data-animera')) !== null;
+      await frame.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: animate ? 'allow' : 'disabled' });
       await page.evaluate(() => document.querySelectorAll(':popover-open').forEach((p) => p.hidePopover()));
     }
     console.log(`${frames.length} skärmdumpar (${suffix}).`);

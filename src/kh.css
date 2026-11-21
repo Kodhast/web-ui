@@ -26,6 +26,7 @@
   --kh-type-pill: 500 12px/16px var(--kh-font-body);
   --kh-type-caption: 500 11px/16px var(--kh-font-body);
   --kh-type-button: 500 14px/20px var(--kh-font-heading);
+  --kh-type-time-wheel: 400 57px/64px var(--kh-font-body); /* Material 3:s displayLarge: tidsväljarens tal */
   --kh-tracking-screen-title: 0;
   --kh-tracking-caption: 0.045em;
 
@@ -545,6 +546,54 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   gap: var(--kh-space-s);
   margin-block-start: var(--kh-space-s);
 }
+
+/* ---------- Tidsväljaren som rullhjul (TimePickerPopup) ---------- */
+
+/*
+ * <kh-time-picker> i en kh-dialog: två hjul (timme och minut, 24 timmar) i segmentvalets nedsänkta spår,
+ * som Material 3:s TimeScroll. kh.js bygger hjulen; varje tal är 56 högt och hjulet visar 120, så att
+ * grannarna syns avskurna. Talet i mitten står i on-surface, grannarna i outline (en rullningsdriven animering).
+ */
+.kh-time-picker {
+  display: grid;
+  grid-template-columns: 100px var(--kh-space-l) 100px;
+  justify-content: center;
+  align-items: center;
+  font: var(--kh-type-time-wheel);
+  font-variant-numeric: tabular-nums;
+  color: var(--kh-on-surface);
+}
+.kh-time-picker__colon { text-align: center; user-select: none; }
+.kh-time-picker__wheel {
+  box-sizing: border-box;
+  block-size: 120px;
+  padding-block: 32px; /* (120 − 56) / 2: ett tal kan stå i mitten */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  border-radius: var(--kh-radius-fab); /* Material 3:s shapes.large, 16 som FAB:en */
+  background-color: var(--kh-row-tint);
+  outline-offset: 2px;
+}
+.kh-time-picker__wheel:focus-visible { outline: 2px solid var(--kh-primary); }
+.kh-time-picker__item {
+  display: grid;
+  place-items: center;
+  block-size: 56px;
+  scroll-snap-align: center;
+  color: var(--kh-outline);
+  cursor: pointer;
+  user-select: none;
+  animation: kh-time-wheel linear both;
+  animation-timeline: view();
+}
+@keyframes kh-time-wheel {
+  0%, 30%, 70%, 100% { color: var(--kh-outline); }
+  50% { color: var(--kh-on-surface); }
+}
+/* Dialogen med tidsväljaren har TimePickerPopups mindre rubrik. */
+.kh-dialog:has(> .kh-time-picker) .kh-dialog__title { font: var(--kh-type-section-title); }
 
 /* ---------- Ark (AppBottomSheet) ---------- */
 

@@ -9,8 +9,10 @@
  * - <kh-toolbar>    Flikraden med huvudknappen och dess meny (AppFloatingToolbar).
  * - <kh-refresh>    Dra ned för att uppdatera (AppPullToRefresh med prickar).
  * - <kh-segmented>  Segmentvalet, ett val i taget (AppSegmentedChoice).
+ * - <kh-time-picker> Tidsväljaren som rullhjul, timme och minut (TimePickerPopup).
  *
- * Val meddelas med händelsen kh-select (detail: { index, value }), en dragning med kh-refresh.
+ * Val meddelas med händelsen kh-select (detail: { index, value }), en dragning med kh-refresh, en ny tid
+ * i tidsväljaren med change.
  */
 (() => {
   if (customElements.get('kh-dots')) return;
@@ -469,4 +471,130 @@
     }
   }
   customElements.define('kh-refresh', KhRefresh);
+
+  /* ---------- Tidsväljaren som rullhjul (TimePickerPopup) ---------- */
+
+  // Hjulet går runt: talen står i flera varv (minst 200 tal, så att en snärt med fingret inte når änden), och
+  // hjulet hoppar osynligt tillbaka till mittvarvet när det stannat.
+  const lapsFor = (count) => Math.max(5, 2 * Math.ceil(100 / count) + 1);
+  const pad = (value) => String(value).padStart(2, '0');
+
+  /** Ett hjul med [values]; [onSettle] när hjulet stannat på ett nytt tal. */
+  const timeWheel = (label, values, onSettle) => {
+    const element = document.createElement('div');
+    element.className = 'kh-time-picker__wheel';
+    element.tabIndex = 0;
+    element.setAttribute('role', 'spinbutton');
+    element.setAttribute('aria-label', label);
+    const count = values.length;
+    const laps = lapsFor(count);
+    for (let lap = 0; lap < laps; lap++) {
+      for (const value of values) {
+        const item = document.createElement('div');
+        item.className = 'kh-time-picker__item';
+        item.textContent = pad(value);
+        element.append(item);
+      }
+    }
+    let index = 0;
+    const pitch = () => element.firstElementChild.offsetHeight;
+    const middle = (i) => Math.floor(laps / 2) * count + i;
+    const wrap = (i) => ((i % count) + count) % count;
+    const position = () => Math.round(element.scrollTop / pitch());
+    const show = (i) => {
+      index = i;
+      element.setAttribute('aria-valuenow', String(values[i]));
+      element.setAttribute('aria-valuetext', pad(values[i]));
+    };
+    const scrollToPosition = (at, behavior) => element.scrollTo({ top: at * pitch(), behavior });
+
+    element.addEventListener('scrollend', () => {
+      if (!pitch()) return;
+      const at = position();
+      const next = wrap(at);
+      if (at !== middle(next)) scrollToPosition(middle(next), 'instant');
+      if (next !== index) {
+        show(next);
+        onSettle();
+      }
+    });
+    element.addEventListener('keydown', (event) => {
+      const step = { ArrowUp: -1, ArrowDown: 1 }[event.key];
+      if (!step) return;
+      event.preventDefault();
+      scrollToPosition(position() + step, 'smooth');
+    });
+    // Ett tryck på ett tal ovanför eller under rullar dit.
+    element.addEventListener('click', (event) => {
+      const item = event.target.closest('.kh-time-picker__item');
+      if (item) scrollToPosition([...element.children].indexOf(item), 'smooth');
+    });
+    // Ett hjul som inte syns (i en stängd dialog) har ingen höjd: talet ställs in när det får en.
+    new ResizeObserver(() => pitch() && scrollToPosition(middle(index), 'instant')).observe(element);
+
+    show(0);
+    return {
+      element,
+      /** Talet i mitten, också medan hjulet rullar. */
+      get value() {
+        return values[pitch() ? wrap(position()) : index];
+      },
+      set(i) {
+        show(wrap(i));
+        if (pitch()) scrollToPosition(middle(index), 'instant');
+      },
+    };
+  };
+
+  /**
+   * <kh-time-picker value="07:30" step="5">: timme och minut som rullhjul, 24 timmar. step är minuthjulets
+   * steg (standard 1); en tid mellan stegen avrundas till närmaste. value läses och sätts som "HH:MM", och
+   * change meddelas när användaren rullat fram en ny tid. Lägg den i en kh-dialog med Avbryt och OK.
+   */
+  class KhTimePicker extends HTMLElement {
+    static observedAttributes = ['value'];
+    #hours;
+    #minutes;
+    #step = 1;
+    #pending = null;
+
+    connectedCallback() {
+      if (this.#hours) return;
+      this.classList.add('kh-time-picker');
+      this.#step = clamp(parseInt(this.getAttribute('step'), 10) || 1, 1, 30);
+      const changed = () => this.dispatchEvent(new Event('change', { bubbles: true }));
+      this.#hours = timeWheel(this.getAttribute('hour-label') ?? 'Timme', Array.from({ length: 24 }, (_, i) => i), changed);
+      this.#minutes = timeWheel(this.getAttribute('minute-label') ?? 'Minut', Array.from({ length: Math.ceil(60 / this.#step) }, (_, i) => i * this.#step), changed);
+      const colon = document.createElement('span');
+      colon.className = 'kh-time-picker__colon';
+      colon.setAttribute('aria-hidden', 'true');
+      colon.textContent = ':';
+      this.replaceChildren(this.#hours.element, colon, this.#minutes.element);
+      this.value = this.#pending ?? this.getAttribute('value') ?? '00:00';
+    }
+
+    attributeChangedCallback(_name, _old, value) {
+      if (value !== null) this.value = value;
+    }
+
+    get value() {
+      if (!this.#hours) return this.#pending ?? this.getAttribute('value') ?? '00:00';
+      return `${pad(this.#hours.value)}:${pad(this.#minutes.value)}`;
+    }
+
+    set value(text) {
+      const match = /^(\d{1,2}):(\d{2})$/.exec(String(text).trim());
+      if (!match) return;
+      if (!this.#hours) {
+        this.#pending = text;
+        return;
+      }
+      const steps = Math.round(Number(match[2]) / this.#step);
+      // 23:58 med steget 5 blir 00:00, inte 23:00.
+      const carry = steps * this.#step >= 60 ? 1 : 0;
+      this.#hours.set(Number(match[1]) + carry);
+      this.#minutes.set(steps);
+    }
+  }
+  customElements.define('kh-time-picker', KhTimePicker);
 })();

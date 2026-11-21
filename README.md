@@ -4,7 +4,7 @@ android-ui:s utseende för Kodhästs webbappar (Husjakt först, sedan Veckans ma
 knappar och de andra delarna som i Android-apparna, som ren CSS. Bara färger och typsnitt skiljer
 mellan apparna; formerna och måtten är desamma överallt.
 
-**Version:** 1.7.0 (tagg `v1.7.0`) ·
+**Version:** 1.8.0 (tagg `v1.8.0`) ·
 tal ur android-ui 3.2.2 · planen: [Kodhast/android-ui#93](https://github.com/Kodhast/android-ui/issues/93).
 
 **Facit är android-ui:s komponenter och Roborazzi-bilder**, inte en mockup. Galleriet här speglar
@@ -17,7 +17,7 @@ Roborazzi-bilderna i `android-ui/ui-components/src/test/screenshots`.
 |---|---|---|
 | 1. Tal | `src/tokens.css` | Hörn, avstånd, ikonstorlekar, spår, tryckskalning, sidhuvudets höjder – genererad ur `tokens.json`, som är android-ui:s fil (ett test där håller den sann mot temat). |
 | 2. Utseende | `src/kh.css` | Klasserna `kh-*` nedan. Ingen shadow DOM: appen når allt. Ingen färg står i filen. |
-| 3. Beteende | `src/kh.js` | Sidhuvudet som krymper, flikraden med huvudknappens meny, prickarna, dra-ned och segmentvalet som egna element utan shadow DOM. Ett skript utan beroenden och utan export. |
+| 3. Beteende | `src/kh.js` | Sidhuvudet som krymper, flikraden med huvudknappens meny, prickarna, dra-ned, segmentvalet och tidsväljarens rullhjul som egna element utan shadow DOM. Ett skript utan beroenden och utan export. |
 | 4. Appen | appens egen CSS | Färgerna, typsnitten, textstorlekarna och djupets färger – motsvarar `AppTheme`. |
 
 Inga beroenden och inget byggsteg: två CSS-filer och ett skript.
@@ -60,7 +60,7 @@ standardvärden – en app som saknar en färg ser det direkt. Galleriets testte
 | `--kh-toolbar`, `--kh-on-toolbar` | `ExtendedColors.toolbar`, `.onToolbar` (flikraden) |
 | `--kh-surface-container-high` (valfri, standard `--kh-card`) | dra-ned-prickarnas behållare |
 | `--kh-font-body`, `--kh-font-heading` | appens typsnitt |
-| `--kh-type-screen-title`, `-big-number`, `-headline`, `-section-title`, `-quantity`, `-item-title`, `-item-subtitle`, `-body`, `-body-medium`, `-pill`, `-caption`, `-button` | `AppTypography` (som `font`-förkortning; standard Material 3:s typskala) |
+| `--kh-type-screen-title`, `-big-number`, `-headline`, `-section-title`, `-quantity`, `-item-title`, `-item-subtitle`, `-body`, `-body-medium`, `-pill`, `-caption`, `-button`, `-time-wheel` | `AppTypography` (`-time-wheel`: tidsväljarens tal, Material 3:s displayLarge) (som `font`-förkortning; standard Material 3:s typskala) |
 | `--kh-tracking-screen-title`, `--kh-tracking-caption` | stilarnas teckenavstånd |
 | `--kh-depth-highlight`, `-sheen`, `-shadow`, `-card-edge`, `-card-shadow`, `-card-sheen` (valfri), `-header-shadow` (valfri, standard `-card-shadow`) | `AppDepth` – gäller inom klassen `kh-depth` |
 | `--kh-card-padding`, `--kh-card-gap`, `--kh-card-border` | `AppCardStyle` (standard ReseApoteket och Dagboken) |
@@ -113,6 +113,7 @@ Med `kh.js` (egna element, inga shadow DOM):
 | `<kh-toolbar>` med `__tabs`, `__tab` (`__label`, `__badge`), `__action` | `AppFloatingToolbar` | En flik som är `button` väljs (`aria-selected`) och meddelar `kh-select`; en länk följer appens `aria-current="page"`. `__action` med `popovertarget` öppnar en `kh-menu` ovanför sig. `--surface`, `--tonal`, `--filled` (`ToolbarStyle`), `--tertiary` (`ActionColor`), `--fixed` längst ned (innehållet behöver `--kh-toolbar-clearance`). |
 | `<kh-refresh>` runt listan | `AppPullToRefresh` med prickar | Dragning högst upp: prickarna följer fingret, efter tröskeln meddelas `kh-refresh`; appen sätter `refreshing` medan den uppdaterar (inom 5 s). En uppdatering appen startat själv visar inga prickar här. |
 | `<kh-segmented>` | `AppSegmentedChoice` | Ett val i taget i barnens `aria-checked` (eller `aria-pressed`/`aria-selected`), med tryck och pilar; meddelar `kh-select` (`detail: { index, value }`). |
+| `<kh-time-picker value="07:30" step="5">` i en `kh-dialog` | `TimePickerPopup` (rullhjul, android-ui #106) | Timme och minut som två hjul i segmentvalets spår (`--kh-row-tint`), 24 timmar, som går runt. Rullas med fingret, mushjulet, pilarna upp och ned eller ett tryck på talet ovanför eller under. `value` läses och sätts som `"HH:MM"` (också medan dialogen är stängd); `step` är minuthjulets steg (standard 1) och en tid mellan stegen avrundas till närmaste. `change` meddelas när hjulet stannat på en ny tid. Dialogens rubrik får `--kh-type-section-title` som i Android; Avbryt och OK är `kh-btn--text`. |
 
 Skillnader mot Android som är kända:
 
@@ -127,6 +128,8 @@ Skillnader mot Android som är kända:
   `kh-page` ställer innehållet i den spalten med bakgrunden kant i kant. Utan variabeln är allt som i telefonen.
 - **Flikraden** har bara rullgardinsmenyn (`ActionMenuStyle.Popup`, standard); FAB-menyn finns inte än.
 - **Skuggor utan djup** (flikraden, huvudknappen, menyn, dra-ned) är Material 3:s nivåer i `--kh-scrim`.
+- **Tidsväljaren** står i `kh-dialog`:s luft (16 mellan rubrik, hjul och knappar); Material 3:s TimePickerDialog har
+  hjulen tätt under rubriken och mer luft under knapparna. Hjulen, talen och spåret är desamma.
 - **En klickbar pill** får sin tryckyta på 48 utan att ta plats i layouten (Android tar platsen).
 
 ## Utveckla
@@ -151,6 +154,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 1.8.0 | Tidsväljaren som rullhjul (android-ui #106: `TimePickerPopup` med `TimeScroll`): `<kh-time-picker>` med timme och minut i två hjul i segmentvalets nedsänkta spår, 100 × 120 med tal 56 höga i `--kh-type-time-wheel`; talet i mitten i `--kh-on-surface`, grannarna i `--kh-outline` (rullningsdriven animering). Hjulen går runt, `step` ger minuthjulets steg, `value` och `change`. Nya skärmdumpar: `TimePickerPopup_oppen`, `TimePickerPopup_djup` |
 | 1.7.0 | Segmentvalet animerar bytet (android-ui #100, 3.5.0): med `.kh-depth` är den valda pillen spårets `::before` och glider till nytt val med Expressives fjäder (`--kh-segment-glide`, `linear()`); texten byter färg och bocken växer fram i stället för att texten hoppar. Antal (2–4) och valt index läses med `:has()` ur barnens `aria-pressed/-checked/-selected`, så det fungerar också för en vanlig `.kh-segmented` som appen själv sätter valet i, utan kh.js; höger till vänster speglas. Pillen krymper när det valda segmentet trycks. Samma stillbild, inga omtagna skärmdumpar |
 | 1.6.1 | Textfältets etikett på kanten står mitt på kantlinjen vilken radhöjd appen än ger `--kh-type-item-subtitle` (`translateY(-50%)` i stället för fasta −8 px), så att kanten bryts bakom texten som i AppTextField. Med Husjakts 16/22 gick linjen förut genom texten. Omtagna: `AppTextField_lagen` |
 | 1.6.0 | Segmentvalet med mer djup (android-ui #97, 3.4.0): med `kh-depth` ligger `kh-segmented` i ett sänkt spår (`--kh-row-tint` och en svag inre skugga) och det valda segmentet lyfts som en egen pill med knapparnas skugga, skimmer och ljuskant; ovalda utan kontur i `--kh-on-surface-variant`. Samma höjd (40 px) och märkning. Utan `kh-depth` oförändrat. Omtagna: `Valda_djup` |
