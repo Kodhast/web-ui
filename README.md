@@ -40,6 +40,11 @@ Inga beroenden och inget byggsteg: två CSS-filer och ett skript.
 `import '@kodhast/web-ui/tokens.css'; import '@kodhast/web-ui/kh.css'; import '@kodhast/web-ui/kh.js';`.
 Paketet publiceras inte till ett register; taggen `v<version>` är versionen.
 
+**Prov för en primär handling (D-3):** `src/prov.js` (`@kodhast/web-ui/prov.js`) är för appens Playwright-prov, inte för
+appen: `await assertSinglePrimaryAction(page)` fäller provet om mer än en fylld knapp (`kh-btn--primary`,
+`kh-btn--destructive`) eller flikradens huvudknapp syns samtidigt i samma fönster (sidan, en öppen dialog eller popover
+räknas för sig), som `assertSinglePrimaryAction()` i android-ui:s `ui-testing`.
+
 ## Appen sätter
 
 Sätt variablerna på `:root` (textstilarnas standardvärden räknas ut där). Färgerna har inga
@@ -94,7 +99,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-divider` | `AppDivider` | – |
 | `kh-foldout` med `__header` (en `button.kh-row` med `aria-expanded`), `__chevron`, `__content` | `Foldout` | Utfälld (`aria-expanded="true"`) ligger rubrik och innehåll på `--kh-foldout-surface` med radens hörn, chevronen vänds; innehållet visas bara när det står (eller utan `hidden`). Appen växlar `aria-expanded`. |
 | `kh-foldout__actions` sist i `__content`, med `kh-btn--destructive-text` sist | `Foldout(actions, delete)` | Radens knappar; Radera i felfärgen sist, som frågar i `kh-dialog` (android-ui #118). |
-| `kh-btn` | `AppButton` | `--secondary`, `--outlined`, `--text`, `--destructive`, `--destructive-text` (Radera sist bland en rads knappar), `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
+| `kh-btn` | `AppButton` | Standard tonad (`Secondary`, 2.0.0); `--primary` är den fyllda för vyns primära handling, högst en per vy (D-3). `--secondary` (samma som standard), `--outlined`, `--text`, `--destructive`, `--destructive-text` (Radera sist bland en rads knappar), `--compact`, `--block`, `disabled`, `aria-busy="true"` (arbetar: behåller färgen) |
 | `kh-icon-btn` | `AppIconButton` | `--tonal` (platta i `secondary-container`), en tonklass (den tonade: platta och ikon; den vanliga: ikonen), `disabled`; 48 i tryckyta och form, ikonen 24, alltid `aria-label` |
 | `kh-chips` + `kh-chip` med `__label`, `__value`, `__pending` | `AppFilterChip`, `ChipRow` | `aria-pressed`/`aria-checked` (bocken ritas av biblioteket), `--emphasized`, `--pending`, `disabled` |
 | `kh-segmented` | `AppSegmentedChoice` | barnen med `aria-checked`/`aria-pressed`/`aria-selected` |
@@ -171,6 +176,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 2.0.0 | **Brytande**, som android-ui 4.0.0 (android-ui #128, skill `android:designregler` D-3): `kh-btn` utan variant är tonad i stället för fylld; den fyllda heter `kh-btn--primary`. **Appen måste** lägga till `kh-btn--primary` på den knapp som ska vara vyns primära – annars blir den tonad. `kh-btn--secondary` finns kvar. Nytt: `src/prov.js` (export `./prov.js`) med `assertSinglePrimaryAction(page)` och `countPrimaryActions()` för appens Playwright-prov. Galleriet sätter `--primary` där det visade en fylld knapp; inga skärmdumpar omtagna |
 | 1.13.1 | Tidsväljaren som android-ui 3.12.0 (#123): talen 52 höga, `--kh-type-time-wheel` 500 45px/52px (var 400 57px/64px), grannarna 32/45 av talet och vikt 400, tabulära siffror; rubriken i `--kh-type-headline` som övriga dialoger med luft ner till hjulen. Omtagna: `TimePickerPopup_oppen`, `TimePickerPopup_djup` |
 | 1.13.0 | Kryss, växel och stegare som i android-ui: `kh-check` (`MorphingCheck`, ringen fjädrar till en kaka med bock) och `kh-check-row` (`CheckRow`, klar och tonad när ikryssad, `--plain`), `kh-switch` och `kh-switch-row` (`SwitchControl`, `SwitchRow`, `--inactive`), `<kh-stepper>` och `kh-stepper-field` (`QuantityStepper`, `format`, `--kh-stepper-button`); alla med djup i `kh-depth`. Nya skärmdumpar: `CheckRow_varianter`, `SwitchRow_varianter`, `QuantityStepper_varianter`, `QuantityStepper_etikett`, `Webb_kryssrad_djup`, `Webb_reglage_djup`, `Webb_stegare_djup` |
 | 1.12.0 | Progressiv oskärpa under sidhuvudet som i android-ui 3.11.1 (#105): innehållet som rullat in under `kh-header` och `kh-topbar` är suddigt vid kanten (radie 8) och skarpt 24 längre ned; tonar in med rullningen, `--kh-blur: 0` stänger av. `kh-header` klipper bara i sidled. Nya skärmdumpar: `EntityListScreen_rullad`, `Webb_topprad_rullad` |
