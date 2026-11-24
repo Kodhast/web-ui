@@ -1,6 +1,6 @@
 {
   "name": "@kodhast/web-ui",
-  "version": "1.13.1",
+  "version": "2.0.0",
   "description": "android-ui:s utseende för webbapparna: tal, kort, rader, knappar och de andra delarna som ren CSS, och sidhuvud, flikrad, prickar och dra-ned som egna element.",
   "license": "MIT",
   "type": "module",
@@ -10,6 +10,7 @@
     "./kh.css": "./src/kh.css",
     "./tokens.css": "./src/tokens.css",
     "./kh.js": "./src/kh.js",
+    "./prov.js": "./src/prov.js",
     "./tokens.json": "./tokens.json"
   },
   "style": "./src/kh.css",

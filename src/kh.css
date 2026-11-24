@@ -514,8 +514,8 @@ kh-stepper {
   padding: var(--kh-space-s) var(--kh-space-xl);
   border: 0;
   border-radius: var(--kh-radius-pill);
-  background-color: var(--kh-primary);
-  color: var(--kh-on-primary);
+  background-color: var(--kh-secondary-container);
+  color: var(--kh-on-secondary-container);
   font: var(--kh-type-button);
   text-decoration: none;
   white-space: nowrap;
@@ -523,6 +523,9 @@ kh-stepper {
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 .kh-btn > svg { inline-size: var(--kh-icon-button); block-size: var(--kh-icon-button); flex: none; fill: currentColor; }
+/* Standard är tonad (Secondary, android-ui 4.0.0); den fyllda --primary är vyns primära handling, högst en per
+   vy (skill android:designregler, D-3). --secondary finns kvar som namn för den tonade. */
+.kh-btn--primary { background-color: var(--kh-primary); color: var(--kh-on-primary); }
 .kh-btn--secondary { background-color: var(--kh-secondary-container); color: var(--kh-on-secondary-container); }
 .kh-btn--outlined {
   background-color: transparent;
@@ -1552,7 +1555,8 @@ kh-refresh[data-state='pulling'] > .kh-refresh__indicator { transition: none; }
   background-image: var(--kh-lift-sheen);
   box-shadow: var(--kh-lift-highlight), var(--kh-lift-near), var(--kh-lift-far);
 }
-.kh-depth .kh-btn--secondary:not(:disabled, [aria-busy='true']) {
+/* Den tonade (standard). Samma specificitet som förr (:where), så att utseendet är oförändrat. */
+.kh-depth .kh-btn:where(:not(.kh-btn--primary, .kh-btn--destructive, .kh-btn--destructive-text, .kh-btn--outlined, .kh-btn--text)):not(:disabled, [aria-busy='true']) {
   box-shadow:
     var(--kh-lift-highlight),
     0 1px 3px color-mix(in srgb, var(--kh-depth-shadow) 50%, transparent),

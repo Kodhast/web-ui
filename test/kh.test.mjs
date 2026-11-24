@@ -121,10 +121,10 @@ test('avdelare: en linje i temats linjefärg, indragen som raderna', async () =>
 
 test('knapp: höjd, pillform, varianter, inaktiv, arbetar och nedtryckt med djup', async () => {
   await mount(`
-    <button class="kh-btn" id="a">Spara</button>
-    <button class="kh-btn kh-btn--compact" id="b">Spara</button>
-    <button class="kh-btn" id="c" disabled>Spara</button>
-    <button class="kh-btn" id="d" aria-busy="true">Sparar …</button>
+    <button class="kh-btn kh-btn--primary" id="a">Spara</button>
+    <button class="kh-btn kh-btn--primary kh-btn--compact" id="b">Spara</button>
+    <button class="kh-btn kh-btn--primary" id="c" disabled>Spara</button>
+    <button class="kh-btn kh-btn--primary" id="d" aria-busy="true">Sparar …</button>
     <button class="kh-btn kh-btn--destructive" id="e">Radera</button>
     <button class="kh-btn kh-btn--secondary" id="f">Lägg till</button>`, { depth: true });
   assert.equal((await box('#a')).height, 56);
@@ -182,7 +182,7 @@ test('ikonknapp: 48 i tryckyta och form, ikon 24; tonad i secondary-container el
 });
 
 test('utan kh-depth är knappar och kort platta', async () => {
-  await mount('<button class="kh-btn" id="a">Spara</button><div class="kh-card" id="b">x</div>');
+  await mount('<button class="kh-btn kh-btn--primary" id="a">Spara</button><div class="kh-card" id="b">x</div>');
   assert.equal(await style('#a', 'box-shadow'), 'none');
   assert.equal(await style('#b', 'box-shadow'), 'none');
 });
@@ -307,7 +307,7 @@ test('textfält: fältets hörn, etiketten flyttar upp till kanten, fel i felfä
 });
 
 test('dialog: öppnas modalt med nedtonad bakgrund, kortets hörn och kortfärg', async () => {
-  await mount('<dialog class="kh-dialog" id="a"><h2 class="kh-dialog__title">Räkna om?</h2><div class="kh-dialog__actions"><button class="kh-btn">Ok</button></div></dialog>');
+  await mount('<dialog class="kh-dialog" id="a"><h2 class="kh-dialog__title">Räkna om?</h2><div class="kh-dialog__actions"><button class="kh-btn kh-btn--primary">Ok</button></div></dialog>');
   await page.evaluate(() => document.getElementById('a').showModal());
   assert.equal(await style('#a', 'display'), 'flex');
   assert.equal(await style('#a', 'border-radius'), `${tokens.radius.card}px`);
@@ -567,7 +567,7 @@ test('sidhuvud: en spalt bredare än fönstret ger samma marginal som utan spalt
 
 test('topprad i en spalt: pilen och åtgärderna följer spaltens kanter', async () => {
   await mount(`<div style="inline-size: 1000px; --kh-page-max: 600px">
-      <header class="kh-topbar" id="t"><button class="kh-icon-btn" id="pil" aria-label="Tillbaka"><svg></svg></button><h1 class="kh-topbar__title">Huset</h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--compact" id="spara">Spara</button></div></header>
+      <header class="kh-topbar" id="t"><button class="kh-icon-btn" id="pil" aria-label="Tillbaka"><svg></svg></button><h1 class="kh-topbar__title">Huset</h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--primary kh-btn--compact" id="spara">Spara</button></div></header>
     </div>`);
   const t = await box('#t');
   assert.equal(t.width, 1000);
@@ -614,7 +614,7 @@ const TOOLBAR = `
 
 test('topprad: 64 hög och fast överst, pilen 4 från kanten, rubriken 56 in och avkortad, åtgärderna 4 från högerkanten', async () => {
   await mount(`<div id="rull" style="block-size: 200px; overflow-y: auto; inline-size: 360px">
-      <header class="kh-topbar" id="t"><button class="kh-icon-btn kh-icon-btn--tonal" id="pil" aria-label="Tillbaka"><svg><use href="#i-arrow-back"/></svg></button><h1 class="kh-topbar__title" id="rubrik"><kh-dots></kh-dots><span id="text">En mycket lång rubrik som inte får plats på en rad i toppraden</span></h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--compact" id="spara">Spara</button></div></header>
+      <header class="kh-topbar" id="t"><button class="kh-icon-btn kh-icon-btn--tonal" id="pil" aria-label="Tillbaka"><svg><use href="#i-arrow-back"/></svg></button><h1 class="kh-topbar__title" id="rubrik"><kh-dots></kh-dots><span id="text">En mycket lång rubrik som inte får plats på en rad i toppraden</span></h1><div class="kh-topbar__actions"><button class="kh-btn kh-btn--primary kh-btn--compact" id="spara">Spara</button></div></header>
       <header class="kh-topbar" id="u"><h1 class="kh-topbar__title" id="utan">Utan pil</h1></header>
       <div style="block-size: 600px"></div>
     </div>`);
