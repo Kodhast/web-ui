@@ -267,6 +267,45 @@ test('segmentval med djup: höger till vänster glider pillen åt vänster', asy
   assert.ok(Math.abs(pill.left - (await box('#c')).left) <= 1);
 });
 
+test('periodväljare: pilarna och etiketten 48 höga i radtonens spår; etiketten i kortfärg, avkortas på en rad; med djup sänkt spår och lyft etikett', async () => {
+  const picker = (id, label, width = '') => `<div class="kh-period" id="${id}"${width}>
+      <button class="kh-icon-btn kh-period__prev" aria-label="Föregående"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>${label}</span></button>
+      <button class="kh-icon-btn kh-period__next" aria-label="Nästa"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>`;
+  await mount(picker('a', 'Tisdag 24 november') + picker('b', 'Vecka 47 · måndag 16 – söndag 22 november i ett långt namn', ' style="inline-size: 240px"'));
+  const track = await box('#a');
+  const prev = await box('#a .kh-period__prev');
+  const label = await box('#a .kh-period__label');
+  const next = await box('#a .kh-period__next');
+  assert.deepEqual([prev.width, prev.height, next.width, next.height], [48, 48, 48, 48]);
+  assert.equal(label.height, 48);
+  assert.equal(track.height, 48 + 2 * tokens.spacing.xs);
+  assert.equal(prev.left - track.left, tokens.spacing.xs, 'pilen vid spårets kant');
+  assert.equal(track.right - next.right, tokens.spacing.xs);
+  assert.ok(Math.abs((label.left + label.right) / 2 - (track.left + track.right) / 2) < 1, 'etiketten i mitten');
+  assert.equal(await style('#a', 'background-color'), await themeColor('--kh-row-tint'));
+  assert.equal(await style('#a', 'border-radius'), '9999px');
+  assert.equal(await style('#a .kh-period__label', 'background-color'), await themeColor('--kh-card'));
+  assert.equal(await style('#a .kh-period__label', 'color'), await themeColor('--kh-on-surface'));
+  assert.equal((await box('#a .kh-period__label svg')).width, tokens.iconSize.small);
+  assert.equal(await style('#a', 'box-shadow'), 'none', 'platt utan djup');
+
+  const narrow = await box('#b');
+  const narrowLabel = await box('#b .kh-period__label');
+  const text = await box('#b .kh-period__label span');
+  assert.equal(narrow.width, 240);
+  assert.equal(narrowLabel.height, 48, 'på en rad');
+  assert.ok(narrowLabel.right <= (await box('#b .kh-period__next')).left, 'etiketten trycker inte undan pilen');
+  assert.ok(text.right <= narrowLabel.right, 'texten inom etiketten');
+  assert.equal(await style('#b .kh-period__label span', 'text-overflow'), 'ellipsis');
+  assert.equal((await box('#b .kh-period__next')).width, 48, 'pilen krymper inte');
+
+  await mount(picker('c', 'Vecka 47 · 16–22 nov'), { depth: true });
+  assert.match(await style('#c', 'box-shadow'), /inset/, 'sänkt spår med djup');
+  assert.match(await style('#c .kh-period__label', 'box-shadow'), /inset/, 'lyft etikett med ljuskant');
+});
+
 test('pill: primärtonad som standard; en ton gäller bara elementet som har den', async () => {
   await mount(`<span class="kh-pill" id="a">3 kvar</span><span class="kh-pill ton-gron" id="b">Packad</span>
     <div class="kh-card kh-card--tone ton-gron"><span class="kh-pill" id="c">I kortet</span></div>`);

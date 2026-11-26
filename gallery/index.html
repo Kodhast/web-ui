@@ -27,6 +27,9 @@
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></symbol>
   <symbol id="i-arrow-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-archive" viewBox="0 0 24 24"><path d="M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v2A1.5 1.5 0 0 1 19.5 9h-15A1.5 1.5 0 0 1 3 7.5v-2A1.5 1.5 0 0 1 4.5 4zM5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/></symbol>
   <symbol id="i-remove" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></symbol>
 </svg>
 
@@ -212,6 +215,43 @@
   <div class="ram kh-depth" data-skarmdump="Webb_stegare_djup">
     <div><kh-stepper value="4" label="portioner" min="1" max="12"></kh-stepper></div>
     <div><kh-stepper value="1" label="portioner" min="1" max="12"></kh-stepper></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Periodväljare (bara webben) · Webb_periodvaljare</h2>
+  <div class="ram" data-skarmdump="Webb_periodvaljare">
+    <div class="kh-period">
+      <button class="kh-icon-btn kh-period__prev" type="button" aria-label="Föregående dag"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Tisdag 24 november</span></button>
+      <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa dag"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <div class="kh-period">
+      <button class="kh-icon-btn kh-period__prev" type="button" aria-label="Föregående vecka"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Vecka 47 · 16–22 nov</span></button>
+      <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa vecka"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <div class="kh-period" style="max-inline-size: 280px">
+      <button class="kh-icon-btn kh-period__prev" type="button" aria-label="Föregående vecka"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Vecka 47 · måndag 16 – söndag 22 november</span></button>
+      <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa vecka"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Periodväljare med djup · Webb_periodvaljare_djup</h2>
+  <div class="ram kh-depth" data-skarmdump="Webb_periodvaljare_djup">
+    <div class="kh-period">
+      <button class="kh-icon-btn kh-period__prev" type="button" aria-label="Föregående dag"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Tisdag 24 november</span></button>
+      <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa dag"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <div class="kh-period">
+      <button class="kh-icon-btn kh-period__prev" type="button" aria-label="Föregående vecka"><svg><use href="#i-chevron-left"/></svg></button>
+      <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Vecka 47 · 16–22 nov</span></button>
+      <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa vecka"><svg><use href="#i-chevron-right"/></svg></button>
+    </div>
   </div>
 </section>
 
