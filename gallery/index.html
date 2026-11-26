@@ -30,6 +30,7 @@
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
   <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/></symbol>
+  <symbol id="i-drag" viewBox="0 0 24 24"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
   <symbol id="i-remove" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></symbol>
 </svg>
 
@@ -252,6 +253,34 @@
       <button class="kh-period__label" type="button"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span>Vecka 47 · 16–22 nov</span></button>
       <button class="kh-icon-btn kh-period__next" type="button" aria-label="Nästa vecka"><svg><use href="#i-chevron-right"/></svg></button>
     </div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Dra för att ändra ordning (bara webben) · Webb_dra_ordning</h2>
+  <div class="ram" data-skarmdump="Webb_dra_ordning">
+    <ul class="kh-card kh-reorder" style="padding: 4px">
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1001 Utveckling</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1001 Utveckling"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-row" data-dragging><span class="kh-row__text"><span class="kh-row__title">1002 Möten</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1002 Möten"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1003 Förvaltning</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1003 Förvaltning"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-reorder__indicator" data-drop-target></li>
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1004 Intern tid</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1004 Intern tid"><svg><use href="#i-drag"/></svg></button></span></li>
+    </ul>
+    <div class="kh-row kh-reorder__preview"><span class="kh-row__text"><span class="kh-row__title">1002 Möten</span></span><span class="kh-row__trailing"><span class="kh-icon-btn kh-reorder__handle"><svg><use href="#i-drag"/></svg></span></span></div>
+  </div>
+</section>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Dra för att ändra ordning med djup · Webb_dra_ordning_djup</h2>
+  <div class="ram kh-depth" data-skarmdump="Webb_dra_ordning_djup">
+    <ul class="kh-card kh-reorder" style="padding: 4px">
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1001 Utveckling</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1001 Utveckling"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-row" data-dragging><span class="kh-row__text"><span class="kh-row__title">1002 Möten</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1002 Möten"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1003 Förvaltning</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1003 Förvaltning"><svg><use href="#i-drag"/></svg></button></span></li>
+      <li class="kh-reorder__indicator" data-drop-target></li>
+      <li class="kh-row"><span class="kh-row__text"><span class="kh-row__title">1004 Intern tid</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" type="button" aria-label="Flytta 1004 Intern tid"><svg><use href="#i-drag"/></svg></button></span></li>
+    </ul>
+    <div class="kh-row kh-reorder__preview"><span class="kh-row__text"><span class="kh-row__title">1002 Möten</span></span><span class="kh-row__trailing"><span class="kh-icon-btn kh-reorder__handle"><svg><use href="#i-drag"/></svg></span></span></div>
   </div>
 </section>
 

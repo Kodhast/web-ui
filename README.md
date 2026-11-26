@@ -116,6 +116,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
 | `kh-page` | – (bara webben) | Innehållets marginal: `--kh-space-l`, eller mer när fönstret är bredare än `--kh-page-max` |
 | `kh-period` | – (bara webben) | Periodväljare: `__prev` och `__next` (`kh-icon-btn` med pilar) och mellan dem `__label`, en knapp med kalenderikon och texten i en `<span>`, i radtonens spår. Texten avkortas på en rad. Appen äger datumet och vad etiketten öppnar |
+| `kh-reorder` | – (bara webben) | Dra för att ändra ordning: listan (`<ul class="kh-reorder">` med `kh-row`), handtaget `kh-reorder__handle` (en `kh-icon-btn` med sex prickar, sist i raden), raden som dras `[data-dragging]` (en streckad plats i `--kh-outline-variant`), linjen där den hamnar `kh-reorder__indicator[data-drop-target]` och den lyfta raden `kh-reorder__preview`. Beteendet ägs av appen eller web-ui-react (React Aria), inte av `kh.js` |
 
 Med `kh.js` (egna element, inga shadow DOM):
 
@@ -196,6 +197,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 2.3.0 | Dra för att ändra ordning, `kh-reorder` (#23, bara webben): handtag, platsen som lämnas, linjen där raden hamnar och den lyfta raden; med djup djupets skugga. Skärmdumpar `Webb_dra_ordning` och `Webb_dra_ordning_djup` |
 | 2.2.0 | Periodväljaren `kh-period` (#22, bara webben, ur Tidrapportens mockup): pilar och en etikett med kalenderikon i radtonens spår; med djup sänkt spår och lyft etikett. Skärmdumpar `Webb_periodvaljare` och `Webb_periodvaljare_djup` |
 | 2.1.0 | Sidhuvudet utan `kh.js` (#24): ett odefinierat `<kh-header>` krymper från 144 till 64 med ren CSS – en rullningsdriven animering för `--kh-header-f` (nu registrerad med `@property`), rubrikens stil som animering mellan `screen-title` och `section-title`, undertiteln och versionen förankrade med `anchor()`, upphöjt efter ihopfällningen. Ny variabel `--kh-header-trailing-size` (standard `48px`) gäller bara utan `kh.js`. Med `kh.js` oförändrat. Nya skärmdumpar på galleriets sida `utan-kh-js.html`: `AppHeader_css_vila`, `AppHeader_css_halvvags`, `AppHeader_css_ihopfalld`, `AppHeader_css_synkar` |
 | 2.0.0 | **Brytande**, som android-ui 4.0.0 (android-ui #128, skill `android:designregler` D-3): `kh-btn` utan variant är tonad i stället för fylld; den fyllda heter `kh-btn--primary`. **Appen måste** lägga till `kh-btn--primary` på den knapp som ska vara vyns primära – annars blir den tonad. `kh-btn--secondary` finns kvar. Nytt: `src/prov.js` (export `./prov.js`) med `assertSinglePrimaryAction(page)` och `countPrimaryActions()` för appens Playwright-prov. Galleriet sätter `--primary` där det visade en fylld knapp; inga skärmdumpar omtagna |
