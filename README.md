@@ -122,13 +122,32 @@ Med `kh.js` (egna element, inga shadow DOM):
 |---|---|---|
 | `<kh-dots>` | `BrandDots` (`AppBrandStyle.dotLoading`, `headerDots`) | `bouncing` hoppar (stilla utan animeringar); `--kh-dots-size` är diametern, `color` färgen. I `kh-btn` med `aria-busy` (knappen som arbetar), i `kh-loading` (`AppLoading`) och före rubriken i sidhuvudet (synkar med `bouncing`). |
 | `kh-topbar` med `__title` (`<kh-dots>` + `<span>`), `__actions` | `AppTopBar(size = Small)` | Underskärmens rad: 64 hög och fast överst; tillbakapilen är en `kh-icon-btn` (`--tonal` som standard i Android, vanlig för Fonder, valfri tonklass); utan pil börjar rubriken 16 in; rubriken avkortas på en rad; `bouncing` på prickarna medan något hämtas. Toppskärmar använder `<kh-header>`. |
-| `<kh-header>` med `__icon`, `__name`, `__version` (valfri), `__trailing`, `__title` (`<kh-dots>` + `<span>`), `__subtitle` | `AppHeader` | Krymper från 144 till 64 med sidans (eller närmaste rullande förälders, eller `scroller="#id"`) rullning, fäller ut högst upp; `data-raised` när innehåll ligger under; `collapsedFraction` läses. Kontot (`kh-avatar`) i `__trailing` får huvudets färg i ringen. |
+| `<kh-header>` med `__icon`, `__name`, `__version` (valfri), `__trailing`, `__title` (`<kh-dots>` + `<span>`), `__subtitle` | `AppHeader` | Krymper från 144 till 64 med sidans (eller närmaste rullande förälders, eller `scroller="#id"`) rullning, fäller ut högst upp; `data-raised` när innehåll ligger under; `collapsedFraction` läses. Krymper också utan `kh.js` (se nedan). Kontot (`kh-avatar`) i `__trailing` får huvudets färg i ringen. |
 | `<kh-toolbar>` med `__tabs`, `__tab` (`__label`, `__badge`), `__action` | `AppFloatingToolbar` | En flik som är `button` väljs (`aria-selected`) och meddelar `kh-select`; en länk följer appens `aria-current="page"`. `__action` med `popovertarget` öppnar en `kh-menu` ovanför sig. `--surface`, `--tonal`, `--filled` (`ToolbarStyle`), `--tertiary` (`ActionColor`), `--fixed` längst ned (innehållet behöver `--kh-toolbar-clearance`). |
 | `<kh-refresh>` runt listan | `AppPullToRefresh` med prickar | Dragning högst upp: prickarna följer fingret, efter tröskeln meddelas `kh-refresh`; appen sätter `refreshing` medan den uppdaterar (inom 5 s). En uppdatering appen startat själv visar inga prickar här. |
 | `<kh-swipe label="Radera">` runt en rad (`tone="hide"` för dölj/arkivera) | `SwipeToDelete`, `SwipeToHide` | Svep åt vänster med finger eller penna (inte mus, inte från kantzonen 24 px): raden följer fingret med `label` på felfärgen (`tone="hide"`: primärtonen) bakom; efter en tredjedel av bredden eller ett snabbt drag meddelas `kh-swipe` och raden glider tillbaka. Svep åt höger går till sidan; elementet har `data-own-swipe="left"` för sidans eget sidledssvep. Raden ska också ha Radera synligt. |
 | `<kh-segmented>` | `AppSegmentedChoice` | Ett val i taget i barnens `aria-checked` (eller `aria-pressed`/`aria-selected`), med tryck och pilar; meddelar `kh-select` (`detail: { index, value }`). |
 | `<kh-stepper value="2" min="0" max="999" step="1" label="doser per dag">` | `QuantityStepper` | − och + i radtonens spår; knappen vid gränsen stängs av, `disabled` stänger båda. Knapparnas namn ur `label` ("Minska doser per dag"). Meddelar `change`; `value` läses och sätts som tal, egenskapen `format` (`(v) => text`) visar värdet med enhet (`valueText`). Knapparna 44, `--kh-stepper-button: 48px` för full tryckyta. Etiketten bredvid (`showLabel`): `<div class="kh-stepper-field">` med `<span class="kh-stepper-field__label" aria-hidden="true">`. |
 | `<kh-time-picker value="07:30" step="5">` i en `kh-dialog` | `TimePickerPopup` (rullhjul, android-ui #106) | Timme och minut som två hjul i segmentvalets spår (`--kh-row-tint`), 24 timmar, som går runt. Rullas med fingret, mushjulet, pilarna upp och ned eller ett tryck på talet ovanför eller under. `value` läses och sätts som `"HH:MM"` (också medan dialogen är stängd); `step` är minuthjulets steg (standard 1) och en tid mellan stegen avrundas till närmaste. `change` meddelas när hjulet stannat på en ny tid. Dialogens rubrik är `--kh-type-headline` som i övriga dialoger, med luft ner till hjulen; Avbryt och OK är `kh-btn--text`. |
+
+**Sidhuvudet utan `kh.js`:** en sida som inte laddar `kh.js` får samma ihopfällning med ren CSS, så länge
+`<kh-header>` är odefinierat (`kh-header:not(:defined)`; laddas `kh.js` gäller dess mått och inget av det här).
+`--kh-header-f` går från 0 till 1 med en rullningsdriven animering (`animation-timeline: scroll(nearest block)`) över
+de första 80 px rullning, och höjden, ikonen, rubrikens läge, stil och bredd, namnet och undertiteln räknas ur den
+som i `kh.js`. Skillnader mot `kh.js`:
+
+- Det som rullar är närmaste rullande förälder; attributet `scroller` och `collapsedFraction` finns inte.
+- Kontots bredd mäts inte: `--kh-header-trailing-size` (standard `48px`, en `kh-avatar`) håller rubrik och namn
+  undan det. Sätt den om `__trailing` har något annat.
+- Prickarna behöver sina två `<i>` i koden: `<kh-dots><i></i><i></i></kh-dots>`.
+- Upphöjt (kortens färg och skugga) slår om direkt när innehåll rullat under, utan `kh.js` 200 ms-övergång, och
+  utan `data-raised`.
+- Versionen förankras efter namnet (`anchor()`) och lämnas bort med `position-visibility`; gränsen kan skilja en px
+  från `kh.js`, som avrundar namnets bredd.
+- Rubrikens spärrning glider i `em` i stället för i px: under en tiondels px ifrån halvvägs.
+
+Galleriets sida [`gallery/utan-kh-js.html`](gallery/utan-kh-js.html) visar det (`AppHeader_css_*`), och provet
+jämför måtten med `kh.js` vid varje rullning (högst en halv px ifrån).
 
 Skillnader mot Android som är kända:
 
@@ -176,6 +195,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 2.1.0 | Sidhuvudet utan `kh.js` (#24): ett odefinierat `<kh-header>` krymper från 144 till 64 med ren CSS – en rullningsdriven animering för `--kh-header-f` (nu registrerad med `@property`), rubrikens stil som animering mellan `screen-title` och `section-title`, undertiteln och versionen förankrade med `anchor()`, upphöjt efter ihopfällningen. Ny variabel `--kh-header-trailing-size` (standard `48px`) gäller bara utan `kh.js`. Med `kh.js` oförändrat. Nya skärmdumpar på galleriets sida `utan-kh-js.html`: `AppHeader_css_vila`, `AppHeader_css_halvvags`, `AppHeader_css_ihopfalld`, `AppHeader_css_synkar` |
 | 2.0.0 | **Brytande**, som android-ui 4.0.0 (android-ui #128, skill `android:designregler` D-3): `kh-btn` utan variant är tonad i stället för fylld; den fyllda heter `kh-btn--primary`. **Appen måste** lägga till `kh-btn--primary` på den knapp som ska vara vyns primära – annars blir den tonad. `kh-btn--secondary` finns kvar. Nytt: `src/prov.js` (export `./prov.js`) med `assertSinglePrimaryAction(page)` och `countPrimaryActions()` för appens Playwright-prov. Galleriet sätter `--primary` där det visade en fylld knapp; inga skärmdumpar omtagna |
 | 1.13.1 | Tidsväljaren som android-ui 3.12.0 (#123): talen 52 höga, `--kh-type-time-wheel` 500 45px/52px (var 400 57px/64px), grannarna 32/45 av talet och vikt 400, tabulära siffror; rubriken i `--kh-type-headline` som övriga dialoger med luft ner till hjulen. Omtagna: `TimePickerPopup_oppen`, `TimePickerPopup_djup` |
 | 1.13.0 | Kryss, växel och stegare som i android-ui: `kh-check` (`MorphingCheck`, ringen fjädrar till en kaka med bock) och `kh-check-row` (`CheckRow`, klar och tonad när ikryssad, `--plain`), `kh-switch` och `kh-switch-row` (`SwitchControl`, `SwitchRow`, `--inactive`), `<kh-stepper>` och `kh-stepper-field` (`QuantityStepper`, `format`, `--kh-stepper-button`); alla med djup i `kh-depth`. Nya skärmdumpar: `CheckRow_varianter`, `SwitchRow_varianter`, `QuantityStepper_varianter`, `QuantityStepper_etikett`, `Webb_kryssrad_djup`, `Webb_reglage_djup`, `Webb_stegare_djup` |
