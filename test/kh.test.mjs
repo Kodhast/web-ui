@@ -306,6 +306,29 @@ test('periodväljare: pilarna och etiketten 48 höga i radtonens spår; etikette
   assert.match(await style('#c .kh-period__label', 'box-shadow'), /inset/, 'lyft etikett med ljuskant');
 });
 
+test('dra för att ändra ordning: handtaget 48 sist i raden; raden som dras lämnar en streckad plats; linjen där den hamnar; den lyfta raden i kortfärg med skugga', async () => {
+  const row = (id, extra = '') => `<li class="kh-row" id="${id}"${extra}><span class="kh-row__text"><span class="kh-row__title">${id}</span></span><span class="kh-row__trailing"><button class="kh-icon-btn kh-reorder__handle" aria-label="Flytta"><svg><use href="#i-drag"/></svg></button></span></li>`;
+  await mount(`<ul class="kh-card kh-reorder" id="lista">${row('a')}${row('b', ' data-dragging')}<li class="kh-reorder__indicator" id="tom"></li><li class="kh-reorder__indicator" id="mal" data-drop-target></li>${row('c')}</ul>
+    <div class="kh-row kh-reorder__preview" id="lyft"><span class="kh-row__text">b</span></div>`);
+  const handle = await box('#a .kh-reorder__handle');
+  assert.deepEqual([handle.width, handle.height], [48, 48]);
+  assert.ok((await box('#a')).right - handle.right <= tokens.spacing.m + 0.5, 'handtaget sist i raden');
+  assert.equal(await style('#a .kh-reorder__handle', 'color'), await themeColor('--kh-on-surface-variant'));
+  assert.equal(await style('#a .kh-reorder__handle', 'cursor'), 'grab');
+  assert.equal(await style('#a', 'outline-style'), 'none');
+  assert.equal(await style('#b', 'outline-style'), 'dashed');
+  assert.equal(await style('#b', 'outline-color'), await themeColor('--kh-outline-variant'));
+  assert.equal(await style('#b .kh-row__text', 'visibility'), 'hidden', 'platsen visar inget innehåll');
+  assert.equal((await box('#b')).height, (await box('#a')).height, 'platsen behåller radens höjd');
+  assert.equal((await box('#tom')).height, 0, 'utan mål syns ingen linje');
+  assert.equal((await box('#mal')).height, 2);
+  assert.equal(await style('#mal', 'background-color'), await themeColor('--kh-primary'));
+  assert.equal(await style('#lyft', 'background-color'), await themeColor('--kh-card'));
+  assert.notEqual(await style('#lyft', 'box-shadow'), 'none');
+  await mount('<div class="kh-row kh-reorder__preview" id="lyft"><span class="kh-row__text">b</span></div>', { depth: true });
+  assert.match(await style('#lyft', 'box-shadow'), /inset/, 'med djup ljuskant och djupets skugga');
+});
+
 test('pill: primärtonad som standard; en ton gäller bara elementet som har den', async () => {
   await mount(`<span class="kh-pill" id="a">3 kvar</span><span class="kh-pill ton-gron" id="b">Packad</span>
     <div class="kh-card kh-card--tone ton-gron"><span class="kh-pill" id="c">I kortet</span></div>`);
