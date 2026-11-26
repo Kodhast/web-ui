@@ -13,11 +13,16 @@ const gallery = pathToFileURL(join(root, 'gallery', 'index.html')).href;
 
 let browser;
 let page;
+// En egen sida utan kh.js: där förblir <kh-header> odefinierat (provet för sidhuvudet utan kh.js).
+const bareGallery = pathToFileURL(join(root, 'gallery', 'utan-kh-js.html')).href;
+const bare = {};
 
 before(async () => {
   browser = await chromium.launch();
   page = await browser.newPage({ viewport: { width: 440, height: 900 } });
   await page.goto(`${gallery}?tema=ljust`);
+  bare.page = await browser.newPage({ viewport: { width: 440, height: 900 } });
+  await bare.page.goto(`${bareGallery}?tema=ljust`);
 });
 
 after(async () => {
@@ -1039,4 +1044,139 @@ test('stegare: − och + inom gränserna, change, knappen vid gränsen av, namn 
   await page.evaluate(() => document.getElementById('q').style.setProperty('--kh-stepper-button', '48px'));
   assert.equal((await box(minus)).width, 48);
   assert.equal(await style('#q', 'background-color'), await themeColor('--kh-row-tint'));
+});
+
+/* ---------- Sidhuvudet utan kh.js (ren CSS) ---------- */
+
+// Sidan utan kh.js (bare): <kh-header> förblir odefinierat, och ihopfällningen är kh.css rullningsdrivna animering.
+
+/** Monterar [html] överst i [target] (kh.js-galleriet eller sidan utan) och väntar två bildrutor. */
+const mountIn = async (target, html) => {
+  await target.evaluate((html) => {
+    document.getElementById('prov')?.remove();
+    const frame = document.createElement('div');
+    frame.id = 'prov';
+    frame.className = 'kh-depth';
+    frame.innerHTML = html;
+    document.body.prepend(frame);
+    scrollTo(0, 0);
+  }, html);
+  await target.evaluate(() => document.fonts.ready);
+  await target.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+};
+const scrollIn = async (target, top) => {
+  await target.evaluate((top) => { document.getElementById('r').scrollTop = top; }, top);
+  await target.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+};
+const boxIn = (target, selector) => target.evaluate((selector) => document.querySelector(selector).getBoundingClientRect().toJSON(), selector);
+const styleIn = (target, selector, prop) => target.evaluate(({ selector, prop }) => getComputedStyle(document.querySelector(selector)).getPropertyValue(prop), { selector, prop });
+// Prickarna har sina <i> i koden: utan kh.js lägger ingen dit dem.
+const BARE_HEADER = VERSION_HEADER.replace('<kh-dots></kh-dots>', '<kh-dots><i></i><i></i></kh-dots>');
+/** Ritas elementet? position-visibility döljer utan att ändra visibility, så frågan ställs till träffytan. */
+const drawn = (target, selector) =>
+  target.evaluate((selector) => {
+    const element = document.querySelector(selector);
+    const rect = element.getBoundingClientRect();
+    return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === element;
+  }, selector);
+
+test('sidhuvud utan kh.js: odefinierat, 144 i vila, 64 efter 80 px rullning utan att innehållet hoppar, rubriken krymper', async () => {
+  const p = bare.page;
+  await mountIn(p, BARE_HEADER);
+  assert.equal(await p.evaluate(() => document.getElementById('h').matches(':defined')), false);
+  const contentAt = async () => (await boxIn(p, '#innehall')).top - (await boxIn(p, '#r')).top;
+  assert.equal((await boxIn(p, '#h')).height, tokens.header.expanded);
+  assert.equal(await contentAt(), tokens.header.expanded);
+  assert.equal(await styleIn(p, '#title', 'font-size'), '34px', 'rubriken i screen-title');
+  const title = await boxIn(p, '#title');
+  const sub = await boxIn(p, '#sub');
+  assert.ok(Math.abs(sub.top - title.bottom) <= 0.5, 'undertiteln direkt under rubriken');
+
+  await scrollIn(p, 40);
+  assert.equal((await boxIn(p, '#h')).height, tokens.header.expanded - 40);
+  assert.equal(await contentAt(), tokens.header.expanded - 40, 'innehållet följer fingret');
+  assert.equal(await styleIn(p, '#title', 'font-size'), '26px', 'halvvägs mellan 34 och 18');
+  assert.equal(await styleIn(p, '#name', 'opacity'), '0');
+  assert.ok(Math.abs((await boxIn(p, '#sub')).top - (await boxIn(p, '#title')).bottom) <= 0.5, 'undertiteln följer rubriken');
+
+  await scrollIn(p, tokens.header.expanded - tokens.header.collapsed);
+  const h = await boxIn(p, '#h');
+  assert.equal(h.height, tokens.header.collapsed);
+  assert.equal(await styleIn(p, '#title', 'font-size'), '18px', 'rubriken i section-title');
+  assert.equal((await boxIn(p, '#icon')).width, tokens.header.collapsedAppIcon);
+  const collapsed = await boxIn(p, '#title');
+  assert.equal(collapsed.left - h.left, tokens.spacing.l + tokens.header.collapsedAppIcon + tokens.spacing.m, 'bredvid ikonen');
+  assert.ok(Math.abs(collapsed.top + collapsed.height / 2 - (h.top + tokens.header.collapsed / 2)) <= 1, 'mitt i den smala raden');
+  assert.deepEqual(rgb(await styleIn(p, '#h', 'background-color')), rgb(await styleIn(p, 'body', 'background-color')), 'inte upphöjt än');
+  assert.equal(await styleIn(p, '#h', '--kh-header-lift'), '0', 'ihopfällt men inget under än');
+
+  await scrollIn(p, 200);
+  assert.equal((await boxIn(p, '#h')).height, tokens.header.collapsed);
+  assert.equal(await styleIn(p, '#h', '--kh-header-lift'), '1', 'upphöjt när innehåll ligger under');
+  assert.match(await styleIn(p, '#h', 'box-shadow'), /15px/);
+  assert.deepEqual(rgb(await styleIn(p, '#h', 'background-color')), rgb(await styleIn(p, '.kh-card', 'background-color')), 'kortens färg');
+
+  await scrollIn(p, 0);
+  assert.equal((await boxIn(p, '#h')).height, tokens.header.expanded, 'fälls ut högst upp');
+  assert.equal(await styleIn(p, '#h', '--kh-header-lift'), '0');
+});
+
+test('sidhuvud utan kh.js: versionen på namnets baslinje efter texten, borta när den inte ryms bredvid ett helt namn', async () => {
+  const p = bare.page;
+  await mountIn(p, BARE_HEADER);
+  const name = await boxIn(p, '#name');
+  const version = await boxIn(p, '#version');
+  assert.ok(Math.abs(version.left - (name.right + tokens.spacing.xs)) <= 0.5, 'ett xs-avstånd efter namnet');
+  // Baslinjen: textens ruta (typsnittets över- och underhäng) plus överhänget ur typsnittets mått.
+  const baselines = await p.evaluate(() => ['#name', '#version'].map((id) => {
+    const element = document.querySelector(id);
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const context = document.createElement('canvas').getContext('2d');
+    context.font = getComputedStyle(element).font;
+    return range.getBoundingClientRect().top + context.measureText('Åg').fontBoundingBoxAscent;
+  }));
+  assert.ok(Math.abs(baselines[0] - baselines[1]) <= 0.5, `samma baslinje (${baselines})`);
+  assert.equal(await drawn(p, '#version'), true);
+
+  await mountIn(p, `<div style="inline-size: 200px">${BARE_HEADER}</div>`);
+  assert.equal(await drawn(p, '#version'), false, 'ryms inte: lämnas bort');
+  assert.ok(await p.evaluate(() => { const e = document.querySelector('#name'); return e.scrollWidth <= e.clientWidth; }), 'namnet kapas inte för versionen');
+});
+
+test('sidhuvud utan kh.js följer kh.js: samma mått, högst en halv px ifrån, vid varje rullning', async () => {
+  const widths = [400, 1000];
+  for (const width of widths) {
+    const html = `<div style="inline-size: ${width}px; --kh-page-max: 600px">${BARE_HEADER}</div>`;
+    await mountIn(page, html);
+    await mountIn(bare.page, html);
+    for (const top of [0, 10, 20, 30, 40, 60, 80, 200]) {
+      await scrollIn(page, top);
+      await scrollIn(bare.page, top);
+      for (const id of ['#h', '#icon', '#name', '#title', '#sub', '#konto']) {
+        const [js, css] = [await boxIn(page, id), await boxIn(bare.page, id)];
+        for (const edge of ['left', 'top', 'height']) {
+          assert.ok(Math.abs(js[edge] - css[edge]) <= 0.5, `${id} ${edge} vid ${top} px i ${width} bred: kh.js ${js[edge]}, CSS ${css[edge]}`);
+        }
+      }
+      for (const prop of ['font-size', 'line-height', 'font-weight']) {
+        assert.equal(await styleIn(bare.page, '#title', prop), await styleIn(page, '#title', prop), `rubrikens ${prop} vid ${top} px`);
+      }
+      for (const id of ['#name', '#sub', '#h']) {
+        assert.equal(await styleIn(bare.page, id, 'opacity'), await styleIn(page, id, 'opacity'), `${id} opacity vid ${top} px`);
+      }
+    }
+  }
+});
+
+test('sidhuvud med kh.js: ren CSS-vägen rör det inte – inga animeringar, kh.js mått i style', async () => {
+  await mountIn(page, VERSION_HEADER);
+  await scrollIn(page, 40);
+  assert.equal(await page.evaluate(() => document.getElementById('h').matches(':defined')), true);
+  assert.equal(await page.evaluate(() => document.getElementById('h').getAnimations({ subtree: true }).filter((a) => !(a.timeline instanceof DocumentTimeline)).length), 0);
+  for (const name of ['--kh-header-height', '--kh-header-title-size', '--kh-header-title-y', '--kh-header-name-x', '--kh-header-f']) {
+    assert.equal(await styleIn(page, '#h', name), await page.evaluate((name) => document.getElementById('h').style.getPropertyValue(name), name), name);
+  }
+  assert.equal(await styleIn(page, '#title', 'font-size'), '26px');
+  assert.equal(await styleIn(page, '#title', 'translate'), 'none');
 });

@@ -10,11 +10,12 @@ import { dirname, join } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'screenshots');
 mkdirSync(out, { recursive: true });
-const url = pathToFileURL(join(root, 'gallery', 'index.html')).href;
+// Galleriet, och sidhuvudet utan kh.js på en egen sida (galleriet laddar kh.js för alla element).
+const pages = ['index.html', 'utan-kh-js.html'].map((file) => pathToFileURL(join(root, 'gallery', file)).href);
 
 const browser = await chromium.launch();
 try {
-  for (const [tema, suffix] of [['ljust', 'light'], ['mork', 'dark']]) {
+  for (const [tema, suffix] of [['ljust', 'light'], ['mork', 'dark']]) for (const url of pages) {
     const page = await browser.newPage({ viewport: { width: 440, height: 900 }, deviceScaleFactor: 2.925 });
     await page.goto(`${url}?tema=${tema}`);
     await page.evaluate(() => document.fonts.ready);

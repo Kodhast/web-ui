@@ -1153,8 +1153,8 @@ kh-dots[bouncing] > i:nth-child(2) { animation-delay: 150ms; }
 /*
  * 144 högt i vila med appens ikon och namn överst, kontot till höger och rubriken stort under; när
  * innehållet rullas krymper det med fingret till 64 och rubriken glider upp bredvid ikonen. kh.js sätter
- * måtten (--kh-header-*) vid varje rullning. Ihopfällt med innehåll under (data-raised) får det kortens
- * färg och skuggan (med djup) eller en hårfin linje (utan).
+ * måtten (--kh-header-*) vid varje rullning; utan kh.js räknas de ur en rullningsdriven animering (längre ned).
+ * Ihopfällt med innehåll under (data-raised) får det kortens färg och skuggan (med djup) eller en hårfin linje (utan).
  */
 @property --kh-header-lift {
   syntax: '<number>';
@@ -1184,7 +1184,7 @@ kh-header[data-raised] { --kh-header-lift: 1; }
  * Progressiv oskärpa under sidhuvudet (underHeaderBlur): innehållet som rullat in under huvudet är suddigast vid
  * nederkanten och skarpt --kh-blur-header-fade längre ned. Den tonar in med ihopfällningen (--kh-header-f), som
  * overlappedFraction i Android; Android växer radien i stället, men det ser likadant ut och kostar mindre. I vila
- * syns inget, och utan kh.js inte heller.
+ * syns inget.
  */
 :is(kh-header, .kh-topbar)::after {
   content: '';
@@ -1273,6 +1273,84 @@ kh-header:defined .kh-header__title {
 }
 :is(.kh-header__name, .kh-header__version, .kh-header__title > :not(kh-dots), .kh-header__subtitle, .kh-header__probe) { text-box: trim-both text; }
 .kh-header__probe { position: absolute; visibility: hidden; white-space: nowrap; }
+
+/*
+ * Utan kh.js (kh-header:not(:defined)): samma ihopfällning med ren CSS. En rullningsdriven animering för
+ * --kh-header-f från 0 till 1 över de första (expanded − collapsed) px rullning i närmaste rullande förälder,
+ * och måtten som kh.js räknar ut står som calc() ur den och talen. Det kh.js mäter ersätts så här:
+ * rubrikens stil interpoleras mellan screen-title och section-title i en egen animering på samma rullning,
+ * rubrikens höjd läses av translate (−50 % av den egna höjden), undertiteln och versionen förankras vid
+ * rubriken och namnet (anchor), versionen lämnas bort när den inte ryms (position-visibility) och
+ * kontots bredd är --kh-header-trailing-size (standard kh-avatar, 48px). Med kh.js gäller inget av det här:
+ * elementet är då :defined, och animeringarna skulle annars gå före kh.js mått i style.
+ */
+@property --kh-header-f {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+kh-header:not(:defined) {
+  --kh-header-travel: calc(var(--kh-header-expanded) - var(--kh-header-collapsed));
+  --kh-header-has-icon: 0;
+  --kh-header-end-clearance: var(--kh-page-inset);
+  --kh-header-sideways: min(1, var(--kh-header-f) * 2); /* kh.js SIDEWAYS_BY = 0,5 */
+  --kh-header-height: calc(var(--kh-header-expanded) - var(--kh-header-travel) * var(--kh-header-f));
+  --kh-header-icon-size: calc(var(--kh-header-app-icon) + (var(--kh-header-collapsed-app-icon) - var(--kh-header-app-icon)) * var(--kh-header-f));
+  --kh-header-name-x: calc(var(--kh-page-inset) + var(--kh-header-has-icon) * (var(--kh-header-icon-size) + var(--kh-space-m)));
+  --kh-header-name-max: max(0px, 100% - var(--kh-header-name-x) - var(--kh-header-end-clearance));
+  --kh-header-title-x: calc(var(--kh-page-inset) + var(--kh-header-sideways) * var(--kh-header-has-icon) * (var(--kh-header-collapsed-app-icon) + var(--kh-space-m)));
+  --kh-header-title-max: max(0px, 100% - 2 * var(--kh-page-inset) + var(--kh-header-sideways) * (var(--kh-page-inset) - var(--kh-header-has-icon) * (var(--kh-header-collapsed-app-icon) + var(--kh-space-m)) - var(--kh-header-end-clearance)));
+  anchor-scope: --kh-header-name, --kh-header-title;
+  /* Upphöjt som data-raised: när rullningen passerat ihopfällningen med mer än en halv px (utan övergång). */
+  animation: kh-header-collapse linear both, kh-header-raise linear forwards;
+  animation-timeline: scroll(nearest block), scroll(nearest block);
+  animation-range: 0 var(--kh-header-travel), calc(var(--kh-header-travel) + 0.5px) calc(var(--kh-header-travel) + 1px);
+}
+kh-header:not(:defined):has(> .kh-header__icon) { --kh-header-has-icon: 1; }
+kh-header:not(:defined):has(> .kh-header__trailing) {
+  --kh-header-end-clearance: calc(var(--kh-header-trailing-size, 48px) + var(--kh-page-inset) - var(--kh-space-l) + var(--kh-space-xs) + var(--kh-space-s));
+}
+@keyframes kh-header-collapse {
+  from { --kh-header-f: 0; }
+  to { --kh-header-f: 1; }
+}
+@keyframes kh-header-raise {
+  from, to { --kh-header-lift: 1; }
+}
+kh-header:not(:defined) > .kh-header__name { anchor-name: --kh-header-name; }
+/* Versionen efter namnets text; en osynlig strut i namnets stil och 64 hög ger raden namnets baslinje. */
+kh-header:not(:defined) > .kh-header__version {
+  position-anchor: --kh-header-name;
+  inset-inline: calc(anchor(end) + var(--kh-space-xs)) var(--kh-header-end-clearance);
+  display: block;
+  inline-size: max-content;
+  block-size: auto;
+  line-height: 0;
+  text-box: normal;
+  transform: none;
+  visibility: visible;
+  position-visibility: no-overflow;
+}
+kh-header:not(:defined) > .kh-header__version::before {
+  content: '\200b';
+  font: var(--kh-type-item-title);
+  line-height: var(--kh-header-collapsed);
+}
+kh-header:not(:defined) > .kh-header__title {
+  anchor-name: --kh-header-title;
+  inset-block-start: calc(var(--kh-header-collapsed) * (1 - var(--kh-header-f) / 2));
+  translate: 0 calc(-50% * var(--kh-header-f));
+  animation: kh-header-title linear both;
+  animation-timeline: scroll(nearest block);
+  animation-range: 0 var(--kh-header-travel);
+}
+@keyframes kh-header-title {
+  from { font: var(--kh-type-screen-title); letter-spacing: var(--kh-tracking-screen-title); }
+  to { font: var(--kh-type-section-title); letter-spacing: 0; }
+}
+kh-header:not(:defined) > .kh-header__subtitle {
+  inset-block-start: anchor(--kh-header-title end);
+}
 
 /* ---------- Toppraden (AppTopBar, liten): <header class="kh-topbar"> ---------- */
 

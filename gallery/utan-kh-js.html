@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>web-ui – sidhuvudet utan kh.js</title>
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/kh.css">
+<link rel="stylesheet" href="theme-test.css">
+<link rel="stylesheet" href="galleri.css">
+<!-- Ingen kh.js här: <kh-header> förblir odefinierat och krymper med ren CSS. -->
+<script>
+  // Ljust eller mörkt: ?tema=mork|ljust, annars systemets val.
+  const tema = new URLSearchParams(location.search).get('tema');
+  document.documentElement.dataset.theme = tema === 'mork' ? 'dark' : tema === 'ljust' ? 'light'
+    : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+</script>
+</head>
+<body class="kh-app">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></symbol>
+</svg>
+
+<header class="galleri-topp">
+  <h1 class="kh-text-section-title">web-ui · sidhuvudet utan kh.js</h1>
+  <button class="kh-btn kh-btn--secondary kh-btn--compact" id="byt-tema" type="button">Byt tema</button>
+</header>
+
+<main>
+<p class="galleri-del kh-text-body">Samma sidhuvud som AppHeader_* i <a href="index.html">galleriet</a>, men sidan laddar inte kh.js:
+  ihopfällningen är en rullningsdriven animering i kh.css. Prickarna har sina två &lt;i&gt; i koden, eftersom kh.js inte lägger dit dem.</p>
+
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud i vila · AppHeader_css_vila</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_css_vila" data-rull="0" data-animera>
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots><i></i><i></i></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud halvvägs · AppHeader_css_halvvags</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_css_halvvags" data-rull="40" data-animera>
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots><i></i><i></i></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud ihopfällt · AppHeader_css_ihopfalld</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_css_ihopfalld" data-rull="81" data-animera>
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots><i></i><i></i></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+<section class="galleri-del">
+  <h2 class="kh-text-caption">Sidhuvud som synkar · AppHeader_css_synkar</h2>
+  <div class="ram ram--skarm kh-depth" data-skarmdump="AppHeader_css_synkar" data-rull="0" data-animera data-tid="225">
+    <div class="rullar">
+      <kh-header>
+        <svg class="kh-header__icon"><use href="#i-box"/></svg>
+        <span class="kh-header__name">Dagboken</span>
+        <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+        <h1 class="kh-header__title"><kh-dots bouncing><i></i><i></i></kh-dots><span>Idag</span></h1>
+        <p class="kh-header__subtitle">God kväll, Anna</p>
+      </kh-header>
+      <div class="ark"><div class="kh-card"><div class="prov"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div></div></div>
+      <div class="fyll"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+  document.getElementById('byt-tema').addEventListener('click', () => {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+  // Ramar som visar ett rullat läge: data-rull är hur långt.
+  for (const frame of document.querySelectorAll('[data-rull]')) {
+    frame.querySelector('.rullar').scrollTop = Number(frame.dataset.rull);
+  }
+</script>
+</body>
+</html>
