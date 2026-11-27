@@ -14,7 +14,8 @@
   document.documentElement.dataset.theme = tema === 'mork' ? 'dark' : tema === 'ljust' ? 'light'
     : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 </script>
-<style>body { margin: 0; }</style>
+<!-- Som apparna: body minst lika hög som fönstret. -->
+<style>body { margin: 0; min-height: 100dvh; }</style>
 </head>
 <!-- Webb_ram: hela sidan är provet. Öppna i ett fönster minst 840 brett; smalare ser ut som telefonen. -->
 <body class="kh-app" data-skarmdump="Webb_ram" data-fonster>
