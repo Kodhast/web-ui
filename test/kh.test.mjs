@@ -474,6 +474,14 @@ test('avatar: pluppen är samma gröna i alla appar, ljus eller mörk efter appe
   await page.evaluate(() => document.documentElement.style.removeProperty('color-scheme'));
 });
 
+test('avatar: utan anslutning en grå ihålig ring på pluppens plats', async () => {
+  await mount('<button class="kh-avatar kh-avatar--offline" id="a"><span class="kh-avatar__circle">AB</span></button>');
+  assert.equal(await style('#a', 'width', '::before'), '12px');
+  assert.equal(await style('#a', 'background-color', '::before'), await themeColor('--kh-background'), 'hålet är ytan');
+  assert.match(await style('#a', 'box-shadow', '::before'), /inset/);
+  assert.ok((await style('#a', 'box-shadow', '::before')).includes(await themeColor('--kh-outline')), 'ringen i outline');
+});
+
 test('textstilarna kommer ur appens variabler', async () => {
   await mount('<p class="kh-text-headline" id="a">Rubrik</p><div class="kh-row"><div class="kh-row__text"><span class="kh-row__title" id="b">T</span></div></div>');
   assert.equal(await style('#a', 'font-size'), '22px');

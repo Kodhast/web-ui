@@ -110,7 +110,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-sheet` med `__title`, `__subtitle`, `__footer` | `AppBottomSheet` | `<dialog>` med `showModal()` |
 | `kh-snackbar-host` + `kh-snackbar` med `__text`, `__action` | `AppSnackbarHost` | står ovanför `kh-toolbar--fixed` när sidan har en |
 | `kh-empty` med `__message`, `__tile`, `__texts`, `__title`, `__text`, `__actions`, `__note` | `EmptyState` | `--error`, `--compact`, `--fullscreen` |
-| `kh-avatar` med `__circle` | `AccountAvatar` | `--online` (pluppen i samma gröna i alla appar, `--kh-color-online-light`/`-dark` ur tokens.json, efter appens `color-scheme`), klickbar som `button` |
+| `kh-avatar` med `__circle` | `AccountAvatar` | `--online` och `--offline` (inloggad: grön plupp i samma gröna i alla appar, `--kh-color-online-light`/`-dark` ur tokens.json, efter appens `color-scheme`, eller grå ihålig ring i `--kh-outline` utan anslutning; utloggad ingen av dem), klickbar som `button` |
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
 | `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg`. En knapp med `popovertarget` öppnar den förankrad under sig, linjerad med högerkanten (ovanför när det inte ryms); `kh.js` förankrar vid trycket, sätter `aria-expanded` och stänger menyn vid ett val. En app som själv anropar `togglePopover()` (t.ex. en knapp i en länk, med `preventDefault`) får samma förankring. |
 | `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
@@ -197,6 +197,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 3.1.0 | `kh-avatar--offline`: inloggad utan anslutning en grå ihålig ring (`--kh-outline`) på pluppens plats (android-ui 5.1.0). Pluppen betyder inloggad och ansluten; utloggad sätter appen ingen av klasserna. Omtagen skärmdump `AccountAvatar_lagen` |
 | 3.0.0 | **Brytande:** variabeln `--kh-online` är borttagen. Pluppen på `kh-avatar--online` är samma gröna i alla appar (android-ui 5.0.0, `OnlineColor`): `--kh-color-online-light` #1E8E3E och `--kh-color-online-dark` #6DD58C ur tokens.json, vald med `light-dark()` efter appens `color-scheme` (Mats 2026-11-27). Ingen app satte `--kh-online`. Omtagna skärmdumpar med avataren |
 | 2.3.0 | Dra för att ändra ordning, `kh-reorder` (#23, bara webben): handtag, platsen som lämnas, linjen där raden hamnar och den lyfta raden; med djup djupets skugga. Skärmdumpar `Webb_dra_ordning` och `Webb_dra_ordning_djup` |
 | 2.2.0 | Periodväljaren `kh-period` (#22, bara webben, ur Tidrapportens mockup): pilar och en etikett med kalenderikon i radtonens spår; med djup sänkt spår och lyft etikett. Skärmdumpar `Webb_periodvaljare` och `Webb_periodvaljare_djup` |
