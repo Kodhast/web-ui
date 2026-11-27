@@ -953,6 +953,54 @@ test('tidsväljare: pilarna och ett tryck på en granne rullar ett steg och medd
   assert.equal(await changed, '00:55');
 });
 
+test('tidsväljare: musen drar hjulet, en snärt glider längre, ett klick väljer grannen och snäppet står av bara under dragningen', async () => {
+  await mount('<kh-time-picker id="t" value="07:30"></kh-time-picker>');
+  await settle();
+  const value = () => page.evaluate(() => document.getElementById('t').value);
+  const minutes = await box('#t .kh-time-picker__wheel:last-of-type');
+  const x = minutes.left + 50;
+  const y = minutes.top + 60;
+  assert.equal(await style('#t .kh-time-picker__wheel', 'cursor'), 'grab');
+
+  // Långsamt tre tal uppåt (156 px): +3, och medan musen är nere står snäppet av.
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  for (let k = 1; k <= 30; k++) {
+    await page.mouse.move(x, y - k * 5.2);
+    await page.waitForTimeout(16);
+  }
+  assert.equal(await style('#t .kh-time-picker__wheel:last-of-type', 'scroll-snap-type'), 'none');
+  assert.equal(await style('#t .kh-time-picker__wheel:last-of-type', 'cursor'), 'grabbing');
+  await page.waitForTimeout(200);
+  await page.mouse.up();
+  await page.waitForFunction(() => document.getElementById('t').value === '07:33');
+  await settle();
+  assert.equal(await style('#t .kh-time-picker__wheel:last-of-type', 'scroll-snap-type'), 'y mandatory');
+
+  // Samma sträcka nedåt med snärt (fort och släppt i rörelse) går längre än tre tal, men högst 30. Händelserna skickas
+  // i sidan, så att farten inte beror på hur fort provet hinner flytta musen.
+  await page.evaluate(({ x, y }) => {
+    const wheel = document.querySelector('#t .kh-time-picker__wheel:last-of-type');
+    wheel.setPointerCapture = () => {};
+    const fire = (type, dy) => wheel.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerType: 'mouse', pointerId: 1, button: 0, clientX: x, clientY: y + dy }));
+    fire('pointerdown', 0);
+    for (const dy of [40, 80, 120, 156]) fire('pointermove', dy);
+    fire('pointerup', 156);
+    delete wheel.setPointerCapture;
+  }, { x, y });
+  await page.waitForFunction(() => !document.querySelector('#t .kh-time-picker__wheel--dragging'));
+  await settle();
+  const flung = Number((await value()).slice(3));
+  assert.ok(flung < 30 && flung >= 3, `snärten gick längre än tre tal och högst 30: ${await value()}`);
+
+  // Ett klick utan rörelse på talet under väljer det.
+  const before = await value();
+  const hours = await box('#t .kh-time-picker__wheel');
+  await page.mouse.click(hours.left + 50, hours.top + 112);
+  await page.waitForFunction((before) => document.getElementById('t').value !== before, before);
+  assert.equal((await value()).slice(0, 2), '08');
+});
+
 test('tidsväljare: i en stängd dialog visar hjulen rätt tid när dialogen öppnas', async () => {
   await mount('<dialog class="kh-dialog" id="d"><h2 class="kh-dialog__title">Välj tid</h2><kh-time-picker id="t"></kh-time-picker></dialog>');
   await page.evaluate(() => { document.getElementById('t').value = '18:15'; document.getElementById('d').showModal(); });

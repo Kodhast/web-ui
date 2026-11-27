@@ -603,6 +603,14 @@
   // hjulet hoppar osynligt tillbaka till mittvarvet när det stannat.
   const lapsFor = (count) => Math.max(5, 2 * Math.ceil(100 / count) + 1);
   const pad = (value) => String(value).padStart(2, '0');
+  /** Så långt musen ska röra sig (px) innan ett tryck blir en dragning. */
+  const DRAG_SLOP = 4;
+  /** En snärt: musen rörde sig snabbare än FLING_SPEED px/ms under de sista FLING_WINDOW ms. */
+  const FLING_WINDOW = 100;
+  const FLING_SPEED = 0.4;
+  /** Hur långt hjulet glider efter en snärt: farten gånger FLING_GLIDE ms, högst FLING_MAX tal. */
+  const FLING_GLIDE = 320;
+  const FLING_MAX = 30;
 
   /** Ett hjul med [values]; [onSettle] när hjulet stannat på ett nytt tal. */
   const timeWheel = (label, values, onSettle) => {
@@ -633,8 +641,62 @@
     };
     const scrollToPosition = (at, behavior) => element.scrollTo({ top: at * pitch(), behavior });
 
+    // Musen drar hjulet (touch rullar det själv): medan den drar och hjulet glider efter står snäppet av
+    // (--dragging), och hjulet ställer sig på ett tal när det stannat.
+    let drag = null;
+    let dragged = false;
+    const DRAGGING = 'kh-time-picker__wheel--dragging';
+    const goTo = (at) => {
+      if (Math.abs(at * pitch() - element.scrollTop) < 1) settle();
+      else scrollToPosition(at, 'smooth');
+    };
+    element.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+      event.preventDefault();
+      element.focus();
+      drag = { y: event.clientY, top: element.scrollTop, samples: [{ y: event.clientY, t: event.timeStamp }] };
+      dragged = false;
+      element.setPointerCapture(event.pointerId);
+    });
+    element.addEventListener('pointermove', (event) => {
+      if (!drag) return;
+      const dy = event.clientY - drag.y;
+      if (!dragged && Math.abs(dy) < DRAG_SLOP) return;
+      if (!dragged) {
+        dragged = true;
+        element.classList.add(DRAGGING);
+      }
+      element.scrollTop = drag.top - dy;
+      drag.samples.push({ y: event.clientY, t: event.timeStamp });
+      while (drag.samples.length > 2 && event.timeStamp - drag.samples[0].t > FLING_WINDOW) drag.samples.shift();
+    });
+    const release = (event) => {
+      if (!drag) return;
+      const { samples } = drag;
+      drag = null;
+      if (!dragged) {
+        // Ett klick: talet under pekaren kommer till mitten (pekaren är fångad, så klicket når inte talet).
+        const y = event.clientY - element.getBoundingClientRect().top + element.scrollTop - (element.clientHeight - pitch()) / 2;
+        goTo(Math.floor(y / pitch()));
+        return;
+      }
+      // En snärt: släppt i rörelse glider hjulet vidare, som med fingret.
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      const speed = (last.y - first.y) / Math.max(1, last.t - first.t);
+      const moving = event.timeStamp - last.t < FLING_WINDOW && Math.abs(speed) > FLING_SPEED;
+      const glide = moving ? Math.max(-FLING_MAX, Math.min(FLING_MAX, speed * FLING_GLIDE / pitch())) : 0;
+      goTo(Math.round(element.scrollTop / pitch() - glide));
+    };
+    element.addEventListener('pointerup', release);
+    element.addEventListener('pointercancel', release);
+
     element.addEventListener('scrollend', () => {
+      if (!drag) settle();
+    });
+    function settle() {
       if (!pitch()) return;
+      element.classList.remove(DRAGGING);
       const at = position();
       const next = wrap(at);
       if (at !== middle(next)) scrollToPosition(middle(next), 'instant');
@@ -642,15 +704,16 @@
         show(next);
         onSettle();
       }
-    });
+    }
     element.addEventListener('keydown', (event) => {
       const step = { ArrowUp: -1, ArrowDown: 1 }[event.key];
       if (!step) return;
       event.preventDefault();
       scrollToPosition(position() + step, 'smooth');
     });
-    // Ett tryck på ett tal ovanför eller under rullar dit.
+    // Ett tryck på ett tal ovanför eller under rullar dit (musen sköts av pointerup ovan).
     element.addEventListener('click', (event) => {
+      if (event.pointerType === 'mouse') return;
       const item = event.target.closest('.kh-time-picker__item');
       if (item) scrollToPosition([...element.children].indexOf(item), 'smooth');
     });
