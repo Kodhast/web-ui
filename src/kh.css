@@ -866,7 +866,10 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   border-radius: var(--kh-radius-fab); /* Material 3:s shapes.large, 16 som FAB:en */
   background-color: var(--kh-row-tint);
   outline-offset: 2px;
+  cursor: grab;
 }
+/* Medan musen drar hjulet och det glider efter står snäppet av, annars hoppar det till ett tal vid varje rörelse. */
+.kh-time-picker__wheel--dragging { scroll-snap-type: none; cursor: grabbing; }
 .kh-time-picker__wheel:focus-visible { outline: 2px solid var(--kh-primary); }
 .kh-time-picker__item {
   display: grid;
@@ -874,7 +877,6 @@ textarea.kh-field__input { resize: none; min-block-size: 56px; field-sizing: con
   block-size: 52px;
   scroll-snap-align: center;
   color: var(--kh-outline);
-  cursor: pointer;
   user-select: none;
   animation: kh-time-wheel linear both;
   animation-timeline: view();
