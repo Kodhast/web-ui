@@ -462,6 +462,18 @@ test('avatar: cirkel 36 i en tryckyta på 48, plupp när ansluten', async () => 
   assert.equal(await style('#b', 'content', '::before'), 'none');
 });
 
+test('avatar: pluppen är samma gröna i alla appar, ljus eller mörk efter appens color-scheme', async () => {
+  await mount('<button class="kh-avatar kh-avatar--online" id="a"><span class="kh-avatar__circle">AB</span></button>');
+  const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
+  const dot = () => style('#a', 'background-color', '::before');
+  assert.notEqual(await dot(), await themeColor('--kh-primary'), 'inte appens primary');
+  await page.evaluate(() => { document.documentElement.style.colorScheme = 'light'; });
+  assert.equal(await dot(), rgb(tokens.color.onlineLight));
+  await page.evaluate(() => { document.documentElement.style.colorScheme = 'dark'; });
+  assert.equal(await dot(), rgb(tokens.color.onlineDark));
+  await page.evaluate(() => document.documentElement.style.removeProperty('color-scheme'));
+});
+
 test('textstilarna kommer ur appens variabler', async () => {
   await mount('<p class="kh-text-headline" id="a">Rubrik</p><div class="kh-row"><div class="kh-row__text"><span class="kh-row__title" id="b">T</span></div></div>');
   assert.equal(await style('#a', 'font-size'), '22px');

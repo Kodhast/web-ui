@@ -1057,7 +1057,8 @@ body:has(kh-toolbar.kh-toolbar--fixed) .kh-snackbar-host {
   box-sizing: border-box;
   border: 2px solid var(--kh-avatar-ring, var(--kh-background));
   border-radius: var(--kh-radius-pill);
-  background: var(--kh-online, var(--kh-primary));
+  /* Samma gröna i alla appar, inte appens färg (android-ui 5.0.0, OnlineColor); väljer efter appens color-scheme. */
+  background: light-dark(var(--kh-color-online-light), var(--kh-color-online-dark));
 }
 
 /* ---------- Ikonknapp (AppIconButton) ---------- */
