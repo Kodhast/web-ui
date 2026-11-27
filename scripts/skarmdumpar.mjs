@@ -10,13 +10,15 @@ import { dirname, join } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'screenshots');
 mkdirSync(out, { recursive: true });
-// Galleriet, och sidhuvudet utan kh.js på en egen sida (galleriet laddar kh.js för alla element).
-const pages = ['index.html', 'utan-kh-js.html'].map((file) => pathToFileURL(join(root, 'gallery', file)).href);
+// Galleriet, sidhuvudet utan kh.js på en egen sida (galleriet laddar kh.js för alla element) och ramen, som
+// bara syns i ett brett fönster: den bilden tas av hela fönstret i 1280 × 800, i skala 1,5.
+const pages = ['index.html', 'utan-kh-js.html', 'ram.html'].map((file) => pathToFileURL(join(root, 'gallery', file)).href);
+const window = (url) => (url.endsWith('ram.html') ? { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1.5 } : { viewport: { width: 440, height: 900 }, deviceScaleFactor: 2.925 });
 
 const browser = await chromium.launch();
 try {
   for (const [tema, suffix] of [['ljust', 'light'], ['mork', 'dark']]) for (const url of pages) {
-    const page = await browser.newPage({ viewport: { width: 440, height: 900 }, deviceScaleFactor: 2.925 });
+    const page = await browser.newPage(window(url));
     await page.goto(`${url}?tema=${tema}`);
     await page.evaluate(() => document.fonts.ready);
     const frames = await page.locator('[data-skarmdump]').all();
@@ -52,7 +54,7 @@ try {
       // data-animera: rullningsdrivna animeringar (tidsväljarens tal) visar sitt läge; 'disabled' skulle spola dem till slutet.
       const animate = time || (await frame.getAttribute('data-animera')) !== null;
       // data-helskarm: en modal dialog eller ett ark ritas över hela fönstret, så bilden tas av fönstret.
-      const shot = (await frame.getAttribute('data-helskarm')) !== null ? page : frame;
+      const shot = (await frame.getAttribute('data-helskarm')) !== null || (await frame.getAttribute('data-fonster')) !== null ? page : frame;
       await shot.screenshot({ path: join(out, `${name}_${suffix}.png`), animations: animate ? 'allow' : 'disabled' });
       await page.evaluate(() => document.querySelectorAll(':popover-open').forEach((p) => p.hidePopover()));
       await page.evaluate(() => document.querySelectorAll('dialog:modal').forEach((d) => d.close()));

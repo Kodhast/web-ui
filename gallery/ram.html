@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>web-ui – ramen på bred skärm</title>
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/kh.css">
+<link rel="stylesheet" href="theme-test.css">
+<script src="../src/kh.js" defer></script>
+<script>
+  // Ljust eller mörkt: ?tema=mork|ljust, annars systemets val.
+  const tema = new URLSearchParams(location.search).get('tema');
+  document.documentElement.dataset.theme = tema === 'mork' ? 'dark' : tema === 'ljust' ? 'light'
+    : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+</script>
+<style>body { margin: 0; }</style>
+</head>
+<!-- Webb_ram: hela sidan är provet. Öppna i ett fönster minst 840 brett; smalare ser ut som telefonen. -->
+<body class="kh-app" data-skarmdump="Webb_ram" data-fonster>
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+  <symbol id="i-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+</svg>
+<div class="kh-frame" id="ram">
+  <kh-header>
+    <svg class="kh-header__icon"><use href="#i-box"/></svg>
+    <span class="kh-header__name">Dagboken</span>
+    <div class="kh-header__trailing"><button class="kh-avatar kh-avatar--online" type="button" aria-label="Konto"><span class="kh-avatar__circle">AB</span></button></div>
+    <h1 class="kh-header__title"><kh-dots></kh-dots><span>Idag</span></h1>
+    <p class="kh-header__subtitle">God kväll, Anna</p>
+  </kh-header>
+  <main class="kh-page" style="display: flex; flex-direction: column; gap: var(--kh-space-m); padding-block-end: calc(var(--kh-toolbar-clearance) + var(--kh-space-l));">
+    <div class="kh-card"><span class="kh-text-item-title">Morgonmedicin</span><span class="kh-text-item-subtitle">Levaxin 50 µg</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Promenad</span><span class="kh-text-item-subtitle">45 min · lugnt</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Mående</span><span class="kh-text-item-subtitle">Bra, lite trött</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Kvällsmedicin</span><span class="kh-text-item-subtitle">Alvedon 500 mg</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Sömn</span><span class="kh-text-item-subtitle">7 h 20 min</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Anteckning</span><span class="kh-text-item-subtitle">Påhittad text för att sidan ska gå att rulla.</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Lunch</span><span class="kh-text-item-subtitle">Soppa och bröd</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Vätska</span><span class="kh-text-item-subtitle">1,5 liter</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Träning</span><span class="kh-text-item-subtitle">Yoga 30 min</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Huvudvärk</span><span class="kh-text-item-subtitle">Lätt, på eftermiddagen</span></div>
+    <div class="kh-card"><span class="kh-text-item-title">Vecka</span><span class="kh-text-item-subtitle">Fyra bra dagar av sju</span></div>
+  </main>
+  <kh-toolbar class="kh-toolbar--fixed" id="flikar">
+    <div class="kh-toolbar__tabs">
+      <button class="kh-toolbar__tab" type="button" aria-selected="true" aria-label="Idag"><svg><use href="#i-clock"/></svg><span class="kh-toolbar__label">Idag</span></button>
+      <button class="kh-toolbar__tab" type="button" aria-selected="false" aria-label="Dagbok"><svg><use href="#i-check"/></svg><span class="kh-toolbar__label">Dagbok</span></button>
+    </div>
+    <button class="kh-toolbar__action" type="button" aria-label="Lägg till"><svg><use href="#i-add"/></svg></button>
+  </kh-toolbar>
+</div>
+</body>
+</html>

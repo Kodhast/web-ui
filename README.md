@@ -114,6 +114,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
 | `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg`. En knapp med `popovertarget` öppnar den förankrad under sig, linjerad med högerkanten (ovanför när det inte ryms); `kh.js` förankrar vid trycket, sätter `aria-expanded` och stänger menyn vid ett val. En app som själv anropar `togglePopover()` (t.ex. en knapp i en länk, med `preventDefault`) får samma förankring. |
 | `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
+| `kh-frame` | – (bara webben) | Appen i ett kort på bred skärm: på appens yttersta element under `<body>`. Från 840 (Material 3:s `expanded`) ett kort `--kh-frame-max` (600) brett, `--kh-frame-margin` (32) från fönstrets kanter, hörn `--kh-frame-radius` (16) och skugga `--kh-frame-shadow` mot `--kh-frame-backdrop` (temats bakgrund mot slöjans färg, 7 % ljust och 45 % mörkt). Kortet rullar själv, så sidhuvudet krymper med det, och håller `kh-toolbar--fixed`, meddelandena och appens fasta delar inom sig; dialoger, ark och menyer täcker fönstret som förut. Under 840 ingenting |
 | `kh-page` | – (bara webben) | Innehållets marginal: `--kh-space-l`, eller mer när fönstret är bredare än `--kh-page-max` |
 | `kh-period` | – (bara webben) | Periodväljare: `__prev` och `__next` (`kh-icon-btn` med pilar) och mellan dem `__label`, en knapp med kalenderikon och texten i en `<span>`, i radtonens spår. Texten avkortas på en rad. Appen äger datumet och vad etiketten öppnar |
 | `kh-reorder` | – (bara webben) | Dra för att ändra ordning: listan (`<ul class="kh-reorder">` med `kh-row`), handtaget `kh-reorder__handle` (en `kh-icon-btn` med sex prickar, sist i raden), raden som dras `[data-dragging]` (en streckad plats i `--kh-outline-variant`), linjen där den hamnar `kh-reorder__indicator[data-drop-target]` och den lyfta raden `kh-reorder__preview`. Beteendet ägs av appen eller web-ui-react (React Aria), inte av `kh.js` |
@@ -162,6 +163,7 @@ Skillnader mot Android som är kända:
 - **Bred skärm** finns bara här (android-ui har inga fönsterklasser, Mats ok 2026-11-20, Kodhast/Husjakt#457): appen
   sätter `--kh-page-max` (innehållets bredd, t.ex. `1200px`) på en förälder, och `kh-header`, `kh-topbar` och
   `kh-page` ställer innehållet i den spalten med bakgrunden kant i kant. Utan variabeln är allt som i telefonen.
+  `kh-frame` lägger i stället hela appen i ett kort med skugga (Mats önskemål 2026-11-27, Kodhast/Tidrapporten#82).
 - **Flikraden** har bara rullgardinsmenyn (`ActionMenuStyle.Popup`, standard); FAB-menyn finns inte än.
 - **Skuggor utan djup** (flikraden, huvudknappen, menyn, dra-ned) är Material 3:s nivåer i `--kh-scrim`.
 - **Tidsväljaren** står i `kh-dialog`:s luft (16 mellan rubrik, hjul och knappar); Material 3:s TimePickerDialog har
@@ -197,6 +199,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 3.2.0 | Ramen `kh-frame` (#29, bara webben): på bred skärm (från 840) ligger appen i ett kort, 600 brett med hörn 16 och skugga mot en mörkare bakgrund; kortet rullar och håller det fasta inom sig. Variablerna `--kh-frame-max`, `--kh-frame-margin`, `--kh-frame-radius`, `--kh-frame-backdrop`, `--kh-frame-shadow`. Galleriet `ram.html`, skärmdump `Webb_ram` |
 | 3.1.0 | `kh-avatar--offline`: inloggad utan anslutning en grå ihålig ring (`--kh-outline`) på pluppens plats (android-ui 5.1.0). Pluppen betyder inloggad och ansluten; utloggad sätter appen ingen av klasserna. Omtagen skärmdump `AccountAvatar_lagen` |
 | 3.0.0 | **Brytande:** variabeln `--kh-online` är borttagen. Pluppen på `kh-avatar--online` är samma gröna i alla appar (android-ui 5.0.0, `OnlineColor`): `--kh-color-online-light` #1E8E3E och `--kh-color-online-dark` #6DD58C ur tokens.json, vald med `light-dark()` efter appens `color-scheme` (Mats 2026-11-27). Ingen app satte `--kh-online`. Omtagna skärmdumpar med avataren |
 | 2.3.0 | Dra för att ändra ordning, `kh-reorder` (#23, bara webben): handtag, platsen som lämnas, linjen där raden hamnar och den lyfta raden; med djup djupets skugga. Skärmdumpar `Webb_dra_ordning` och `Webb_dra_ordning_djup` |
