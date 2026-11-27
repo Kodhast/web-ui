@@ -691,6 +691,7 @@ test('ramen: från 840 ett kort 600 brett med skugga, rullningen och det fasta i
     await wide.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
     assert.equal(await height(), 64, 'sidhuvudet krymper när kortet rullas');
     assert.equal(await wide.evaluate(() => scrollY), 0, 'sidan själv rullar inte');
+    assert.equal(await wide.evaluate(() => document.documentElement.scrollHeight), 800, 'sidan är inte högre än fönstret, också med min-height: 100dvh på body');
 
     await narrow.goto(`${url}?tema=ljust`);
     const small = await rect(narrow, '#ram');

@@ -1504,6 +1504,8 @@ kh-header:not(:defined) > .kh-header__subtitle {
  */
 @media (min-width: 840px) {
   body:has(> .kh-frame) {
+    /* Ramens marginal stannar i body, så att en app med min-height: 100dvh på body inte får en sida som rullar. */
+    display: flow-root;
     margin: 0;
     background: var(--kh-frame-backdrop, light-dark(
       color-mix(in srgb, var(--kh-background), var(--kh-scrim) 7%),
