@@ -1494,6 +1494,42 @@ kh-header:not(:defined) > .kh-header__subtitle {
 }
 
 /*
+ * Ramen (bara webben): på bred skärm (från 840, Material 3:s "expanded") ligger appen i ett kort med skugga mot
+ * en mörkare bakgrund i stället för att fylla fönstret. Appen sätter .kh-frame på sitt yttersta element, direkt
+ * under <body>; under 840 gör klassen ingenting. Ramen är rullningsbehållaren, så kh-header krymper med ramens
+ * rullning, och den håller position: fixed (flikraden, meddelandena, appens egna fasta delar) inom kortet.
+ * Dialoger, ark och menyer ligger i top layer och täcker hela fönstret som förut.
+ * --kh-frame-max (600px), --kh-frame-margin, --kh-frame-radius, --kh-frame-backdrop och --kh-frame-shadow
+ * ändrar bredd, luft, hörn, bakgrunden runt kortet och skuggan.
+ */
+@media (min-width: 840px) {
+  body:has(> .kh-frame) {
+    margin: 0;
+    background: var(--kh-frame-backdrop, light-dark(
+      color-mix(in srgb, var(--kh-background), var(--kh-scrim) 7%),
+      color-mix(in srgb, var(--kh-background), var(--kh-scrim) 45%)));
+  }
+  .kh-frame {
+    --kh-frame-gap: var(--kh-frame-margin, var(--kh-space-xxl));
+    box-sizing: border-box;
+    inline-size: min(100% - 2 * var(--kh-frame-gap), var(--kh-frame-max, 600px));
+    block-size: calc(100dvh - 2 * var(--kh-frame-gap));
+    margin: var(--kh-frame-gap) auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    border-radius: var(--kh-frame-radius, var(--kh-radius-menu));
+    background: var(--kh-background);
+    box-shadow: var(--kh-frame-shadow,
+      0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--kh-on-background) 8%, transparent)),
+      0 2px 6px color-mix(in srgb, var(--kh-scrim) 12%, transparent),
+      0 16px 48px color-mix(in srgb, var(--kh-scrim) 22%, transparent));
+    /* Gör ramen till behållare för position: fixed, så att det fasta stannar i kortet. */
+    contain: layout paint;
+  }
+}
+
+/*
  * Kort i rutnät, som Material 3:s fönsterklasser: en spalt i kompakt (under 600), annars så många spalter om
  * minst --kh-grid-min (300) som ryms. Korten står överst i sin rad och behåller sin egen höjd.
  */

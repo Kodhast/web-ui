@@ -669,6 +669,41 @@ test('sidan: .kh-page har marginalen --kh-space-l, och mer när spalten är smal
   assert.equal((await box('#pb')).left - (await box('#b')).left, tokens.spacing.l);
 });
 
+test('ramen: från 840 ett kort 600 brett med skugga, rullningen och det fasta i kortet; smalare som telefonen', async () => {
+  const url = pathToFileURL(join(root, 'gallery', 'ram.html')).href;
+  const wide = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const narrow = await browser.newPage({ viewport: { width: 440, height: 900 } });
+  try {
+    await wide.goto(`${url}?tema=ljust`);
+    const rect = (p, selector) => p.evaluate((selector) => document.querySelector(selector).getBoundingClientRect().toJSON(), selector);
+    const css = (p, selector, prop) => p.evaluate(({ selector, prop }) => getComputedStyle(document.querySelector(selector)).getPropertyValue(prop), { selector, prop });
+    const frame = await rect(wide, '#ram');
+    assert.deepEqual([frame.left, frame.top, frame.width, frame.height], [340, tokens.spacing.xxl, 600, 800 - 2 * tokens.spacing.xxl]);
+    assert.equal(await css(wide, '#ram', 'border-top-left-radius'), `${tokens.radius.menu}px`);
+    assert.notEqual(await css(wide, '#ram', 'box-shadow'), 'none');
+    assert.notEqual(await css(wide, 'body', 'background-color'), await css(wide, '#ram', 'background-color'), 'bakgrunden runt kortet skiljer sig från appens');
+    const bar = await rect(wide, '#flikar');
+    assert.ok(bar.left >= frame.left && bar.right <= frame.right, 'flikraden inom kortets bredd');
+    assert.equal(bar.bottom, frame.bottom - tokens.spacing.l, 'flikraden vid kortets underkant');
+    const height = () => wide.evaluate(() => document.querySelector('kh-header').getBoundingClientRect().height);
+    assert.equal(await height(), 144);
+    await wide.evaluate(() => { document.getElementById('ram').scrollTop = 400; });
+    await wide.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    assert.equal(await height(), 64, 'sidhuvudet krymper när kortet rullas');
+    assert.equal(await wide.evaluate(() => scrollY), 0, 'sidan själv rullar inte');
+
+    await narrow.goto(`${url}?tema=ljust`);
+    const small = await rect(narrow, '#ram');
+    assert.deepEqual([small.left, small.top, small.width], [0, 0, 440]);
+    assert.equal(await css(narrow, '#ram', 'box-shadow'), 'none');
+    assert.equal(await css(narrow, '#ram', 'overflow-y'), 'visible');
+    assert.equal((await rect(narrow, '#flikar')).bottom, 900 - tokens.spacing.l, 'flikraden vid fönstrets underkant som förut');
+  } finally {
+    await wide.close();
+    await narrow.close();
+  }
+});
+
 test('kortrutnät: en spalt under 600, annars så många spalter om minst 300 som ryms', async () => {
   const columns = () => page.evaluate(() => getComputedStyle(document.getElementById('g')).gridTemplateColumns.split(' ').length);
   const GRID = (width, min = '') => `<div style="inline-size: ${width}px"><div class="kh-grid" id="g" style="${min}">${'<div class="kh-card">x</div>'.repeat(5)}</div></div>`;
