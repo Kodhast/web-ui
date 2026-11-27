@@ -1045,8 +1045,10 @@ body:has(kh-toolbar.kh-toolbar--fixed) .kh-snackbar-host {
 .kh-avatar__circle > * { grid-area: 1 / 1; }
 .kh-avatar__circle > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
 .kh-avatar__circle > svg { inline-size: var(--kh-icon-standard); block-size: var(--kh-icon-standard); fill: currentColor; }
-/* Ansluten: pluppen nere till höger med en ring i ytan avataren står på. */
-.kh-avatar--online::before {
+/* Inloggad: ansluten en grön plupp nere till höger, utan anslutning en grå ihålig ring på samma plats (formen
+   skiljer lägena, inte bara färgen); båda med en ring i ytan avataren står på. Utloggad: ingen av klasserna. */
+.kh-avatar--online::before,
+.kh-avatar--offline::before {
   content: '';
   position: absolute;
   inset-block-end: 6px;
@@ -1059,6 +1061,10 @@ body:has(kh-toolbar.kh-toolbar--fixed) .kh-snackbar-host {
   border-radius: var(--kh-radius-pill);
   /* Samma gröna i alla appar, inte appens färg (android-ui 5.0.0, OnlineColor); väljer efter appens color-scheme. */
   background: light-dark(var(--kh-color-online-light), var(--kh-color-online-dark));
+}
+.kh-avatar--offline::before {
+  background: var(--kh-avatar-ring, var(--kh-background));
+  box-shadow: inset 0 0 0 2px var(--kh-outline);
 }
 
 /* ---------- Ikonknapp (AppIconButton) ---------- */
