@@ -29,4 +29,6 @@
   --kh-header-collapsed: 64px;
   --kh-header-app-icon: 40px;
   --kh-header-collapsed-app-icon: 32px;
+  --kh-color-online-light: #1E8E3E;
+  --kh-color-online-dark: #6DD58C;
 }

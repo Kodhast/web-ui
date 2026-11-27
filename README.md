@@ -15,7 +15,7 @@ Roborazzi-bilderna i `android-ui/ui-components/src/test/screenshots`.
 
 | Lager | Fil | Vad |
 |---|---|---|
-| 1. Tal | `src/tokens.css` | Hörn, avstånd, ikonstorlekar, spår, tryckskalning, sidhuvudets höjder – genererad ur `tokens.json`, som är android-ui:s fil (ett test där håller den sann mot temat). |
+| 1. Tal | `src/tokens.css` | Hörn, avstånd, ikonstorlekar, spår, tryckskalning, sidhuvudets höjder och pluppens gröna (bibliotekets enda färg) – genererad ur `tokens.json`, som är android-ui:s fil (ett test där håller den sann mot temat). |
 | 2. Utseende | `src/kh.css` | Klasserna `kh-*` nedan. Ingen shadow DOM: appen når allt. Ingen färg står i filen. |
 | 3. Beteende | `src/kh.js` | Sidhuvudet som krymper, flikraden med huvudknappens meny, prickarna, dra-ned, segmentvalet, tidsväljarens rullhjul och stegaren som egna element utan shadow DOM. Ett skript utan beroenden och utan export. |
 | 4. Appen | appens egen CSS | Färgerna, typsnitten, textstorlekarna och djupets färger – motsvarar `AppTheme`. |
@@ -62,7 +62,7 @@ standardvärden – en app som saknar en färg ser det direkt. Galleriets testte
 | `--kh-inverse-surface`, `--kh-inverse-on-surface`, `--kh-inverse-primary` | meddelandet |
 | `--kh-scrim` | bakom dialog och ark |
 | `--kh-blur` (standard `1`; `0` = av) | `AppTheme(blur = AppBlur())` / `blur = null`: oskärpan bakom dialog och ark och under sidhuvudet |
-| `--kh-card`, `--kh-row-tint`, `--kh-online` (standard primary) | `ExtendedColors.card`, `.rowTint`, `.online` |
+| `--kh-card`, `--kh-row-tint` | `ExtendedColors.card`, `.rowTint` |
 | `--kh-toolbar`, `--kh-on-toolbar` | `ExtendedColors.toolbar`, `.onToolbar` (flikraden) |
 | `--kh-surface-container-high` (valfri, standard `--kh-card`) | dra-ned-prickarnas behållare |
 | `--kh-font-body`, `--kh-font-heading` | appens typsnitt |
@@ -110,7 +110,7 @@ Varje del finns i galleriet med skärmdump ljust och mörkt och ett beteendeprov
 | `kh-sheet` med `__title`, `__subtitle`, `__footer` | `AppBottomSheet` | `<dialog>` med `showModal()` |
 | `kh-snackbar-host` + `kh-snackbar` med `__text`, `__action` | `AppSnackbarHost` | står ovanför `kh-toolbar--fixed` när sidan har en |
 | `kh-empty` med `__message`, `__tile`, `__texts`, `__title`, `__text`, `__actions`, `__note` | `EmptyState` | `--error`, `--compact`, `--fullscreen` |
-| `kh-avatar` med `__circle` | `AccountAvatar` | `--online`, klickbar som `button` |
+| `kh-avatar` med `__circle` | `AccountAvatar` | `--online` (pluppen i samma gröna i alla appar, `--kh-color-online-light`/`-dark` ur tokens.json, efter appens `color-scheme`), klickbar som `button` |
 | `kh-text-*`, `kh-icon`, `kh-icon--*`, `kh-app`, `kh-inactive` | `AppTypography`, `IconSize`, `INACTIVE_ALPHA` | – |
 | `kh-menu` med `__item` (`<div popover>`) | `AppMenuPopup` | `__item--destructive`, ikon som `svg`. En knapp med `popovertarget` öppnar den förankrad under sig, linjerad med högerkanten (ovanför när det inte ryms); `kh.js` förankrar vid trycket, sätter `aria-expanded` och stänger menyn vid ett val. En app som själv anropar `togglePopover()` (t.ex. en knapp i en länk, med `preventDefault`) får samma förankring. |
 | `kh-grid` | – (bara webben) | Kort i rutnät: en spalt under 600 (Material 3:s kompakta fönster), annars så många spalter om minst `--kh-grid-min` (300) som ryms |
@@ -197,6 +197,7 @@ taggas `main` med `v<version>`: Actions → Tagga → Run workflow på `main` (`
 
 | Version | Ändring |
 |---|---|
+| 3.0.0 | **Brytande:** variabeln `--kh-online` är borttagen. Pluppen på `kh-avatar--online` är samma gröna i alla appar (android-ui 5.0.0, `OnlineColor`): `--kh-color-online-light` #1E8E3E och `--kh-color-online-dark` #6DD58C ur tokens.json, vald med `light-dark()` efter appens `color-scheme` (Mats 2026-11-27). Ingen app satte `--kh-online`. Omtagna skärmdumpar med avataren |
 | 2.3.0 | Dra för att ändra ordning, `kh-reorder` (#23, bara webben): handtag, platsen som lämnas, linjen där raden hamnar och den lyfta raden; med djup djupets skugga. Skärmdumpar `Webb_dra_ordning` och `Webb_dra_ordning_djup` |
 | 2.2.0 | Periodväljaren `kh-period` (#22, bara webben, ur Tidrapportens mockup): pilar och en etikett med kalenderikon i radtonens spår; med djup sänkt spår och lyft etikett. Skärmdumpar `Webb_periodvaljare` och `Webb_periodvaljare_djup` |
 | 2.1.0 | Sidhuvudet utan `kh.js` (#24): ett odefinierat `<kh-header>` krymper från 144 till 64 med ren CSS – en rullningsdriven animering för `--kh-header-f` (nu registrerad med `@property`), rubrikens stil som animering mellan `screen-title` och `section-title`, undertiteln och versionen förankrade med `anchor()`, upphöjt efter ihopfällningen. Ny variabel `--kh-header-trailing-size` (standard `48px`) gäller bara utan `kh.js`. Med `kh.js` oförändrat. Nya skärmdumpar på galleriets sida `utan-kh-js.html`: `AppHeader_css_vila`, `AppHeader_css_halvvags`, `AppHeader_css_ihopfalld`, `AppHeader_css_synkar` |

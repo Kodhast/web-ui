@@ -16,13 +16,18 @@ const PREFIX = {
   radius: 'radius',
   track: 'track',
   depth: 'depth',
-  header: 'header'
+  header: 'header',
+  color: 'color'
 };
 
 const kebab = (name) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 
-/** Ett värde i dp (= CSS-px), "full" (helt rundad), en lista med hörn eller ett rent tal (skala). */
+/** Ett värde i dp (= CSS-px), "full" (helt rundad), en lista med hörn, ett rent tal (skala) eller en färg (#RRGGBB). */
 export function cssValue(group, value) {
+  if (group === 'color') {
+    if (typeof value !== 'string' || !/^#[0-9A-F]{6}$/i.test(value)) throw new Error(`Okänd färg i color: ${JSON.stringify(value)}`);
+    return value;
+  }
   if (value === 'full') return '9999px';
   if (Array.isArray(value)) return value.map((v) => cssValue(group, v)).join(' ');
   if (typeof value !== 'number') throw new Error(`Okänt värde i ${group}: ${JSON.stringify(value)}`);
